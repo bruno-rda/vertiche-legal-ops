@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/* ─── Vertiche Design Tokens ─── */
+@theme {
+  /* Colors — Editorial Executive palette */
+  --color-surface: #F7F7F5;
+  --color-surface-card: #FFFFFF;
+  --color-border: #E5E5E0;
+  --color-border-strong: #D1D1CB;
+
+  --color-text-primary: #111111;
+  --color-text-secondary: #6B6B66;
+  --color-text-muted: #9C9C96;
+
+  --color-accent: #111111;
+  --color-accent-hover: #2A2A2A;
+
+  /* Semantic — Status colors */
+  --color-success: #2D6A4F;
+  --color-success-light: #D8F3DC;
+  --color-success-muted: #40916C;
+
+  --color-warning: #B45309;
+  --color-warning-light: #FEF3C7;
+  --color-warning-muted: #D97706;
+
+  --color-danger: #8B1A1A;
+  --color-danger-light: #FEE2E2;
+  --color-danger-muted: #B91C1C;
+
+  --color-info: #6B6B66;
+  --color-info-light: #F3F4F6;
+
+  --color-neutral: #9C9C96;
+  --color-neutral-light: #F0F0EC;
+
+  --color-blue: #2563EB;
+  --color-blue-light: #DBEAFE;
+
+  /* Spacing */
+  --spacing-page: 2rem;
+  --spacing-section: 1.5rem;
+  --spacing-card: 1.25rem;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+  --shadow-card-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* Font families */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Sidebar */
+  --sidebar-width: 220px;
+  --sidebar-collapsed-width: 64px;
+  --header-height: 56px;
+}
+
+/* ─── Google Fonts ─── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── Global Styles ─── */
+html {
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* ─── Utility Classes ─── */
+@utility font-display {
+  font-family: var(--font-display);
+}
+
+@utility font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Skeleton shimmer animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@utility animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+  background: linear-gradient(90deg, var(--color-neutral-light) 25%, var(--color-border) 50%, var(--color-neutral-light) 75%);
+  background-size: 200% 100%;
+}
+
+/* Toast slide-in */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@utility animate-slide-in {
+  animation: slide-in-right 0.2s ease-out;
+}
