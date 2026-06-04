@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '@/api/client';
 import type { Documento, PaginatedResponse } from '@/types';
 import { Badge } from '@/components/Badge';
@@ -10,6 +10,7 @@ import { formatDate } from '@/lib/utils';
 import { Download, ChevronDown, AlertTriangle } from 'lucide-react';
 
 export function DocumentosPage() {
+  const navigate = useNavigate();
   const [sp, setSp] = useSearchParams();
   const page = parseInt(sp.get('page') || '1');
   const estadoOcr = sp.get('estado_ocr') || '';
@@ -72,7 +73,7 @@ export function DocumentosPage() {
                   ))}
                 </tr></thead>
                 <tbody>{data.data.map(d => (
-                  <tr key={d.id} className="border-b border-border last:border-b-0 hover:bg-surface/60 transition-colors">
+                  <tr key={d.id} onClick={() => navigate(`/tiendas/${d.tienda_id}?tab=documentos`)} className="border-b border-border last:border-b-0 hover:bg-surface/60 transition-colors cursor-pointer">
                     <td className="px-4 py-3.5">
                       <p className="text-sm font-medium text-text-primary truncate max-w-[200px]">{d.nombre_archivo}</p>
                     </td>
@@ -80,7 +81,7 @@ export function DocumentosPage() {
                     <td className="px-4 py-3.5"><Badge variant={d.estado_ocr} size="sm" /></td>
                     <td className="px-4 py-3.5 text-sm text-text-secondary">{d.cargado_por_nombre}</td>
                     <td className="px-4 py-3.5 text-sm text-text-muted">{formatDate(d.cargado_en)}</td>
-                    <td className="px-4 py-3.5">
+                    <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2">
                         <button className="p-1.5 hover:bg-neutral-light rounded-md transition-colors" title="Descargar">
                           <Download className="w-4 h-4 text-text-secondary" />
