@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { api } from '@/api/client';
 import type { Tienda, Expediente, Alerta, Documento, HistorialItem } from '@/types';
 import { Badge } from '@/components/Badge';
@@ -8,18 +7,28 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Skeleton } from '@/components/Skeleton';
 import { EmptyState } from '@/components/EmptyState';
-import { formatDate, daysRemaining, timeAgo } from '@/lib/utils';
+import { formatDate, timeAgo } from '@/lib/utils';
 import {
   MapPin, Tag, Download, FileText, AlertTriangle,
-  Upload, ChevronRight, History, Bell, FolderOpen,
+  Upload, History, Bell, FolderOpen,
 } from 'lucide-react';
+import { ExpedienteTab } from './components/ExpedienteTab';
+import { TramitesLinks } from '@/components/TramitesLinks';
 
 type Tab = 'expediente' | 'documentos' | 'alertas' | 'historial';
 
 export function TiendaDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<Tab>('expediente');
+  const [sp, setSp] = useSearchParams();
+  const activeTab = (sp.get('tab') as Tab) || 'expediente';
+
+  const setActiveTab = (tab: Tab) => {
+    setSp(prev => {
+      const next = new URLSearchParams(prev);
+      next.set('tab', tab);
+      return next;
+    });
+  };
 
   const { data: tienda, isLoading } = useQuery({
     queryKey: ['tienda', id],
@@ -89,9 +98,8 @@ export function TiendaDetailPage() {
       <div className="border-b border-border flex gap-0 overflow-x-auto">
         {tabs.map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-              activeTab === tab.key ? 'border-accent text-text-primary' : 'border-transparent text-text-secondary hover:text-text-primary'
-            }`}>
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.key ? 'border-accent text-text-primary' : 'border-transparent text-text-secondary hover:text-text-primary'
+              }`}>
             <tab.icon className="w-4 h-4" />{tab.label}
             {tab.count !== undefined && tab.count > 0 && (
               <span className="ml-1 bg-neutral-light text-text-secondary text-xs px-1.5 py-0.5 rounded-full">{tab.count}</span>
@@ -102,29 +110,7 @@ export function TiendaDetailPage() {
 
       {/* Tab Content */}
       {activeTab === 'expediente' && expediente && (
-        <div className="space-y-2">
-          {expediente.tramites.length === 0 ? <EmptyState variant="no-data" title="Sin trámites" description="Esta tienda no tiene trámites registrados." /> :
-            expediente.tramites.map(t => {
-              const days = daysRemaining(t.fecha_vencimiento);
-              return (
-                <div key={t.id} onClick={() => navigate(`/tiendas/${id}/tramites/${t.id}`)}
-                  className="bg-surface-card border border-border rounded-lg px-5 py-4 flex items-center gap-4 hover:shadow-card-hover hover:border-border-strong cursor-pointer transition-all">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-text-primary">{t.nombre}</p>
-                    <p className="text-xs text-text-muted mt-0.5 capitalize">{t.tipo}</p>
-                  </div>
-                  <Badge variant={t.estado} size="sm" />
-                  <div className="text-right shrink-0">
-                    <p className="text-xs text-text-muted">{formatDate(t.fecha_vencimiento)}</p>
-                    <p className={`text-xs font-semibold ${days < 0 ? 'text-danger' : days <= 15 ? 'text-warning' : 'text-text-secondary'}`}>
-                      {days < 0 ? `${Math.abs(days)}d vencido` : days === 0 ? 'Vence hoy' : `${days}d restantes`}
-                    </p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-text-muted" />
-                </div>
-              );
-            })}
-        </div>
+        <ExpedienteTab expediente={expediente} tiendaId={id!} />
       )}
 
       {activeTab === 'documentos' && (
@@ -141,6 +127,13 @@ export function TiendaDetailPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-text-primary truncate">{d.nombre_archivo}</p>
                   <p className="text-xs text-text-muted mt-0.5">{d.cargado_por_nombre} · {formatDate(d.cargado_en)}</p>
+                  <div className="mt-1">
+                    <TramitesLinks
+                      tiendaId={id}
+                      tramiteIds={d.tramite_ids}
+                      tramiteNombres={d.tramite_nombres}
+                    />
+                  </div>
                 </div>
                 <Badge variant={d.estado_ocr} size="sm" />
                 {d.requiere_revision_manual && (
