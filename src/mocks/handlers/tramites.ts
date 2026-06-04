@@ -4,7 +4,7 @@ import { mockTiendas } from '../data/tiendas';
 
 export const tramitesHandlers = [
   // GET /api/tramites — global list with filters
-  http.get('*/api/tramites', ({ request }) => {
+  http.get('*/api/tramites', async ({ request }) => {
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const pageSize = parseInt(url.searchParams.get('page_size') || '25');
@@ -51,21 +51,32 @@ export const tramitesHandlers = [
     const total = filtered.length;
     const totalPages = Math.ceil(total / pageSize);
     const start = (page - 1) * pageSize;
-    const data = filtered.slice(start, start + pageSize);
+    let data = filtered.slice(start, start + pageSize);
+
+    // Inject up-to-date documents to accurately reflect associations
+    const { mockDocumentos } = await import('../data/documentos');
+    data = data.map((t) => ({
+      ...t,
+      documentos: mockDocumentos.filter((d) => d.tramite_ids.includes(t.id))
+    }));
 
     return HttpResponse.json({ data, total, page, page_size: pageSize, total_pages: totalPages });
   }),
 
   // GET /api/tramites/:id
-  http.get('*/api/tramites/:id', ({ params }) => {
+  http.get('*/api/tramites/:id', async ({ params }) => {
     const tramite = mockTramites.find((t) => t.id === params.id);
     if (!tramite) {
       return HttpResponse.json({ detail: 'Trámite no encontrado' }, { status: 404 });
     }
 
+    const { mockDocumentos } = await import('../data/documentos');
+    const upToDateDocs = mockDocumentos.filter((d) => d.tramite_ids.includes(tramite.id));
+
     // Enrich with mock observaciones and historial
     return HttpResponse.json({
       ...tramite,
+      documentos: upToDateDocs,
       observaciones: [
         {
           id: `obs-${tramite.id}-1`,

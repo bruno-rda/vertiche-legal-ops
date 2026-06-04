@@ -59,6 +59,7 @@ export type EstadoOCR = 'procesando' | 'completado' | 'baja_confianza' | 'error'
 export interface Documento {
   id: string;
   tramite_ids: string[];
+  tramite_nombres?: string[];
   nombre_archivo: string;
   url: string;
   estado_ocr: EstadoOCR;

@@ -31,19 +31,20 @@ function generateDocumentosForTramites(): Documento[] {
       const estadoOcr = ocrStates[Math.floor(Math.random() * ocrStates.length)];
       const docName = docNames[Math.floor(Math.random() * docNames.length)];
 
-      docs.push({
+      const newDoc: Documento = {
         id: `doc-${String(docCounter).padStart(4, '0')}`,
         tramite_ids: [tramite.id],
+        tramite_nombres: [tramite.nombre],
         nombre_archivo: `${tramite.tienda_id}_${docName}`,
         url: `https://api.vertiche.com/docs/${docCounter}/${docName}`,
         estado_ocr: estadoOcr,
         datos_extraidos: estadoOcr === 'completado' || estadoOcr === 'baja_confianza'
           ? {
-              fecha_vigencia: tramite.fecha_vencimiento,
-              numero_permiso: `PERM-${Math.floor(Math.random() * 90000) + 10000}`,
-              referencia_pago: `REF-${Math.floor(Math.random() * 900000) + 100000}`,
-              domicilio: `Av. Principal #${100 + docCounter}, Col. Centro`,
-            }
+            fecha_vigencia: tramite.fecha_vencimiento,
+            numero_permiso: `PERM-${Math.floor(Math.random() * 90000) + 10000}`,
+            referencia_pago: `REF-${Math.floor(Math.random() * 900000) + 100000}`,
+            domicilio: `Av. Principal #${100 + docCounter}, Col. Centro`,
+          }
           : undefined,
         requiere_revision_manual: estadoOcr === 'baja_confianza',
         cargado_por: Math.random() > 0.5 ? 'usr-001' : 'usr-002',
@@ -51,7 +52,10 @@ function generateDocumentosForTramites(): Documento[] {
         cargado_en: new Date(Date.now() - Math.floor(Math.random() * 60) * 86400000).toISOString(),
         tienda_id: tramite.tienda_id,
         tienda_nombre: tramite.tienda_nombre,
-      });
+      };
+      
+      docs.push(newDoc);
+      tramite.documentos.push(newDoc);
     }
   });
 
