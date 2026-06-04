@@ -30,3 +30,6 @@ The tramites handler's geographic state filter needs to cross-reference tiendas 
 
 ### 2026-05-14 — Sidebar alert count polling every 60 seconds
 Docs specify 60s polling or WebSocket. Implementing polling via React Query's `refetchInterval` for simplicity. WebSocket can be added later without UI changes.
+
+### 2026-06-04 — Documentos global table routes to Tienda detail
+Instead of trying to squeeze too much information (like associated trámites) into the global Documentos page table, clicking a row navigates to the specific Tienda's detail page (`/tiendas/:id?tab=documentos`). This keeps the global view uncluttered and routes users to the most contextual place for managing that document's linkages and actions.

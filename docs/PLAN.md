@@ -42,21 +42,15 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
   - **Components:** DocumentosPage (global list with filters)
   - **Mock handlers:** documentos list, upload
 
+- **Iteration 8 — Trámites refinement ✅**
+  - Make mocked tramites have associated documents
+  - Tramite detail page: documents section
+  - Link tramites asociados in documentos tab and global page
+  - Separate expediente into two collapsible sections
+
 ---
 
 ## 3. Backlog
-- Separate expediente into two collapsible sections
-
-In the Expediente tab of the tienda detail page, split the tramites list into two collapsible sections: "Trámites activos" and "Trámites vencidos". Trámites activos includes everything that is not in `vencido` state. Trámites vencidos includes only `vencido` state. The "Trámites vencidos" section should be collapsed by default and show a count in the header (e.g. "Trámites vencidos (3)"). The "Trámites activos" section should be expanded by default. Each section header should be clickable to toggle collapse/expand with a smooth animation.
-
-- Make mocked tramites have associated documents
-
-Update the MSW mock data so that tramites have documents associated to them. At least 60% of tramites should have one or more documents. Include variety: some tramites with one document, some with two or three, some with none. The documents associated to each tramite should also appear in the tienda's documentos tab. This is needed so that the documents section in the tramite detail page and the documentos tab in tienda detail are testable with realistic data.
-
-- Tramite detail page: documents section
-
-Add a documents section to the tramite detail page, below the OCR data section. This section shows all documents currently associated to this tramite. Each document row shows: descriptive name, OCR status badge, upload date, uploaded by, a PDF preview button (opens the in-app PDF viewer), and a download button. Below the list, provide two actions: "Asociar documento existente" (opens a modal that lists all documents in the tienda's expediente that are not yet associated to this tramite, selectable and confirmable) and "Cargar nuevo documento" (inline file input, no modal, just a file picker that triggers upload and associates the document to this tramite automatically upon completion). The upload flow should show a progress indicator inline in the section, not a toast. Once uploaded, the new document appears in the list with OCR status `procesando` and updates automatically via polling.
-
 - Document upload modal (drag & drop) in tienda detail — Documentos tab
 
 Replace or enhance the existing upload trigger in the Documentos tab of the tienda detail page with a proper upload modal. The modal should have: a drag-and-drop zone that also accepts click-to-browse, accepts PDF files only (show a clear error if another format is dropped), a file name field that is pre-filled with the filename but editable (this becomes the descriptive name of the document, not just the raw filename), a multi-select of tramites from the current tienda's expediente to associate the document to (required, at least one must be selected), a real upload progress bar that reflects actual upload progress (not a fake timer), and a cancel button that aborts the upload if in progress. After successful upload the modal closes, a success toast appears, and the new document appears in the list with OCR status `procesando`.
@@ -88,10 +82,6 @@ Add the following filters to the tramites global page, in addition to what alrea
 - Allow column sorting in all tables
 
 All data tables in the application (tiendas list, tramites global, documentos global, alertas) should support ascending and descending sort by clicking column headers. Sortable columns should have a visual indicator (chevron icon) that shows current sort direction. Clicking the same column header again reverses the direction. Clicking a different header resets to ascending for that column. Sort state should be maintained when the user navigates back to the page within the same session. Sorting is done client-side for tables with full data loaded, and passed as query params to the backend for paginated tables.
-
-- Link tramites asociados in documentos tab and global page
-
-In the Documentos tab of the tienda detail page, each document row should show the tramites it is associated to as clickable links. Clicking a tramite link navigates to that tramite's detail page. In the documentos global page table, add a "Trámites asociados" column that shows the same clickable links. If a document has more than two associated tramites, show the first two and a "+N más" label that expands inline on click.
 
 - Allow alert silencing from Alertas tab in tienda detail
 
