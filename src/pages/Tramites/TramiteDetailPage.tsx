@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { formatDate, daysRemaining } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
 import { Calendar, RotateCcw, User, AlertTriangle, FileText, Clock } from 'lucide-react';
+import { DocumentosSection } from './components/DocumentosSection';
 
 export function TramiteDetailPage() {
   const { id, tramiteId } = useParams<{ id: string; tramiteId: string }>();
@@ -79,6 +80,11 @@ export function TramiteDetailPage() {
             ))}
           </div>
         </div>
+      )}
+
+      {/* Documentos */}
+      {tramiteId && tramite.tienda_id && (
+        <DocumentosSection tramiteId={tramiteId} tiendaId={tramite.tienda_id} />
       )}
 
       {/* Historial */}
