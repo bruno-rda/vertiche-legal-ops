@@ -55,15 +55,6 @@ src/
 ├── api/
 │   └── client.ts           # Typed fetch wrapper; auth interceptors live here
 ├── components/             # Shared, stateless UI primitives (no API calls)
-│   ├── Badge.tsx
-│   ├── Breadcrumbs.tsx
-│   ├── EmptyState.tsx
-│   ├── Modal.tsx
-│   ├── Pagination.tsx
-│   ├── ProgressBar.tsx
-│   ├── SearchInput.tsx
-│   ├── Skeleton.tsx
-│   └── Toast.tsx
 ├── layouts/
 │   ├── AppLayout.tsx       # Authenticated shell: sidebar + header
 │   └── AuthLayout.tsx      # Unauthenticated shell: centered card
@@ -75,12 +66,6 @@ src/
 │   ├── data/               # In-memory mock datasets (source of truth for dev)
 │   └── handlers/           # MSW route handlers per domain
 ├── pages/                  # Route-level components, one folder per feature
-│   ├── Alertas/
-│   ├── Dashboard/
-│   ├── Documentos/
-│   ├── Login/
-│   ├── Tiendas/
-│   └── Tramites/
 ├── stores/
 │   ├── authStore.ts        # Auth state (user, token, isAuthenticated)
 │   └── uiStore.ts          # UI state (sidebar collapse, toast queue)
@@ -257,20 +242,7 @@ Route structure:
 
 ---
 
-## 11. Domain Business Rules
-
-These rules from the product docs must be enforced in the UI:
-
-- **Alert silence**: Only silenceable via the `POST /api/alertas/:id/silenciar` endpoint. The UI must offer duration options (7, 15, 30, 60 days). Handled by the `AlertasPage` modal.
-- **Alert → Trámite link**: Alerts with a `tramite_id` show a "Ir al trámite" button. Alerts without one (e.g., OCR/inconsistency alerts) do not. This is intentional behavior, not a bug.
-- **Compliance color thresholds**: ≥85% = green, 60–84% = amber, <60% = red. Used in `ProgressBar` and any inline percentage display.
-- **Days remaining**: Negative = overdue (shown in red with "X días vencido"). Zero = "Vence hoy". Positive = days remaining.
-- **Trámite type**: `federal` | `estatal` | `municipal` — always displayed capitalized in the UI.
-- **Role-based UI**: ADMIN-only actions (e.g., "Escalar a alerta") must be gated with `user?.rol === 'ADMIN'`. VIEWER users should not see mutation-triggering buttons.
-
----
-
-## 12. TypeScript Rules
+## 11. TypeScript Rules
 
 - **Strict mode is on.** `noImplicitAny`, `strictNullChecks`, and all strict flags apply.
 - Never use `any`. Use `unknown` for untyped external data, then narrow.
@@ -281,7 +253,7 @@ These rules from the product docs must be enforced in the UI:
 
 ---
 
-## 13. Verification Checklist
+## 12. Verification Checklist
 
 Before considering any change done, verify:
 
@@ -298,7 +270,7 @@ Before considering any change done, verify:
 
 ---
 
-## 14. What Not To Do
+## 13. What Not To Do
 
 - **Do not** call `window.location.reload()` as a primary error recovery mechanism — use React Query's `refetch`.
 - **Do not** store server-fetched data in Zustand.
