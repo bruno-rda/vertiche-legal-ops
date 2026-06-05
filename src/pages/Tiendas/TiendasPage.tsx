@@ -12,9 +12,9 @@ import { formatDate } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
 
 const ESTADOS = [
-  'Aguascalientes','Baja California','Chihuahua','Ciudad de México',
-  'Coahuila','Estado de México','Guanajuato','Jalisco','Nuevo León',
-  'Puebla','Querétaro','Sinaloa','Sonora','Veracruz','Yucatán',
+  'Aguascalientes', 'Baja California', 'Chihuahua', 'Ciudad de México',
+  'Coahuila', 'Estado de México', 'Guanajuato', 'Jalisco', 'Nuevo León',
+  'Puebla', 'Querétaro', 'Sinaloa', 'Sonora', 'Veracruz', 'Yucatán',
 ];
 
 export function TiendasPage() {
@@ -70,7 +70,7 @@ export function TiendasPage() {
           <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
         </div>
         <div className="relative">
-          <select value={`${sortBy}:${sortOrder}`} onChange={(e) => { const [sb,so]=e.target.value.split(':'); const p=new URLSearchParams(sp); p.set('sort_by',sb); p.set('sort_order',so); p.set('page','1'); setSp(p); }} className="appearance-none pl-3 pr-8 py-2 text-sm bg-surface-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer">
+          <select value={`${sortBy}:${sortOrder}`} onChange={(e) => { const [sb, so] = e.target.value.split(':'); const p = new URLSearchParams(sp); p.set('sort_by', sb); p.set('sort_order', so); p.set('page', '1'); setSp(p); }} className="appearance-none pl-3 pr-8 py-2 text-sm bg-surface-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer">
             <option value="nombre:asc">Nombre A-Z</option>
             <option value="nombre:desc">Nombre Z-A</option>
             <option value="cumplimiento:asc">Menor cumplimiento</option>
@@ -90,7 +90,7 @@ export function TiendasPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    {['Tienda','Estado','Municipio','Cumplimiento','Trámites','Actualización'].map(h => (
+                    {['Tienda', 'Estado', 'Municipio', 'Cumplimiento', 'Trámites', 'Actualización'].map(h => (
                       <th key={h} className="text-left text-xs font-semibold text-text-secondary uppercase tracking-wider px-4 py-3">{h}</th>
                     ))}
                   </tr>
@@ -106,7 +106,8 @@ export function TiendasPage() {
                         <div className="flex items-center gap-1.5">
                           {t.tramites_vencidos > 0 && <Badge variant="vencido" size="sm">{t.tramites_vencidos}</Badge>}
                           {t.tramites_por_vencer > 0 && <Badge variant="por_vencer" size="sm">{t.tramites_por_vencer}</Badge>}
-                          <span className="text-xs text-text-muted">/ {t.total_tramites}</span>
+                          {(t.tramites_vencidos > 0 || t.tramites_por_vencer > 0) && <span className="text-xs text-text-muted">/ </span>}
+                          <span className="text-xs text-text-muted">{t.total_tramites}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3.5 text-sm text-text-muted">{formatDate(t.ultima_actualizacion)}</td>

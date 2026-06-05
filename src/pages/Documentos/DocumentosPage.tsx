@@ -7,7 +7,14 @@ import { Pagination } from '@/components/Pagination';
 import { EmptyState } from '@/components/EmptyState';
 import { TableSkeleton } from '@/components/Skeleton';
 import { formatDate } from '@/lib/utils';
-import { Download, ChevronDown, AlertTriangle } from 'lucide-react';
+import { Download, ChevronDown, AlertTriangle, Eye } from 'lucide-react';
+import { useState } from 'react';
+import { useAuthStore } from '@/stores/authStore';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { Modal } from '@/components/Modal';
+import { PDFViewer } from '@/components/PDFViewer';
+import { OCRReviewModal } from '@/components/OCRReviewModal';
+import { InlineEdit } from '@/components/InlineEdit';
 
 export function DocumentosPage() {
   const navigate = useNavigate();
@@ -15,6 +22,20 @@ export function DocumentosPage() {
   const page = parseInt(sp.get('page') || '1');
   const estadoOcr = sp.get('estado_ocr') || '';
   const revision = sp.get('requiere_revision') || '';
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  const [documentToReview, setDocumentToReview] = useState<Documento | null>(null);
+  const [documentToView, setDocumentToView] = useState<Documento | null>(null);
+
+  const updateNameMutation = useMutation({
+    mutationFn: async ({ docId, newName }: { docId: string, newName: string }) => {
+      return api.post(`/documentos/${docId}/rename`, { nombre_archivo: newName });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['documentos'] });
+    }
+  });
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['documentos', page, estadoOcr, revision],
@@ -74,8 +95,12 @@ export function DocumentosPage() {
                 </tr></thead>
                 <tbody>{data.data.map(d => (
                   <tr key={d.id} onClick={() => navigate(`/tiendas/${d.tienda_id}?tab=documentos`)} className="border-b border-border last:border-b-0 hover:bg-surface/60 transition-colors cursor-pointer">
-                    <td className="px-4 py-3.5">
-                      <p className="text-sm font-medium text-text-primary truncate max-w-[200px]">{d.nombre_archivo}</p>
+                    <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
+                      <InlineEdit 
+                        value={d.nombre_archivo} 
+                        onSave={(newName) => updateNameMutation.mutate({ docId: d.id, newName })}
+                        className="text-sm font-medium text-text-primary w-fit max-w-[200px]"
+                      />
                     </td>
                     <td className="px-4 py-3.5 text-sm text-text-secondary">{d.tienda_nombre}</td>
                     <td className="px-4 py-3.5"><Badge variant={d.estado_ocr} size="sm" /></td>
@@ -86,10 +111,19 @@ export function DocumentosPage() {
                         <button className="p-1.5 hover:bg-neutral-light rounded-md transition-colors" title="Descargar">
                           <Download className="w-4 h-4 text-text-secondary" />
                         </button>
-                        {d.requiere_revision_manual && (
-                          <span className="flex items-center gap-1 text-xs text-warning font-medium">
+                        <button 
+                          onClick={() => setDocumentToView(d)}
+                          className="p-1.5 hover:bg-neutral-light rounded-md transition-colors" title="Ver PDF"
+                        >
+                          <Eye className="w-4 h-4 text-text-secondary" />
+                        </button>
+                        {d.requiere_revision_manual && user?.rol === 'ADMIN' && (
+                          <button 
+                            onClick={() => setDocumentToReview(d)}
+                            className="flex items-center gap-1 px-2 py-1 bg-warning-light text-warning-dark text-xs font-medium rounded-md hover:bg-warning/20 transition-colors"
+                          >
                             <AlertTriangle className="w-3.5 h-3.5" />Revisar
-                          </span>
+                          </button>
                         )}
                       </div>
                     </td>
@@ -103,6 +137,27 @@ export function DocumentosPage() {
           </>
         ) : <EmptyState variant="no-results" action={hasFilters ? { label: 'Limpiar filtros', onClick: clear } : undefined} />}
       </div>
+
+      {documentToReview && (
+        <OCRReviewModal
+          isOpen={!!documentToReview}
+          onClose={() => setDocumentToReview(null)}
+          documento={documentToReview}
+        />
+      )}
+
+      <Modal
+        isOpen={!!documentToView}
+        onClose={() => setDocumentToView(null)}
+        title="Ver Documento"
+        size="xl"
+      >
+        <div className="h-[75vh]">
+          {documentToView && (
+            <PDFViewer url={documentToView.url} title={documentToView.nombre_archivo} />
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }

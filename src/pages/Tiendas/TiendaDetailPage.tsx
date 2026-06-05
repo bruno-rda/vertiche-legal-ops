@@ -10,10 +10,18 @@ import { EmptyState } from '@/components/EmptyState';
 import { formatDate, timeAgo } from '@/lib/utils';
 import {
   MapPin, Tag, Download, FileText, AlertTriangle,
-  Upload, History, Bell, FolderOpen,
+  Upload, History, Bell, FolderOpen, Eye
 } from 'lucide-react';
 import { ExpedienteTab } from './components/ExpedienteTab';
 import { TramitesLinks } from '@/components/TramitesLinks';
+import { useState } from 'react';
+import { useAuthStore } from '@/stores/authStore';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { DocumentUploadModal } from './components/DocumentUploadModal';
+import { OCRReviewModal } from '@/components/OCRReviewModal';
+import { Modal } from '@/components/Modal';
+import { PDFViewer } from '@/components/PDFViewer';
+import { InlineEdit } from '@/components/InlineEdit';
 
 type Tab = 'expediente' | 'documentos' | 'alertas' | 'historial';
 
@@ -21,6 +29,21 @@ export function TiendaDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [sp, setSp] = useSearchParams();
   const activeTab = (sp.get('tab') as Tab) || 'expediente';
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [documentToReview, setDocumentToReview] = useState<Documento | null>(null);
+  const [documentToView, setDocumentToView] = useState<Documento | null>(null);
+
+  const updateNameMutation = useMutation({
+    mutationFn: async ({ docId, newName }: { docId: string, newName: string }) => {
+      return api.post(`/documentos/${docId}/rename`, { nombre_archivo: newName });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tienda', id, 'documentos'] });
+    }
+  });
 
   const setActiveTab = (tab: Tab) => {
     setSp(prev => {
@@ -116,16 +139,27 @@ export function TiendaDetailPage() {
       {activeTab === 'documentos' && (
         <div className="space-y-3">
           <div className="flex justify-end">
-            <button className="flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover transition-colors">
-              <Upload className="w-4 h-4" />Cargar documento
-            </button>
+            {(user?.rol === 'ADMIN' || user?.rol === 'OPERATOR') && (
+              <button 
+                onClick={() => setIsUploadOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover transition-colors"
+              >
+                <Upload className="w-4 h-4" />Cargar documento
+              </button>
+            )}
           </div>
           {!documentos || documentos.length === 0 ? <EmptyState variant="no-data" title="Sin documentos" description="No hay documentos cargados para esta tienda." /> :
             documentos.map(d => (
               <div key={d.id} className="bg-surface-card border border-border rounded-lg px-5 py-4 flex items-center gap-4">
                 <FileText className="w-5 h-5 text-text-muted shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-text-primary truncate">{d.nombre_archivo}</p>
+                  <div className="flex items-center gap-2">
+                    <InlineEdit 
+                      value={d.nombre_archivo} 
+                      onSave={(newName) => updateNameMutation.mutate({ docId: d.id, newName })}
+                      className="text-sm font-medium text-text-primary"
+                    />
+                  </div>
                   <p className="text-xs text-text-muted mt-0.5">{d.cargado_por_nombre} · {formatDate(d.cargado_en)}</p>
                   <div className="mt-1">
                     <TramitesLinks
@@ -136,10 +170,23 @@ export function TiendaDetailPage() {
                   </div>
                 </div>
                 <Badge variant={d.estado_ocr} size="sm" />
-                {d.requiere_revision_manual && (
-                  <span className="flex items-center gap-1 text-xs text-warning font-medium"><AlertTriangle className="w-3.5 h-3.5" />Revisar</span>
-                )}
-                <button className="p-1.5 hover:bg-neutral-light rounded-md transition-colors"><Download className="w-4 h-4 text-text-secondary" /></button>
+                <div className="flex items-center gap-1">
+                  {d.requiere_revision_manual && user?.rol === 'ADMIN' && (
+                    <button 
+                      onClick={() => setDocumentToReview(d)}
+                      className="flex items-center gap-1 px-2 py-1 bg-warning-light text-warning-dark text-xs font-medium rounded-md hover:bg-warning/20 transition-colors mr-1"
+                    >
+                      <AlertTriangle className="w-3.5 h-3.5" />Revisar
+                    </button>
+                  )}
+                  <button 
+                    onClick={() => setDocumentToView(d)}
+                    className="p-1.5 hover:bg-neutral-light rounded-md transition-colors" title="Ver PDF"
+                  >
+                    <Eye className="w-4 h-4 text-text-secondary" />
+                  </button>
+                  <button className="p-1.5 hover:bg-neutral-light rounded-md transition-colors" title="Descargar"><Download className="w-4 h-4 text-text-secondary" /></button>
+                </div>
               </div>
             ))}
         </div>
@@ -174,6 +221,37 @@ export function TiendaDetailPage() {
             </div>}
         </div>
       )}
+
+      {/* Modals */}
+      {id && expediente && (
+        <DocumentUploadModal
+          isOpen={isUploadOpen}
+          onClose={() => setIsUploadOpen(false)}
+          tiendaId={id}
+          tramites={expediente.tramites}
+        />
+      )}
+
+      {documentToReview && (
+        <OCRReviewModal
+          isOpen={!!documentToReview}
+          onClose={() => setDocumentToReview(null)}
+          documento={documentToReview}
+        />
+      )}
+
+      <Modal
+        isOpen={!!documentToView}
+        onClose={() => setDocumentToView(null)}
+        title="Ver Documento"
+        size="xl"
+      >
+        <div className="h-[75vh]">
+          {documentToView && (
+            <PDFViewer url={documentToView.url} title={documentToView.nombre_archivo} />
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }
