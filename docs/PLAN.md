@@ -5,7 +5,8 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
 ---
 
 ## 1. Current Sprint
-*(No active sprint items.)*
+
+*(No active tasks)*
 
 ---
 
@@ -48,25 +49,14 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
   - Link tramites asociados in documentos tab and global page
   - Separate expediente into two collapsible sections
 
+- **Iteration 9 — Document Upload & OCR Review ✅**
+  - **Components:** DocumentUploadModal, OCRReviewModal, PDFViewer, InlineEdit
+  - **Features:** Drag & drop upload, inline document renaming, side-by-side PDF viewer, manual OCR review with confidence highlights
+  - **Mock handlers:** extended `/documentos` with `rename`, `ocr-review`, and `upload` (in-memory)
+
 ---
 
 ## 3. Backlog
-- Document upload modal (drag & drop) in tienda detail — Documentos tab
-
-Replace or enhance the existing upload trigger in the Documentos tab of the tienda detail page with a proper upload modal. The modal should have: a drag-and-drop zone that also accepts click-to-browse, accepts PDF files only (show a clear error if another format is dropped), a file name field that is pre-filled with the filename but editable (this becomes the descriptive name of the document, not just the raw filename), a multi-select of tramites from the current tienda's expediente to associate the document to (required, at least one must be selected), a real upload progress bar that reflects actual upload progress (not a fake timer), and a cancel button that aborts the upload if in progress. After successful upload the modal closes, a success toast appears, and the new document appears in the list with OCR status `procesando`.
-
-- Allow document metadata editing (descriptive name and OCR-extracted fields)
-
-In every place where a document appears with an edit action (documentos tab in tienda, documentos global page, tramite detail documents section), allow editing two things. First, the descriptive name of the document (the user-facing name, not the original filename). This should be an inline edit: click the name, it becomes an input, press Enter or click outside to save. Second, the OCR-extracted fields (fecha de vigencia, número de permiso, referencia de pago, domicilio, and any other fields the backend returns). These are editable only by ADMIN. The edit UI for OCR fields should be the same modal already planned for OCR review (see "OCR review modal" item). When saving edits to OCR fields, if the field being edited is a date (fecha de vigencia), show a confirmation dialog before saving since it affects compliance calculations. All edits are recorded in the document's history and in the tienda's historial tab.
-
-- In-app PDF viewer
-
-Implement a reusable in-app PDF viewer that can be triggered from any document reference in the application. The viewer opens as a full-screen modal overlay. It should render the PDF using `react-pdf` (which uses PDF.js under the hood). The viewer should support: page navigation (previous/next with keyboard arrow support), zoom in/out, and a download button. While the PDF is loading, show a skeleton loader inside the modal. If the PDF fails to load, show an error state with a fallback download button. The viewer receives a URL (the signed URL from the document entity) and a title (the descriptive name of the document). This component is used in: the tramite detail documents section, the documentos tab in tienda detail, the documentos global page, and the OCR review modal.
-
-- OCR review modal with side-by-side PDF viewer
-
-When a document has `estado_ocr: 'baja_confianza'` or `requiere_revision_manual: true`, a "Revisar" button appears. Clicking it opens a large modal (90vw, 85vh) split into two panels. Left panel: the in-app PDF viewer (see PDF viewer item) showing the document. Right panel: a form with all OCR-extracted fields, each showing its extracted value and a confidence indicator. Fields with low confidence are visually highlighted (amber border or background). Each field is editable. At the bottom of the right panel: a "Guardar correcciones" button and a "Cancelar" button. On save, if any date field was modified, show a confirmation dialog ("Estás modificando una fecha de vigencia. Esta acción quedará registrada en el historial. ¿Confirmar?"). After saving successfully, the document's `requiere_revision_manual` flag is cleared, the OCR status updates to `completado`, and the modal closes with a success toast. This action is ADMIN only. The edit is recorded in historial.
-
 - Allow tramite detail editing (name, dates, permanency)
 
 On the tramite detail page, ADMIN users can edit the following fields: nombre del trámite, fecha de inicio, fecha de vencimiento, and whether the trámite is permanent. A permanent trámite has no expiration date, never generates vencimiento alerts, and displays a "Permanente" badge instead of a date. The edit UI should be an "Editar" button in the tramite detail header that toggles the fields into editable inputs inline (not a separate page or modal). Editing the fecha de vencimiento should show a confirmation dialog since it affects alert thresholds. Toggling a trámite to permanent should also confirm ("Este trámite no generará alertas de vencimiento. ¿Confirmar?"). All edits are recorded in the tramite's historial.

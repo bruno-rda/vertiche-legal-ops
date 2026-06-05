@@ -33,3 +33,6 @@ Docs specify 60s polling or WebSocket. Implementing polling via React Query's `r
 
 ### 2026-06-04 — Documentos global table routes to Tienda detail
 Instead of trying to squeeze too much information (like associated trámites) into the global Documentos page table, clicking a row navigates to the specific Tienda's detail page (`/tiendas/:id?tab=documentos`). This keeps the global view uncluttered and routes users to the most contextual place for managing that document's linkages and actions.
+
+### 2026-06-04 — Local Worker for react-pdf
+To avoid CORS issues and external CDN dependencies that might block rendering offline or in secure environments, the `react-pdf` worker is bundled locally using Vite's `?url` import strategy (`pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();`). This ensures reliable PDF parsing.
