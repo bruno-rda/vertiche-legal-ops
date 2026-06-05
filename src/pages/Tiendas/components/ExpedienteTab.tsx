@@ -6,6 +6,9 @@ import type { Tramite, Expediente } from '@/types';
 import { Badge } from '@/components/Badge';
 import { EmptyState } from '@/components/EmptyState';
 import { formatDate, daysRemaining } from '@/lib/utils';
+import { useAuthStore } from '@/stores/authStore';
+import { Plus } from 'lucide-react';
+import { NuevoTramiteModal } from './NuevoTramiteModal';
 
 interface ExpedienteTabProps {
   expediente: Expediente;
@@ -14,15 +17,31 @@ interface ExpedienteTabProps {
 
 export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const isAdmin = user?.rol === 'ADMIN';
+
   const [isActivosOpen, setIsActivosOpen] = useState(true);
   const [isVencidosOpen, setIsVencidosOpen] = useState(false);
-
-  if (expediente.tramites.length === 0) {
-    return <EmptyState variant="no-data" title="Sin trámites" description="Esta tienda no tiene trámites registrados." />;
-  }
+  const [isNuevoTramiteOpen, setIsNuevoTramiteOpen] = useState(false);
 
   const activos = expediente.tramites.filter(t => t.estado !== 'vencido');
   const vencidos = expediente.tramites.filter(t => t.estado === 'vencido');
+
+  const emptyStateContent = (
+    <div className="space-y-4">
+      <EmptyState variant="no-data" title="Sin trámites" description="Esta tienda no tiene trámites registrados." />
+      {isAdmin && (
+        <div className="flex justify-center">
+          <button
+            onClick={() => setIsNuevoTramiteOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover transition-colors"
+          >
+            <Plus className="w-4 h-4" />Nuevo trámite
+          </button>
+        </div>
+      )}
+    </div>
+  );
 
   const renderTramite = (t: Tramite) => {
     const days = daysRemaining(t.fecha_vencimiento);
@@ -45,8 +64,33 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
     );
   };
 
+  if (expediente.tramites.length === 0) {
+    return (
+      <>
+        {emptyStateContent}
+        {isNuevoTramiteOpen && (
+          <NuevoTramiteModal
+            isOpen={isNuevoTramiteOpen}
+            onClose={() => setIsNuevoTramiteOpen(false)}
+            tiendaId={tiendaId}
+          />
+        )}
+      </>
+    );
+  }
+
   return (
     <div className="space-y-4">
+      {isAdmin && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => setIsNuevoTramiteOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover transition-colors"
+          >
+            <Plus className="w-4 h-4" />Nuevo trámite
+          </button>
+        </div>
+      )}
       {/* Activos */}
       {activos.length > 0 && (
         <div className="border border-border rounded-xl overflow-hidden bg-surface">
@@ -101,6 +145,14 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
             )}
           </AnimatePresence>
         </div>
+      )}
+
+      {isNuevoTramiteOpen && (
+        <NuevoTramiteModal
+          isOpen={isNuevoTramiteOpen}
+          onClose={() => setIsNuevoTramiteOpen(false)}
+          tiendaId={tiendaId}
+        />
       )}
     </div>
   );

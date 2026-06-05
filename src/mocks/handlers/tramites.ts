@@ -109,4 +109,50 @@ export const tramitesHandlers = [
       ],
     });
   }),
+
+  // PUT /api/tramites/:id
+  http.put('*/api/tramites/:id', async ({ request, params }) => {
+    const tramiteIndex = mockTramites.findIndex((t) => t.id === params.id);
+    if (tramiteIndex === -1) {
+      return HttpResponse.json({ detail: 'Trámite no encontrado' }, { status: 404 });
+    }
+
+    const updates = await request.json() as any;
+    const tramite = mockTramites[tramiteIndex];
+    
+    // Update fields
+    if (updates.nombre !== undefined) tramite.nombre = updates.nombre;
+    if (updates.fecha_inicio !== undefined) tramite.fecha_inicio = updates.fecha_inicio;
+    if (updates.fecha_vencimiento !== undefined) tramite.fecha_vencimiento = updates.fecha_vencimiento;
+    if (updates.es_permanente !== undefined) {
+      tramite.es_permanente = updates.es_permanente;
+      if (tramite.es_permanente) {
+        tramite.fecha_vencimiento = '';
+        tramite.estado = 'vigente'; // Permanente doesn't expire
+      }
+    }
+
+    // Calculate new status if not permanente
+    if (!tramite.es_permanente && tramite.fecha_vencimiento) {
+      const days = Math.ceil((new Date(tramite.fecha_vencimiento).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
+      if (days < 0) tramite.estado = 'vencido';
+      else if (days <= 15) tramite.estado = 'por_vencer';
+      else if (tramite.estado === 'vencido' || tramite.estado === 'por_vencer') tramite.estado = 'vigente';
+    }
+
+    // In a real app we'd add to historial here
+    if (!tramite.historial) tramite.historial = [];
+    tramite.historial.unshift({
+      id: `hist-${tramite.id}-${Date.now()}`,
+      entidad_tipo: 'tramite',
+      entidad_id: tramite.id,
+      accion: 'tramite_actualizado',
+      usuario_id: 'usr-admin',
+      usuario_nombre: 'Admin User',
+      fecha: new Date().toISOString(),
+      detalle: 'Detalles del trámite actualizados',
+    });
+
+    return HttpResponse.json(tramite);
+  }),
 ];
