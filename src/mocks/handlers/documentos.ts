@@ -87,4 +87,65 @@ export const documentosHandlers = [
       cargado_en: new Date().toISOString(),
     });
   }),
+
+  http.post('*/api/documentos/:id/rename', async ({ params, request }) => {
+    const docIndex = mockDocumentos.findIndex((d) => d.id === params.id);
+    if (docIndex === -1) {
+      return HttpResponse.json({ detail: 'Documento no encontrado' }, { status: 404 });
+    }
+    const { nombre_archivo } = await request.json() as any;
+    mockDocumentos[docIndex].nombre_archivo = nombre_archivo;
+    return HttpResponse.json(mockDocumentos[docIndex]);
+  }),
+
+  http.post('*/api/documentos/:id/ocr-review', async ({ params, request }) => {
+    const docIndex = mockDocumentos.findIndex((d) => d.id === params.id);
+    if (docIndex === -1) {
+      return HttpResponse.json({ detail: 'Documento no encontrado' }, { status: 404 });
+    }
+    const { datos_extraidos } = await request.json() as any;
+    
+    // Update the values and set confidence to 100 since it was manually reviewed
+    const updatedFields: any = {};
+    for (const [key, value] of Object.entries(datos_extraidos)) {
+      updatedFields[key] = { value, confidence: 100 };
+    }
+
+    mockDocumentos[docIndex].datos_extraidos = {
+      ...mockDocumentos[docIndex].datos_extraidos,
+      ...updatedFields
+    };
+    mockDocumentos[docIndex].estado_ocr = 'completado';
+    mockDocumentos[docIndex].requiere_revision_manual = false;
+    
+    return HttpResponse.json(mockDocumentos[docIndex]);
+  }),
+
+  http.post('*/api/tiendas/:id/documentos', async ({ params, request }) => {
+    const { fileName, tramiteIds } = await request.json() as any;
+    
+    // Auto-populate tramite_nombres
+    const { mockTramites } = await import('../data/tramites');
+    const tramiteNombres = tramiteIds.map((id: string) => {
+      const t = mockTramites.find(t => t.id === id);
+      return t ? t.nombre : 'Trámite';
+    });
+
+    const newDoc: any = {
+      id: `doc-new-${Date.now()}`,
+      tramite_ids: tramiteIds,
+      tramite_nombres: tramiteNombres,
+      nombre_archivo: fileName || 'nuevo_documento.pdf',
+      url: 'https://api.vertiche.com/docs/new/documento.pdf',
+      estado_ocr: 'procesando',
+      requiere_revision_manual: false,
+      cargado_por: 'usr-001',
+      cargado_por_nombre: 'Ana García López',
+      cargado_en: new Date().toISOString(),
+      tienda_id: params.id,
+    };
+    
+    mockDocumentos.push(newDoc);
+    return HttpResponse.json(newDoc);
+  }),
 ];

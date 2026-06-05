@@ -67,3 +67,20 @@ function generateTramitesForTienda(tiendaId: string, tiendaNombre: string): Tram
 export const mockTramites: Tramite[] = mockTiendas.flatMap((t) =>
   generateTramitesForTienda(t.id, t.nombre)
 );
+
+// Update tiendas with the generated tramites data to maintain consistency
+mockTiendas.forEach((tienda) => {
+  const tramites = mockTramites.filter(t => t.tienda_id === tienda.id);
+  
+  tienda.total_tramites = tramites.length;
+  tienda.tramites_vencidos = tramites.filter(t => t.estado === 'vencido').length;
+  tienda.tramites_por_vencer = tramites.filter(t => t.estado === 'por_vencer').length;
+  
+  // Calculate cumplimiento based on tramites (weight: vencidos hurt more)
+  const penalty = (tienda.tramites_vencidos * 25) + (tienda.tramites_por_vencer * 10);
+  tienda.cumplimiento = Math.max(0, 100 - penalty);
+  
+  if (tienda.cumplimiento >= 85) tienda.estado_cumplimiento = 'vigente';
+  else if (tienda.cumplimiento >= 60) tienda.estado_cumplimiento = 'en_riesgo';
+  else tienda.estado_cumplimiento = 'critico';
+});

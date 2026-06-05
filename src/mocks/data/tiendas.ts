@@ -39,17 +39,6 @@ function generateTienda(index: number): Tienda {
   const estado = estados[index % estados.length];
   const munis = municipios[estado] || ['Centro'];
   const municipio = munis[index % munis.length];
-  const cumplimiento = Math.floor(Math.random() * 60) + 40; // 40-100
-
-  let estadoCumplimiento: EstadoCumplimiento;
-  if (cumplimiento >= 85) estadoCumplimiento = 'vigente';
-  else if (cumplimiento >= 60) estadoCumplimiento = 'en_riesgo';
-  else estadoCumplimiento = 'critico';
-
-  const totalTramites = Math.floor(Math.random() * 8) + 4; // 4-12
-  const tramitesVencidos = estadoCumplimiento === 'critico' ? Math.floor(Math.random() * 3) + 1 : 0;
-  const tramitesPorVencer = estadoCumplimiento !== 'vigente' ? Math.floor(Math.random() * 3) + 1 : Math.floor(Math.random() * 2);
-
   const daysAgo = Math.floor(Math.random() * 30);
   const ultimaActualizacion = new Date(Date.now() - daysAgo * 86400000).toISOString();
 
@@ -60,11 +49,11 @@ function generateTienda(index: number): Tienda {
     municipio,
     direccion: `Av. Principal #${100 + index}, Col. Centro, ${municipio}, ${estado}`,
     marcas: pickRandom(marcas, Math.floor(Math.random() * 3) + 1),
-    cumplimiento,
-    estado_cumplimiento: estadoCumplimiento,
-    total_tramites: totalTramites,
-    tramites_vencidos: tramitesVencidos,
-    tramites_por_vencer: tramitesPorVencer,
+    cumplimiento: 100,
+    estado_cumplimiento: 'vigente',
+    total_tramites: 0,
+    tramites_vencidos: 0,
+    tramites_por_vencer: 0,
     ultima_actualizacion: ultimaActualizacion,
   };
 }

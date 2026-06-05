@@ -40,10 +40,10 @@ function generateDocumentosForTramites(): Documento[] {
         estado_ocr: estadoOcr,
         datos_extraidos: estadoOcr === 'completado' || estadoOcr === 'baja_confianza'
           ? {
-            fecha_vigencia: tramite.fecha_vencimiento,
-            numero_permiso: `PERM-${Math.floor(Math.random() * 90000) + 10000}`,
-            referencia_pago: `REF-${Math.floor(Math.random() * 900000) + 100000}`,
-            domicilio: `Av. Principal #${100 + docCounter}, Col. Centro`,
+            fecha_vigencia: { value: tramite.fecha_vencimiento, confidence: estadoOcr === 'baja_confianza' ? 45 : 95 },
+            numero_permiso: { value: `PERM-${Math.floor(Math.random() * 90000) + 10000}`, confidence: estadoOcr === 'baja_confianza' ? 55 : 92 },
+            referencia_pago: { value: `REF-${Math.floor(Math.random() * 900000) + 100000}`, confidence: 88 },
+            domicilio: { value: `Av. Principal #${100 + docCounter}, Col. Centro`, confidence: 99 },
           }
           : undefined,
         requiere_revision_manual: estadoOcr === 'baja_confianza',

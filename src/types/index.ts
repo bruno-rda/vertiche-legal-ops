@@ -56,6 +56,11 @@ export interface Tramite {
 
 export type EstadoOCR = 'procesando' | 'completado' | 'baja_confianza' | 'error';
 
+export interface OCRExtractedField {
+  value: string;
+  confidence: number;
+}
+
 export interface Documento {
   id: string;
   tramite_ids: string[];
@@ -63,7 +68,7 @@ export interface Documento {
   nombre_archivo: string;
   url: string;
   estado_ocr: EstadoOCR;
-  datos_extraidos?: Record<string, string | undefined>;
+  datos_extraidos?: Record<string, OCRExtractedField>;
   requiere_revision_manual: boolean;
   cargado_por: string;
   cargado_por_nombre?: string;
