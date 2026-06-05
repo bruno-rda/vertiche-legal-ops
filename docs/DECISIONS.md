@@ -36,3 +36,6 @@ Instead of trying to squeeze too much information (like associated trámites) in
 
 ### 2026-06-04 — Local Worker for react-pdf
 To avoid CORS issues and external CDN dependencies that might block rendering offline or in secure environments, the `react-pdf` worker is bundled locally using Vite's `?url` import strategy (`pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();`). This ensures reliable PDF parsing.
+
+### 2026-06-04 — Quick filters converted to Dropdowns
+To ensure URL query param updates do not suffer from stale state/closure bugs (where rapid sequential React updates overwrite each other), the pill buttons in `TramitesPage` were converted to a native select dropdown. This simplifies state management and unifies the UI with the rest of the application's table filters.

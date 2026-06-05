@@ -6,7 +6,7 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
 
 ## 1. Current Sprint
 
-*(No active tasks)*
+*(No active sprint currently. Planning for next iteration.)*
 
 ---
 
@@ -54,21 +54,14 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
   - **Features:** Drag & drop upload, inline document renaming, side-by-side PDF viewer, manual OCR review with confidence highlights
   - **Mock handlers:** extended `/documentos` with `rename`, `ocr-review`, and `upload` (in-memory)
 
+- **Iteration 10 — Editing & Management ✅**
+  - **Components:** NuevoTramiteModal, TramiteEditModal, TiendaEditModal
+  - **Features:** Create tramites from tienda Expediente, edit tramite details (permanency, dates), edit tienda details, advanced table filtering (dropdowns for geographic states and quick filters)
+  - **Mock handlers:** extended `POST /tiendas/:id/tramites`, `PUT /tramites/:id`, `PUT /tiendas/:id`
+
 ---
 
 ## 3. Backlog
-- Allow tramite detail editing (name, dates, permanency)
-
-On the tramite detail page, ADMIN users can edit the following fields: nombre del trámite, fecha de inicio, fecha de vencimiento, and whether the trámite is permanent. A permanent trámite has no expiration date, never generates vencimiento alerts, and displays a "Permanente" badge instead of a date. The edit UI should be an "Editar" button in the tramite detail header that toggles the fields into editable inputs inline (not a separate page or modal). Editing the fecha de vencimiento should show a confirmation dialog since it affects alert thresholds. Toggling a trámite to permanent should also confirm ("Este trámite no generará alertas de vencimiento. ¿Confirmar?"). All edits are recorded in the tramite's historial.
-
-- Allow tramite creation from tienda detail
-
-ADMIN users can create a new trámite directly from the Expediente tab in the tienda detail page. A "Nuevo trámite" button opens a modal with the following fields: nombre (text, required), tipo jurisdiccional (select: federal / estatal / municipal, required), fecha de inicio (date picker, required), fecha de vencimiento (date picker, required unless "Permanente" is checked), es permanente (checkbox, if checked disables and clears fecha de vencimiento), and es recurrente (checkbox, if checked shows a select for periodo: anual / bianual). On submit, the new trámite appears in the Expediente tab in the correct section (activos) with state `pendiente_documentacion`. A success toast confirms creation. The creation is recorded in the tienda's historial.
-
-- Allow tramite filtering in tramites global page
-
-Add the following filters to the tramites global page, in addition to what already exists: filter by geographic state (dropdown of Mexican states), date range filter for fecha de vencimiento (from / to date pickers), and three quick-filter buttons: "Solo vencidos", "Por vencer en 30 días", "Por vencer en 60 días". The quick-filter buttons are mutually exclusive and visually toggled (active state). When a quick filter is active, the date range filter is disabled. All filters combine with AND logic. The active filter count should be shown as a badge on a "Filtros" button if any non-default filters are active, so the user knows filters are applied.
-
 - Allow column sorting in all tables
 
 All data tables in the application (tiendas list, tramites global, documentos global, alertas) should support ascending and descending sort by clicking column headers. Sortable columns should have a visual indicator (chevron icon) that shows current sort direction. Clicking the same column header again reverses the direction. Clicking a different header resets to ascending for that column. Sort state should be maintained when the user navigates back to the page within the same session. Sorting is done client-side for tables with full data loaded, and passed as query params to the backend for paginated tables.
@@ -84,10 +77,6 @@ Add a "Resueltas" tab to the alertas page alongside "Activas" and "Silenciadas".
 - WhatsApp and email alert sending
 
 In the global alertas page, each alert in the Activas tab should show which notification channels have already been used for that alert: email and/or WhatsApp, shown as small channel badges (e.g. an envelope icon for email, a phone icon for WhatsApp), greyed out if not yet sent, filled/colored if already sent. Each alert should also have a "Enviar" dropdown button with two options: "Enviar por email" and "Enviar por WhatsApp". Clicking either triggers the corresponding backend action and updates the channel badge state immediately (optimistic update). If the send fails, revert the badge and show an error toast. This feature is only visible to ADMIN and OPERATOR roles. The backend integration for this is not yet defined; for now implement the UI with MSW mocks that simulate success after a short delay.
-
-- Allow store editing
-
-In the tienda detail page header, ADMIN users can edit the tienda's basic data: nombre, estado (dropdown of Mexican states), municipio (text field), and dirección. An "Editar" button in the header toggles the fields into editable inputs inline. Save and cancel buttons appear while editing. On save, a success toast confirms. The edit is recorded in the tienda's historial.
 
 - User management screen (ADMIN only)
 
