@@ -65,6 +65,25 @@ export const tiendasHandlers = [
     return HttpResponse.json(tienda);
   }),
 
+  // PUT /api/tiendas/:id
+  http.put('*/api/tiendas/:id', async ({ request, params }) => {
+    const tienda = mockTiendas.find((t) => t.id === params.id);
+    if (!tienda) {
+      return HttpResponse.json({ detail: 'Tienda no encontrada' }, { status: 404 });
+    }
+
+    const data = await request.json() as any;
+    
+    // Update basic fields
+    if (data.nombre) tienda.nombre = data.nombre;
+    if (data.estado) tienda.estado = data.estado;
+    if (data.municipio) tienda.municipio = data.municipio;
+    if (data.direccion) tienda.direccion = data.direccion;
+
+    // Ideally, we'd add to the history mock here, but since the history mock is regenerated per request, we'll just return the updated tienda.
+    return HttpResponse.json(tienda);
+  }),
+
   // GET /api/tiendas/:id/expediente
   http.get('*/api/tiendas/:id/expediente', ({ params }) => {
     const tramites = mockTramites.filter((t) => t.tienda_id === params.id);
@@ -78,6 +97,46 @@ export const tiendasHandlers = [
       cumplimiento,
       ultima_actualizacion: new Date().toISOString(),
     });
+  }),
+
+  // POST /api/tiendas/:id/tramites
+  http.post('*/api/tiendas/:id/tramites', async ({ request, params }) => {
+    const tienda = mockTiendas.find((t) => t.id === params.id);
+    if (!tienda) {
+      return HttpResponse.json({ detail: 'Tienda no encontrada' }, { status: 404 });
+    }
+
+    const data = await request.json() as any;
+
+    const newTramite = {
+      id: `tramite-${Date.now()}`,
+      tienda_id: tienda.id,
+      tienda_nombre: tienda.nombre,
+      nombre: data.nombre,
+      tipo: data.tipo,
+      estado: 'pendiente_documentacion' as const,
+      fecha_inicio: data.fecha_inicio,
+      fecha_vencimiento: data.es_permanente ? '' : data.fecha_vencimiento,
+      es_permanente: data.es_permanente,
+      es_recurrente: data.es_recurrente,
+      periodo_recurrencia: data.es_recurrente ? data.periodo_recurrencia : undefined,
+      observaciones: [],
+      documentos: [],
+      historial: [{
+        id: `hist-new-${Date.now()}`,
+        entidad_tipo: 'tramite',
+        entidad_id: `tramite-${Date.now()}`,
+        accion: 'tramite_creado',
+        usuario_id: 'usr-admin',
+        usuario_nombre: 'Admin User',
+        fecha: new Date().toISOString(),
+        detalle: 'Trámite creado manualmente',
+      }],
+    };
+
+    mockTramites.push(newTramite as any);
+
+    return HttpResponse.json(newTramite, { status: 201 });
   }),
 
   // GET /api/tiendas/:id/alertas

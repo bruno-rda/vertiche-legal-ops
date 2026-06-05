@@ -13,13 +13,7 @@ type FormData = {
   direccion: string;
 };
 
-const ESTADOS_MEXICO = [
-  "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", "Chihuahua",
-  "Ciudad de México", "Coahuila", "Colima", "Durango", "Estado de México", "Guanajuato", "Guerrero",
-  "Hidalgo", "Jalisco", "Michoacán", "Morelos", "Nayarit", "Nuevo León", "Oaxaca", "Puebla", "Querétaro",
-  "Quintana Roo", "San Luis Potosí", "Sinaloa", "Sonora", "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz",
-  "Yucatán", "Zacatecas"
-];
+import { ESTADOS_MEXICO } from '@/lib/constants';
 
 export function TiendaEditModal({ 
   isOpen, 

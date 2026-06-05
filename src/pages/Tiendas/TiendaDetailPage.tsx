@@ -22,6 +22,8 @@ import { OCRReviewModal } from '@/components/OCRReviewModal';
 import { Modal } from '@/components/Modal';
 import { PDFViewer } from '@/components/PDFViewer';
 import { InlineEdit } from '@/components/InlineEdit';
+import { Edit2 } from 'lucide-react';
+import { TiendaEditModal } from './components/TiendaEditModal';
 
 type Tab = 'expediente' | 'documentos' | 'alertas' | 'historial';
 
@@ -33,8 +35,11 @@ export function TiendaDetailPage() {
   const queryClient = useQueryClient();
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [documentToReview, setDocumentToReview] = useState<Documento | null>(null);
   const [documentToView, setDocumentToView] = useState<Documento | null>(null);
+
+  const isAdmin = user?.rol === 'ADMIN';
 
   const updateNameMutation = useMutation({
     mutationFn: async ({ docId, newName }: { docId: string, newName: string }) => {
@@ -95,11 +100,21 @@ export function TiendaDetailPage() {
     <div className="space-y-6">
       <Breadcrumbs items={[{ label: 'Tiendas', href: '/tiendas' }, { label: tienda.nombre }]} />
       {/* Header */}
-      <div className="bg-surface-card rounded-xl border border-border p-6">
+      <div 
+        className={`bg-surface-card rounded-xl border border-border p-6 relative ${isAdmin ? 'hover:border-accent/30 cursor-pointer group transition-colors' : ''}`}
+        onClick={() => isAdmin && setIsEditModalOpen(true)}
+      >
+        {isAdmin && (
+          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button className="p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-neutral-light">
+              <Edit2 className="w-4 h-4" />
+            </button>
+          </div>
+        )}
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="font-display text-2xl text-text-primary">{tienda.nombre}</h1>
+              <h1 className="font-display text-2xl text-text-primary pr-8">{tienda.nombre}</h1>
               <Badge variant={tienda.estado_cumplimiento} dot />
             </div>
             <div className="flex flex-wrap items-center gap-4 text-sm text-text-secondary">
@@ -252,6 +267,14 @@ export function TiendaDetailPage() {
           )}
         </div>
       </Modal>
+
+      {isEditModalOpen && tienda && (
+        <TiendaEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          tienda={tienda}
+        />
+      )}
     </div>
   );
 }
