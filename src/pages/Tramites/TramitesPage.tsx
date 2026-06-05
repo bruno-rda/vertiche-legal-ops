@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { TableSkeleton } from '@/components/Skeleton';
 import { formatDate, daysRemaining } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
+import { ESTADOS_MEXICO } from '@/lib/constants';
 
 export function TramitesPage() {
   const navigate = useNavigate();
@@ -17,12 +18,18 @@ export function TramitesPage() {
   const search = sp.get('search') || '';
   const estado = sp.get('estado') || '';
   const tipo = sp.get('tipo') || '';
+  const estadoGeo = sp.get('estado_geografico') || '';
+  const soloVencidos = sp.get('solo_vencidos') === 'true';
+  const porVencerDias = sp.get('por_vencer_dias') || '';
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['tramites', page, search, estado, tipo],
+    queryKey: ['tramites', page, search, estado, tipo, estadoGeo, soloVencidos, porVencerDias],
     queryFn: () => api.get<PaginatedResponse<Tramite>>('/api/tramites', {
       page, page_size: 25,
       search: search || undefined, estado: estado || undefined, tipo: tipo || undefined,
+      estado_geografico: estadoGeo || undefined,
+      solo_vencidos: soloVencidos || undefined,
+      por_vencer_dias: porVencerDias || undefined,
     }),
   });
 
@@ -33,7 +40,25 @@ export function TramitesPage() {
     setSp(p);
   };
   const clear = () => setSp({});
-  const hasFilters = search || estado || tipo;
+  const hasFilters = search || estado || tipo || estadoGeo || soloVencidos || porVencerDias;
+
+  const quickFilterValue = soloVencidos ? 'solo_vencidos' : porVencerDias === '30' ? 'por_vencer_30' : porVencerDias === '60' ? 'por_vencer_60' : '';
+
+  const handleQuickFilterChange = (val: string) => {
+    const p = new URLSearchParams(sp);
+    p.set('page', '1');
+    p.delete('estado');
+    p.delete('solo_vencidos');
+    p.delete('por_vencer_dias');
+    
+    if (val === 'solo_vencidos') p.set('solo_vencidos', 'true');
+    else if (val === 'por_vencer_30') p.set('por_vencer_dias', '30');
+    else if (val === 'por_vencer_60') p.set('por_vencer_dias', '60');
+    
+    setSp(p);
+  };
+
+
 
   return (
     <div className="space-y-6">
@@ -65,8 +90,26 @@ export function TramitesPage() {
           </select>
           <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
         </div>
-        {hasFilters && <button onClick={clear} className="text-sm text-text-secondary hover:text-text-primary underline">Limpiar filtros</button>}
+        <div className="relative">
+          <select value={estadoGeo} onChange={e => up('estado_geografico', e.target.value)} className="appearance-none pl-3 pr-8 py-2 text-sm bg-surface-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer">
+            <option value="">Todos los estados geográficos</option>
+            {ESTADOS_MEXICO.map(st => <option key={st} value={st}>{st}</option>)}
+          </select>
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+        </div>
+        <div className="relative">
+          <select value={quickFilterValue} onChange={e => handleQuickFilterChange(e.target.value)} className="appearance-none pl-3 pr-8 py-2 text-sm bg-surface-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer">
+            <option value="">Filtros rápidos...</option>
+            <option value="solo_vencidos">Solo vencidos</option>
+            <option value="por_vencer_30">Por vencer en 30 días</option>
+            <option value="por_vencer_60">Por vencer en 60 días</option>
+          </select>
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+        </div>
+        
+        {hasFilters && <button onClick={clear} className="text-sm text-text-secondary hover:text-text-primary underline ml-2">Limpiar filtros</button>}
       </div>
+
       <div className="bg-surface-card rounded-xl border border-border overflow-hidden">
         {isLoading ? <TableSkeleton rows={8} cols={7} /> : isError ? (
           <EmptyState variant="error" action={{ label: 'Reintentar', onClick: () => window.location.reload() }} />
