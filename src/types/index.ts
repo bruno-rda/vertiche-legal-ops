@@ -46,6 +46,7 @@ export interface Tramite {
   estado: TramiteEstado;
   fecha_inicio: string;
   fecha_vencimiento: string;
+  es_permanente?: boolean;
   es_recurrente: boolean;
   periodo_recurrencia?: string;
   observaciones: Observacion[];

@@ -39,7 +39,7 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
   }, [isOpen]);
 
   const mutation = useMutation({
-    mutationFn: async (formData: FormData) => {
+    mutationFn: async (data: { file: File; fileName: string; tramiteIds: string[] }) => {
       // Simulate real upload progress since MSW doesn't support it natively for FormData easily without fetch tricks
       return new Promise((resolve, reject) => {
         let progress = 0;
@@ -50,8 +50,8 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
             clearInterval(interval);
             // After progress hits 100, make the actual API call
             api.post(`/tiendas/${tiendaId}/documentos`, {
-              fileName,
-              tramiteIds: selectedTramites,
+              fileName: data.fileName,
+              tramiteIds: data.tramiteIds,
             }).then(resolve).catch(reject);
           }
         }, 150);
@@ -127,12 +127,8 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
 
     setIsUploading(true);
     setError(null);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('fileName', fileName);
-    formData.append('tramiteIds', JSON.stringify(selectedTramites));
     
-    mutation.mutate(formData);
+    mutation.mutate({ file, fileName, tramiteIds: selectedTramites });
   };
 
   if (!isOpen) return null;

@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { pdfjs, Document, Page } from 'react-pdf';
-import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, AlertCircle, Maximize, Minimize } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, AlertCircle } from 'lucide-react';
 import { Skeleton } from './Skeleton';
-import { EmptyState } from './EmptyState';
 
 // Configure PDF worker to load locally via Vite
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -48,8 +47,6 @@ export function PDFViewer({ url, title, onClose }: PDFViewerProps) {
 
   const zoomIn = () => setScale(prevScale => Math.min(prevScale + 0.25, 3));
   const zoomOut = () => setScale(prevScale => Math.max(prevScale - 0.25, 0.5));
-
-  const resetZoom = () => setScale(1.0);
 
   const handleDownload = () => {
     const link = document.createElement('a');

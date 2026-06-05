@@ -4,6 +4,7 @@ import type { TramiteEstado, AlertaSeveridad, EstadoOCR, EstadoCumplimiento } fr
  * Format a date string to a localized Spanish date
  */
 export function formatDate(dateStr: string): string {
+  if (!dateStr) return '-';
   return new Date(dateStr).toLocaleDateString('es-MX', {
     year: 'numeric',
     month: 'short',
@@ -35,6 +36,7 @@ export function timeAgo(dateStr: string): string {
  * Calculate days remaining until a date. Negative means overdue.
  */
 export function daysRemaining(dateStr: string): number {
+  if (!dateStr) return NaN;
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   const target = new Date(dateStr);

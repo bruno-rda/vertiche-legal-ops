@@ -1,11 +1,6 @@
-import type { Tienda, EstadoCumplimiento } from '@/types';
+import type { Tienda } from '@/types';
 
-const estados = [
-  'Jalisco', 'Nuevo León', 'Ciudad de México', 'Estado de México',
-  'Puebla', 'Guanajuato', 'Querétaro', 'Chihuahua', 'Sonora',
-  'Baja California', 'Yucatán', 'Veracruz', 'Coahuila', 'Sinaloa',
-  'Aguascalientes',
-];
+import { ESTADOS_MEXICO as estados } from '@/lib/constants';
 
 const municipios: Record<string, string[]> = {
   'Jalisco': ['Guadalajara', 'Zapopan', 'Tlaquepaque', 'Tonalá'],

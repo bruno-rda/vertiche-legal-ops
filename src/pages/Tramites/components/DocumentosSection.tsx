@@ -55,11 +55,7 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
       const formData = new FormData();
       formData.append('file', file);
       formData.append('tramite_ids', tramiteId);
-      return api.post<Documento>('/api/documentos/upload', formData, {
-        headers: {
-          // Leave Content-Type empty so fetch sets the correct boundary for FormData
-        },
-      });
+      return api.post<Documento>('/api/documentos/upload', formData);
     },
     onSuccess: () => {
       addToast({ type: 'success', message: 'Documento cargado correctamente.' });
