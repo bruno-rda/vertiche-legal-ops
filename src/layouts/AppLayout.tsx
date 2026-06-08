@@ -139,7 +139,7 @@ export function AppLayout() {
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group relative ${isActive
-                    ? 'bg-accent text-white'
+                    ? 'bg-neutral-light text-text-primary'
                     : 'text-text-secondary hover:bg-neutral-light hover:text-text-primary'
                   }`
                 }
