@@ -1,31 +1,61 @@
 import { useAuthStore } from '@/stores/authStore';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '@/api/client';
-import type { Tienda, PaginatedResponse } from '@/types';
+import type { User } from '@/types';
 import { Badge } from '@/components/Badge';
 import { Skeleton } from '@/components/Skeleton';
 import { formatDate } from '@/lib/utils';
-import { UserCircle, Mail, Calendar, Store, MapPin, Activity } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { UserCircle, Mail, Calendar, Store, Activity } from 'lucide-react';
+import { StoreSummary } from './components/StoreSummary';
+import { StoreAssignment } from './components/StoreAssignment';
+import { useState } from 'react';
 
 export function ProfilePage() {
-  const { user } = useAuthStore();
-  const navigate = useNavigate();
+  const { user: currentUser } = useAuthStore();
+  const [searchParams] = useSearchParams();
+  const idParam = searchParams.get('id');
 
-  // If operator, fetch their assigned stores. The API will automatically scope them.
-  const { data: tiendasData, isLoading: isLoadingTiendas } = useQuery({
-    queryKey: ['tiendas', 'assigned'],
-    queryFn: () => api.get<PaginatedResponse<Tienda>>('/api/tiendas?page_size=100'),
-    enabled: user?.rol === 'OPERATOR',
+  const userId = idParam || currentUser?.id;
+  const isOwnProfile = userId === currentUser?.id;
+  const isAdminView = currentUser?.rol === 'ADMIN';
+
+  const [isEditingAssignment, setIsEditingAssignment] = useState(false);
+
+  const { data: userProfile, isLoading } = useQuery({
+    queryKey: ['usuario', userId],
+    queryFn: () => {
+      // If it's the current user, we can just use the auth store data initially, 
+      // but to keep it fresh, let's fetch.
+      return api.get<User>(`/api/usuarios/${userId}`);
+    },
+    enabled: !!userId,
   });
 
-  if (!user) return null;
+  if (!currentUser) return null;
+
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-8">
+        <Skeleton count={1} className="h-12 w-48 mb-6" />
+        <div className="bg-surface-card rounded-xl border border-border p-6 md:p-8">
+          <Skeleton count={3} className="h-16" />
+        </div>
+      </div>
+    );
+  }
+
+  const user = userProfile || currentUser;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="font-display text-3xl text-text-primary">Mi Perfil</h1>
-        <p className="text-sm text-text-secondary mt-1">Información de cuenta y configuración</p>
+        <h1 className="font-display text-3xl text-text-primary">
+          {isOwnProfile ? 'Mi Perfil' : 'Perfil de Usuario'}
+        </h1>
+        <p className="text-sm text-text-secondary mt-1">
+          {isOwnProfile ? 'Información de cuenta y configuración' : 'Información y asignaciones del usuario'}
+        </p>
       </div>
 
       <div className="bg-surface-card rounded-xl border border-border p-6 md:p-8">
@@ -36,7 +66,12 @@ export function ProfilePage() {
           
           <div className="flex-1 space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-text-primary">{user.nombre}</h2>
+              <h2 className="text-2xl font-bold text-text-primary flex items-center gap-3">
+                {user.nombre}
+                {user.estado === 'inactivo' && (
+                  <Badge variant="default" className="bg-danger-light text-danger">Inactivo</Badge>
+                )}
+              </h2>
               <div className="flex items-center gap-3 mt-2">
                 <Badge variant={user.rol === 'ADMIN' ? 'vigente' : user.rol === 'OPERATOR' ? 'en_revision' : 'info'}>
                   {user.rol}
@@ -51,10 +86,10 @@ export function ProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-border">
               <div>
                 <p className="text-sm font-medium text-text-secondary mb-1 flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4" /> Fecha de ingreso
+                  <Calendar className="w-4 h-4" /> Fecha de creación
                 </p>
                 <p className="text-base text-text-primary">
-                  {user.fecha_ingreso ? formatDate(user.fecha_ingreso) : 'No registrada'}
+                  {user.fecha_creacion ? formatDate(user.fecha_creacion) : 'No registrada'}
                 </p>
               </div>
               <div>
@@ -74,37 +109,18 @@ export function ProfilePage() {
 
       {user.rol === 'OPERATOR' && (
         <>
-          <div className="bg-surface-card rounded-xl border border-border p-6 md:p-8">
-            <div className="flex items-center gap-2 mb-6">
-              <Store className="w-5 h-5 text-text-primary" />
-              <h2 className="text-xl font-bold text-text-primary">Tiendas bajo tu responsabilidad</h2>
-            </div>
-            
-            {isLoadingTiendas ? (
-              <Skeleton count={3} className="h-16 mb-2" />
-            ) : tiendasData?.data && tiendasData.data.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {tiendasData.data.map(tienda => (
-                  <div 
-                    key={tienda.id}
-                    onClick={() => navigate(`/tiendas/${tienda.id}`)}
-                    className="p-4 rounded-lg border border-border hover:border-border-strong hover:shadow-card-hover transition-all cursor-pointer bg-surface flex flex-col gap-2"
-                  >
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-semibold text-text-primary">{tienda.nombre}</h3>
-                      <Badge variant={tienda.estado_cumplimiento} size="sm" />
-                    </div>
-                    <div className="flex items-center gap-1.5 text-sm text-text-secondary mt-auto">
-                      <MapPin className="w-4 h-4" />
-                      {tienda.municipio}, {tienda.estado}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-text-muted">No tienes tiendas asignadas actualmente.</p>
-            )}
-          </div>
+          {isEditingAssignment && isAdminView ? (
+            <StoreAssignment 
+              user={user} 
+              onCancel={() => setIsEditingAssignment(false)} 
+            />
+          ) : (
+            <StoreSummary 
+              userId={user.id} 
+              isAdminView={isAdminView}
+              onEditAssignment={() => setIsEditingAssignment(true)}
+            />
+          )}
 
           <div className="bg-surface-card rounded-xl border border-border p-6 md:p-8">
             <div className="flex items-center gap-2 mb-6">
@@ -112,7 +128,9 @@ export function ProfilePage() {
               <h2 className="text-xl font-bold text-text-primary">Desempeño</h2>
             </div>
             <div className="py-8 text-center bg-surface border border-dashed border-border rounded-lg">
-              <p className="text-sm text-text-secondary">Las métricas de desempeño estarán disponibles en la próxima actualización.</p>
+              <p className="text-sm text-text-secondary">
+                Las métricas de desempeño estarán disponibles en la próxima actualización.
+              </p>
             </div>
           </div>
         </>

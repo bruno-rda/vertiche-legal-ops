@@ -74,35 +74,14 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
   - **Features:** Operator-scoped data visibility across all global views. Context-aware empty states for unassigned operators. Read-only user profile page with assigned stores summary. Admin-only "Operador encargado" filter in the Tiendas list including a "Sin asignar" option.
   - **Mock handlers:** Centralized token parsing (`getUserFromRequest`) to auto-filter `tiendas`, `tramites`, `alertas`, `documentos`, and `dashboard` data based on the caller's `tiendas_asignadas`.
 
+- **Iteration 14 — User Management & Store Assignment ✅**
+  - **Components:** UsuariosPage, UsersTable, InviteUserModal, ProfilePage (StoreAssignment, StoreSummary)
+  - **Features:** Comprehensive user list with a clean, card-based layout (replacing standard tables), role-based badges, and soft-delete/permanent delete capabilities. Implemented an interactive geographic state-based store assignment interface for admins in the operator profile, complete with a sticky save/discard bar and computed changes summary. Added a collapsible read-only store assignment summary grouped by geographic state.
+  - **Mock handlers:** User CRUD (`GET /usuarios`, `POST /usuarios`, `PUT /usuarios/:id/status`, `DELETE /usuarios/:id`), and profile assignment mutations (`PUT /usuarios/:id/tiendas`).
+
 ---
 
 ## 3. Backlog
-- User management screen with store assignment (ADMIN only)
-
-Replace the previously planned basic user management screen with a richer version. The `/usuarios` page is accessible only to ADMIN and shows a table of all users with columns: nombre, email, rol (badge), tiendas asignadas (count badge, only meaningful for OPERATOR role), fecha de creación, and acciones. Actions per row: "Ver perfil" and "Desactivar". Deactivated users live in an "Inactivos" tab and can be reactivated. ADMIN cannot deactivate their own account. An "Invitar usuario" button at the top opens a modal with nombre, email, and rol fields.
-
-Clicking "Ver perfil" on any user opens their profile page (see operator profile item). For OPERATOR rows, the tiendas count badge is a clickable link that jumps directly to the store assignment section of their profile.
-
-The table should support filtering by rol and searching by nombre or email. Empty state when no users exist should be friendly and direct ("Aún no hay usuarios. Invita al primero.").
-
-- Store assignment interface in operator profile (ADMIN view)
-
-Inside the operator's profile page, a dedicated "Tiendas asignadas" section allows the ADMIN to manage which stores the operator is responsible for. The interaction must feel clean and not overwhelming given the scale (thousands of stores).
-
-The assignment flow works in two steps. First, a state selector: a visual list of Mexican states, each showing how many stores exist in that state and how many are already assigned to this operator. States with partial assignment show a distinct visual treatment (e.g. a partial fill indicator). Clicking a state expands it inline to show the individual tiendas in that state as a checklist. Each tienda row shows its nombre, municipio, and current compliance badge. The ADMIN can check/uncheck individual tiendas. A "Seleccionar todo el estado" checkbox at the top of each expanded state allows bulk selection.
-
-Changes are not saved until the ADMIN clicks a "Guardar cambios" button that appears as a sticky bar at the bottom of the section when there are unsaved changes. The sticky bar also shows a summary of pending changes ("Agregando 12, eliminando 3"). Clicking "Descartar" reverts to the last saved state. On save, a success toast confirms and the sticky bar disappears.
-
-If the operator has no stores assigned yet, the section shows a friendly empty state ("Este operador aún no tiene tiendas asignadas. Selecciona un estado para comenzar.") with the state selector visible immediately below.
-
-- Assigned stores summary in operator profile
-
-In both the ADMIN view of an operator's profile and the operator's own profile view, show a read-only "Tiendas asignadas" section that summarizes the stores they are responsible for. Stores are grouped by state, with each state showing as a collapsible row: state name, store count, and a compliance summary (e.g. "14 vigentes, 3 por vencer, 1 crítica"). Expanding a state reveals the individual tienda rows with nombre, municipio, and compliance badge. Each tienda name is a clickable link that navigates to that tienda's detail page.
-
-If the operator has no assigned stores, show a clear empty state. For ADMIN viewing this section, the edit assignment button ("Editar asignación") appears at the top right of this section and scrolls to or activates the assignment interface. For the operator viewing their own profile, this section is fully read-only with no edit controls visible.
-
-The total store count should be prominently displayed at the top of the section (e.g. "47 tiendas asignadas en 5 estados").
-
 - Operator performance metrics
 
 A "Desempeño" section appears in the operator profile page, visible to ADMIN (for any operator) and to the operator themselves (their own profile only). At the top of the section, a time range selector with three options: "Últimos 30 días", "Mes en curso", and "Últimos 90 días". Changing the range updates all metrics instantly.

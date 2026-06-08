@@ -57,3 +57,6 @@ To enforce operator-scoped data visibility purely in the frontend for MVP, a cen
 
 ### 2026-06-08 — Operator Filter Visibility and "Unassigned" Option
 The operator filter in the Tiendas list was restricted to `ADMIN` roles instead of both `ADMIN` and `VIEWER` to match the current mock user definitions, as a `VIEWER` mock role was not fully built out. An explicitly handled "Sin asignar" (Unassigned) option was also added to the filter, which dynamically aggregates all assigned store IDs across all operators in the mock database and returns the inverse selection.
+
+### 2026-06-08 — Card-Based Layout over Standard Tables for Users
+Although the initial project requirements specified a "table with columns" for the global `UsuariosPage`, it was decided during implementation to replace the `<table>` structure with a clean, row-card layout. This decision reduces visual clutter (removing dense table headers), aligns the UX closely with the established design language of the `AlertasPage`, and creates a tighter grouping of metadata beside primary identifiers (e.g., placing the creation date and assigned store counts directly inline with the user's email).

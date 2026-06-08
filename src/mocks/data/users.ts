@@ -7,7 +7,8 @@ export const mockUsers: (User & { password: string })[] = [
     email: 'ana.garcia@vertiche.com',
     rol: 'ADMIN',
     password: 'admin123',
-    fecha_ingreso: '2023-01-15T10:00:00Z',
+    fecha_creacion: '2023-01-15T10:00:00Z',
+    estado: 'activo',
   },
   {
     id: 'usr-002',
@@ -16,7 +17,8 @@ export const mockUsers: (User & { password: string })[] = [
     rol: 'OPERATOR',
     password: 'operator123',
     tiendas_asignadas: ['tienda-001', 'tienda-002', 'tienda-003', 'tienda-004', 'tienda-005'],
-    fecha_ingreso: '2024-03-20T09:00:00Z',
+    fecha_creacion: '2024-03-20T09:00:00Z',
+    estado: 'activo',
   },
   {
     id: 'usr-003',
@@ -24,7 +26,8 @@ export const mockUsers: (User & { password: string })[] = [
     email: 'maria.fernandez@vertiche.com',
     rol: 'VIEWER',
     password: 'viewer123',
-    fecha_ingreso: '2024-05-10T11:30:00Z',
+    fecha_creacion: '2024-05-10T11:30:00Z',
+    estado: 'activo',
   },
   {
     id: 'usr-004',
@@ -33,7 +36,8 @@ export const mockUsers: (User & { password: string })[] = [
     rol: 'OPERATOR',
     password: 'operator123',
     tiendas_asignadas: ['tienda-006', 'tienda-007', 'tienda-008'],
-    fecha_ingreso: '2025-02-01T08:00:00Z',
+    fecha_creacion: '2025-02-01T08:00:00Z',
+    estado: 'activo',
   },
   {
     id: 'usr-005',
@@ -42,6 +46,17 @@ export const mockUsers: (User & { password: string })[] = [
     rol: 'OPERATOR',
     password: 'operator123',
     tiendas_asignadas: [],
-    fecha_ingreso: '2026-05-20T14:00:00Z',
+    fecha_creacion: '2026-05-20T14:00:00Z',
+    estado: 'activo',
+  },
+  {
+    id: 'usr-006',
+    nombre: 'Elena Torres (Inactiva)',
+    email: 'elena.torres@vertiche.com',
+    rol: 'OPERATOR',
+    password: 'operator123',
+    tiendas_asignadas: ['tienda-009', 'tienda-010'],
+    fecha_creacion: '2023-11-10T09:15:00Z',
+    estado: 'inactivo',
   },
 ];

@@ -10,7 +10,8 @@ export interface User {
   email: string;
   rol: UserRole;
   tiendas_asignadas?: string[];
-  fecha_ingreso?: string;
+  fecha_creacion: string;
+  estado: 'activo' | 'inactivo';
 }
 
 export type TramiteEstado =

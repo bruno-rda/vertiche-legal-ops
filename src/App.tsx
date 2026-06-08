@@ -12,6 +12,7 @@ import { TramiteDetailPage } from '@/pages/Tramites/TramiteDetailPage';
 import { AlertasPage } from '@/pages/Alertas/AlertasPage';
 import { DocumentosPage } from '@/pages/Documentos/DocumentosPage';
 import { ProfilePage } from '@/pages/Profile/ProfilePage';
+import { UsuariosPage } from '@/pages/Usuarios/UsuariosPage';
 import { ToastContainer } from '@/components/Toast';
 import type { ReactNode } from 'react';
 
@@ -36,6 +37,12 @@ function PublicRoute({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+function AdminRoute({ children }: { children: ReactNode }) {
+  const user = useAuthStore((s) => s.user);
+  if (user?.rol !== 'ADMIN') return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -56,6 +63,7 @@ export default function App() {
             <Route path="/alertas" element={<AlertasPage />} />
             <Route path="/documentos" element={<DocumentosPage />} />
             <Route path="/perfil" element={<ProfilePage />} />
+            <Route path="/usuarios" element={<AdminRoute><UsuariosPage /></AdminRoute>} />
           </Route>
 
           {/* Redirects */}

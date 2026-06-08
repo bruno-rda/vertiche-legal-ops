@@ -14,10 +14,11 @@ import {
   LogOut,
   Menu,
   X,
+  Users,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-const navItems = [
+const baseNavItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/tiendas', label: 'Tiendas', icon: Store },
   { to: '/tramites', label: 'Trámites', icon: FileText },
@@ -55,6 +56,11 @@ export function AppLayout() {
   };
 
   const sidebarWidth = sidebarCollapsed ? 'w-16' : 'w-[220px]';
+
+  const navItems = [
+    ...baseNavItems,
+    ...(user?.rol === 'ADMIN' ? [{ to: '/usuarios', label: 'Usuarios', icon: Users }] : []),
+  ];
 
   return (
     <div className="h-screen flex flex-col bg-surface">
