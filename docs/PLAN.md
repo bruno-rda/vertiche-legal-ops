@@ -72,18 +72,78 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
 ---
 
 ## 3. Backlog
+- User management screen with store assignment (ADMIN only)
+
+Replace the previously planned basic user management screen with a richer version. The `/usuarios` page is accessible only to ADMIN and shows a table of all users with columns: nombre, email, rol (badge), tiendas asignadas (count badge, only meaningful for OPERATOR role), fecha de creación, and acciones. Actions per row: "Ver perfil" and "Desactivar". Deactivated users live in an "Inactivos" tab and can be reactivated. ADMIN cannot deactivate their own account. An "Invitar usuario" button at the top opens a modal with nombre, email, and rol fields.
+
+Clicking "Ver perfil" on any user opens their profile page (see operator profile item). For OPERATOR rows, the tiendas count badge is a clickable link that jumps directly to the store assignment section of their profile.
+
+The table should support filtering by rol and searching by nombre or email. Empty state when no users exist should be friendly and direct ("Aún no hay usuarios. Invita al primero.").
+
+- Store assignment interface in operator profile (ADMIN view)
+
+Inside the operator's profile page, a dedicated "Tiendas asignadas" section allows the ADMIN to manage which stores the operator is responsible for. The interaction must feel clean and not overwhelming given the scale (thousands of stores).
+
+The assignment flow works in two steps. First, a state selector: a visual list of Mexican states, each showing how many stores exist in that state and how many are already assigned to this operator. States with partial assignment show a distinct visual treatment (e.g. a partial fill indicator). Clicking a state expands it inline to show the individual tiendas in that state as a checklist. Each tienda row shows its nombre, municipio, and current compliance badge. The ADMIN can check/uncheck individual tiendas. A "Seleccionar todo el estado" checkbox at the top of each expanded state allows bulk selection.
+
+Changes are not saved until the ADMIN clicks a "Guardar cambios" button that appears as a sticky bar at the bottom of the section when there are unsaved changes. The sticky bar also shows a summary of pending changes ("Agregando 12, eliminando 3"). Clicking "Descartar" reverts to the last saved state. On save, a success toast confirms and the sticky bar disappears.
+
+If the operator has no stores assigned yet, the section shows a friendly empty state ("Este operador aún no tiene tiendas asignadas. Selecciona un estado para comenzar.") with the state selector visible immediately below.
+
+- Assigned stores summary in operator profile
+
+In both the ADMIN view of an operator's profile and the operator's own profile view, show a read-only "Tiendas asignadas" section that summarizes the stores they are responsible for. Stores are grouped by state, with each state showing as a collapsible row: state name, store count, and a compliance summary (e.g. "14 vigentes, 3 por vencer, 1 crítica"). Expanding a state reveals the individual tienda rows with nombre, municipio, and compliance badge. Each tienda name is a clickable link that navigates to that tienda's detail page.
+
+If the operator has no assigned stores, show a clear empty state. For ADMIN viewing this section, the edit assignment button ("Editar asignación") appears at the top right of this section and scrolls to or activates the assignment interface. For the operator viewing their own profile, this section is fully read-only with no edit controls visible.
+
+The total store count should be prominently displayed at the top of the section (e.g. "47 tiendas asignadas en 5 estados").
+
+- Operator performance metrics
+
+A "Desempeño" section appears in the operator profile page, visible to ADMIN (for any operator) and to the operator themselves (their own profile only). At the top of the section, a time range selector with three options: "Últimos 30 días", "Mes en curso", and "Últimos 90 días". Changing the range updates all metrics instantly.
+
+The metrics displayed are:
+
+* Documentos cargados: total documents uploaded in the period
+* Trámites resueltos: tramites that moved to `vigente` state during the period while under this operator's responsibility
+* Alertas atendidas: alerts that were silenced or resolved during the period for this operator's tiendas
+* Tiempo promedio de resolución: average time in days between an alert being generated and being resolved, for this operator's tiendas
+* Trámites vencidos bajo responsabilidad: tramites that reached `vencido` state during the period while this operator was assigned to the tienda
+
+Each metric is displayed as a card with a large number, a label, and a subtle trend indicator comparing to the previous equivalent period (e.g. if viewing last 30 days, compare to the 30 days before that). Trend up is green for positive metrics (documentos cargados, trámites resueltos, alertas atendidas) and red for negative ones (trámites vencidos, tiempo promedio). Trend direction for tiempo promedio is inverted: lower is better.
+
+Below the metric cards, a simple activity timeline shows the last 20 actions this operator has taken (document uploads, state changes, alert resolutions) with timestamp, action description, and the tienda involved. Each tienda name in the timeline is a clickable link.
+
+Add mock data that makes these metrics feel realistic and varied across different operators.
+
+- Operator-scoped data visibility
+
+OPERATOR role users see only data related to their assigned tiendas across the entire application. This scoping applies to every data surface: dashboard metrics and charts reflect only their tiendas, the tiendas list shows only their assigned stores, the tramites global page shows only tramites from their tiendas, the alertas page shows only alerts from their tiendas, and the documentos page shows only documents from their tiendas.
+
+The dashboard for an operator should feel purposeful and personal, not like a degraded version of the admin dashboard. The compliance map or chart reflects their assigned states. The metric cards show their scope. No UI element should suggest there is more data they cannot see — the experience should feel complete within their context.
+
+VIEWER role always sees everything with no scoping. ADMIN always sees everything with no scoping.
+
+- Empty state for operator with no assigned stores
+
+When an OPERATOR logs in and has no tiendas assigned yet, every data surface (dashboard, tiendas, tramites, alertas, documentos) shows a consistent, friendly empty state instead of empty tables. The message should be specific to the context: on the dashboard, "Aún no tienes tiendas asignadas. Contacta a un administrador para comenzar." On the tiendas page: "No tienes tiendas asignadas." The empty states should not look like errors. They should use the same EmptyState component already in the design system but with operator-specific messaging. ADMIN users who happen to see a system with no tiendas loaded yet should see slightly different messaging that reflects their role ("No hay tiendas en el sistema todavía.").
+
+- User profile page (all roles)
+
+Every user can access their own profile by clicking their avatar or name in the sidebar. The profile page lives at `/perfil`. It shows: nombre completo, email, rol (badge), and fecha de ingreso al sistema. All fields are read-only. Below the basic info, OPERATOR users see their "Tiendas asignadas" section (item 3) and their "Desempeño" section (item 4). VIEWER and ADMIN users see only the basic info section. The page has a clean, card-based layout with generous spacing. No edit functionality anywhere on this page for any role.
+
+- Operator filter in tiendas list
+
+In the tiendas global list page (`/tiendas`), add a filter by operador encargado. The filter is a searchable dropdown that lists all OPERATOR users. Selecting one filters the table to show only tiendas assigned to that operator. This filter is only visible to ADMIN and VIEWER roles (operators only see their own tiendas so the filter is irrelevant to them). The filter combines with existing filters (estado geográfico, estado de cumplimiento). When an operator filter is active, the active filter badge count should reflect it.
+
 - Allow column sorting in all tables
 
-All data tables in the application (tiendas list, tramites global, documentos global, alertas) should support ascending and descending sort by clicking column headers. Sortable columns should have a visual indicator (chevron icon) that shows current sort direction. Clicking the same column header again reverses the direction. Clicking a different header resets to ascending for that column. Sort state should be maintained when the user navigates back to the page within the same session. Sorting is done client-side for tables with full data loaded, and passed as query params to the backend for paginated tables.
-
-- User management screen (ADMIN only)
-
-Add a "Usuarios" item to the sidebar, visible only to ADMIN role, linking to `/usuarios`. This page shows a table of all system users with columns: nombre, email, rol (badge), fecha de creación, and acciones. Actions per user: "Editar rol" (opens a small modal with a role selector: ADMIN / OPERATOR / VIEWER) and "Desactivar" (soft delete, with confirmation dialog). At the top of the page, an "Invitar usuario" button opens a modal with fields: nombre, email, and rol. Submitting sends an invite (mocked for now). Deactivated users appear in a separate "Inactivos" tab and can be reactivated. ADMIN cannot deactivate their own account.
+All data tables in the application (tiendas list, tramites global, documentos global, alertas) should support ascending and descending sort by clicking column headers. Sortable columns should have a visual indicator (chevron icon) that shows the current sort direction. Clicking the same column toggles direction. Clicking a different column resets to ascending for that column. Sort state is maintained within the session when navigating back to the page. For paginated tables, sort params are passed to the backend as query parameters. For fully client-side loaded tables, sorting is handled in the browser.
 
 - WebSocket integration for real-time alerts
 
-Replace the 60-second polling for the sidebar alert count and the alert list with a WebSocket connection. On new alert received, update the sidebar badge count, append the alert to the active list if the user is on the alertas page, and show a toast notification. If the WebSocket connection drops, fall back to polling at 60 seconds and show a subtle "reconectando..." indicator in the sidebar. On reconnect, do a full refetch of alerts to catch any missed updates. The WebSocket URL should come from an environment variable.
+Replace the 60-second polling for the sidebar alert count and the alert list with a WebSocket connection. On receiving a new alert, update the sidebar badge count, append the alert to the active list if the user is currently on the alertas page, and show a toast notification with the alert message and a link to the affected tienda. If the WebSocket connection drops, fall back silently to 60-second polling and show a subtle "Reconectando..." indicator in the sidebar footer. On reconnect, do a full refetch of alerts to catch any missed updates. The WebSocket URL comes from an environment variable. Operator-scoped users should only receive WebSocket events for their assigned tiendas.
 
 - OpenAPI client generation
 
-Remove the manually defined types in `src/types/index.ts` and the manually written API functions. Replace them with an auto-generated client using `@hey-api/openapi-ts` pointed at the backend's `openapi.json`. Set up a `generate:api` script in `package.json` that runs the generation. All React Query hooks should continue to work unchanged since they wrap the generated functions. Document the generation command and workflow in the project README.
+Remove manually defined types in `src/types/index.ts` and manually written API functions. Replace with an auto-generated client using `@hey-api/openapi-ts` pointed at the backend's `openapi.json`. Add a `generate:api` script to `package.json`. All existing React Query hooks should continue working unchanged since they wrap the generated functions. Document the generation command and workflow in the README. This task should be done last as it touches the entire data layer.
