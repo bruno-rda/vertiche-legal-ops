@@ -8,7 +8,6 @@ import { Pagination } from '@/components/Pagination';
 import { SearchInput } from '@/components/SearchInput';
 import { EmptyState } from '@/components/EmptyState';
 import { TableSkeleton } from '@/components/Skeleton';
-import { formatDate } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -28,7 +27,7 @@ export function TiendasPage() {
   const operadorId = sp.get('operador_id') || '';
   const sortBy = sp.get('sort_by') || 'nombre';
   const sortOrder = sp.get('sort_order') || 'asc';
-  
+
   const user = useAuthStore(s => s.user);
 
   const { data: usuarios } = useQuery({
@@ -42,7 +41,7 @@ export function TiendasPage() {
     queryFn: () => api.get<PaginatedResponse<Tienda>>('/api/tiendas', {
       page, page_size: 25,
       search: search || undefined, estado: estado || undefined,
-      estado_cumplimiento: ec || undefined, 
+      estado_cumplimiento: ec || undefined,
       operador_id: operadorId || undefined,
       sort_by: sortBy, sort_order: sortOrder,
     }),
@@ -62,10 +61,10 @@ export function TiendasPage() {
   if (isUnassignedOperator) {
     return (
       <div className="pt-20">
-        <EmptyState 
-          variant="no-data" 
-          title="Sin tiendas asignadas" 
-          description="No tienes tiendas asignadas." 
+        <EmptyState
+          variant="no-data"
+          title="Sin tiendas asignadas"
+          description="No tienes tiendas asignadas."
         />
       </div>
     );
@@ -120,7 +119,7 @@ export function TiendasPage() {
         {hasFilters && <button onClick={clear} className="text-sm text-text-secondary hover:text-text-primary underline">Limpiar filtros</button>}
       </div>
       <div className="bg-surface-card rounded-xl border border-border overflow-hidden">
-        {isLoading ? <TableSkeleton rows={8} cols={6} /> : isError ? (
+        {isLoading ? <TableSkeleton rows={8} cols={user?.rol === 'ADMIN' ? 6 : 5} /> : isError ? (
           <EmptyState variant="error" action={{ label: 'Reintentar', onClick: () => window.location.reload() }} />
         ) : data && data.data.length > 0 ? (
           <>
@@ -128,7 +127,7 @@ export function TiendasPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    {['Tienda', 'Estado', 'Municipio', 'Cumplimiento', 'Trámites', 'Actualización'].map(h => (
+                    {['Tienda', 'Estado', 'Municipio', ...(user?.rol === 'ADMIN' ? ['Operador'] : []), 'Cumplimiento', 'Trámites'].map(h => (
                       <th key={h} className="text-left text-xs font-semibold text-text-secondary uppercase tracking-wider px-4 py-3">{h}</th>
                     ))}
                   </tr>
@@ -139,6 +138,15 @@ export function TiendasPage() {
                       <td className="px-4 py-3.5 text-sm font-medium text-text-primary">{t.nombre}</td>
                       <td className="px-4 py-3.5 text-sm text-text-secondary">{t.estado}</td>
                       <td className="px-4 py-3.5 text-sm text-text-secondary">{t.municipio}</td>
+                      {user?.rol === 'ADMIN' && (
+                        <td className="px-4 py-3.5 text-sm text-text-secondary">
+                          {usuarios ? (
+                            usuarios.find(u => u.rol === 'OPERATOR' && u.tiendas_asignadas?.includes(t.id))?.nombre || <span className="text-text-muted italic">Sin asignar</span>
+                          ) : (
+                            <span className="text-text-muted">Cargando...</span>
+                          )}
+                        </td>
+                      )}
                       <td className="px-4 py-3.5 min-w-[160px]"><ProgressBar value={t.cumplimiento} showLabel size="sm" /></td>
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-1.5">
@@ -148,7 +156,6 @@ export function TiendasPage() {
                           <span className="text-xs text-text-muted">{t.total_tramites}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 text-sm text-text-muted">{formatDate(t.ultima_actualizacion)}</td>
                     </tr>
                   ))}
                 </tbody>
