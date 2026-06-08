@@ -45,3 +45,9 @@ To ensure that store-specific alert queries (e.g., `GET /api/tiendas/:id/alertas
 
 ### 2026-06-08 — Debounced Expandable Search + Keep Previous Data
 To maintain the "wow" aesthetic of the clean UI while offering powerful bulk triage capabilities, the search function in the Global Alertas page was hidden behind an expandable icon interaction. To prevent the UI from jumping heavily on each keystroke, the input state was separated from the query parameter and debounced by 300ms, combined with React Query's `placeholderData: keepPreviousData` to ensure seamless transitions.
+
+### 2026-06-08 — Dynamic SVG Parsing for Map over Static Component
+To implement the interactive map without artificially inflating the JavaScript bundle size by ~160KB with a massive static SVG file, the map is loaded dynamically via `fetch('/mx.svg')` and parsed using `DOMParser`. The extracted paths are then mapped into reactive `<path>` elements. This keeps the initial load lean while granting full React-level interactivity (hover, click, styling) over the SVG paths.
+
+### 2026-06-08 — Shared Layout Sizing Constants
+Extracted `MAP_CONTAINER_CLASSES` to a shared constant within `MexicoMap.tsx` and applied it to the alternate list view in `DashboardPage.tsx`. This ensures that toggling between the map and list views feels perfectly stable with no layout shifting, establishing a single source of truth for potential future dimensional changes.

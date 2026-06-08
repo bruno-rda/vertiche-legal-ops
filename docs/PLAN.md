@@ -64,6 +64,11 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
   - **Features:** Bulk WhatsApp/Email notifications with visual selection checkboxes, ability to reactivate resolved alerts, debounced expandable search bar for triage, synchronized global/local alert state.
   - **Mock handlers:** `mockAlertas` array direct mutability, extended `GET /api/alertas` with text search support.
 
+- **Iteration 12 — Dashboard Map Visualization ✅**
+  - **Components:** MexicoMap, MapTooltip
+  - **Features:** Interactive SVG map of Mexico with 32 states colored by compliance level. Custom tooltip showing state metrics. Toggle view between map and list in the dashboard. Shared layout dimensions extracted for easy maintainability.
+  - **Mock handlers:** Used existing `cumplimiento-por-estado` mock data.
+
 ---
 
 ## 3. Backlog
@@ -74,10 +79,6 @@ All data tables in the application (tiendas list, tramites global, documentos gl
 - User management screen (ADMIN only)
 
 Add a "Usuarios" item to the sidebar, visible only to ADMIN role, linking to `/usuarios`. This page shows a table of all system users with columns: nombre, email, rol (badge), fecha de creación, and acciones. Actions per user: "Editar rol" (opens a small modal with a role selector: ADMIN / OPERATOR / VIEWER) and "Desactivar" (soft delete, with confirmation dialog). At the top of the page, an "Invitar usuario" button opens a modal with fields: nombre, email, and rol. Submitting sends an invite (mocked for now). Deactivated users appear in a separate "Inactivos" tab and can be reactivated. ADMIN cannot deactivate their own account.
-
-- SVG map of Mexico for dashboard compliance visualization
-
-Replace the horizontal bar chart on the dashboard with an SVG map of Mexico showing all 32 states. Each state is colored based on the aggregated compliance level of its tiendas using the existing color scale (dark green >85%, amber 60–85%, dark red <60%, light grey for states with no tiendas). On hover, show a tooltip with: state name, number of tiendas, compliance percentage, and number of critical tramites. Clicking a state navigates to `/tiendas?estado=[nombre]`. State color transitions should be animated with CSS (fill transition 300ms). Use a clean, minimalist SVG with no unnecessary detail — just state outlines with fills. The SVG asset needs to be sourced or built with each state as a separate `<path>` element with a `data-estado` attribute matching the state names used in the rest of the app.
 
 - WebSocket integration for real-time alerts
 

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import { useNavigate } from 'react-router-dom';
@@ -8,11 +9,13 @@ import { Skeleton } from '@/components/Skeleton';
 import { formatDate, daysRemaining, timeAgo, formatPercent } from '@/lib/utils';
 import {
   Store, CheckCircle, AlertTriangle, XCircle,
-  ArrowRight, Clock,
+  ArrowRight, Clock, Map, BarChart3,
 } from 'lucide-react';
+import { MexicoMap, MAP_CONTAINER_CLASSES } from './components/MexicoMap';
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const [viewMode, setViewMode] = useState<'map' | 'chart'>('map');
 
   const { data: metrics, isLoading: metricsLoading } = useQuery({
     queryKey: ['dashboard', 'metrics'],
@@ -101,39 +104,65 @@ export function DashboardPage() {
               Nivel de cumplimiento agregado por estado geográfico
             </p>
           </div>
+          <div className="flex bg-surface border border-border rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('map')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map'
+                ? 'bg-surface-card text-text-primary shadow-sm'
+                : 'text-text-secondary hover:text-text-primary'
+                }`}
+            >
+              <Map className="w-4 h-4" />
+              Mapa
+            </button>
+            <button
+              onClick={() => setViewMode('chart')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'chart'
+                ? 'bg-surface-card text-text-primary shadow-sm'
+                : 'text-text-secondary hover:text-text-primary'
+                }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              Lista
+            </button>
+          </div>
         </div>
 
         {cumplimientoLoading ? (
           <Skeleton count={8} className="h-8" />
         ) : cumplimiento && cumplimiento.length > 0 ? (
-          <div className="space-y-3">
-            {cumplimiento.map((c) => (
-              <button
-                key={c.estado}
-                onClick={() => navigate(`/tiendas?estado=${encodeURIComponent(c.estado)}`)}
-                className="w-full flex items-center gap-4 group hover:bg-surface rounded-lg px-3 py-2 -mx-3 transition-colors"
-              >
-                <span className="text-sm font-medium text-text-primary w-36 text-left truncate">
-                  {c.estado}
-                </span>
-                <div className="flex-1">
-                  <ProgressBar value={c.cumplimiento} size="sm" />
-                </div>
-                <span className="text-sm font-semibold text-text-primary w-12 text-right">
-                  {c.cumplimiento}%
-                </span>
-                <span className="text-xs text-text-muted w-20 text-right">
-                  {c.total_tiendas} tienda{c.total_tiendas !== 1 ? 's' : ''}
-                </span>
-                {c.tramites_criticos > 0 && (
-                  <Badge variant="critical" size="sm">
-                    {c.tramites_criticos} crít.
-                  </Badge>
-                )}
-                <ArrowRight className="w-4 h-4 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-            ))}
-          </div>
+          viewMode === 'map' ? (
+            <MexicoMap data={cumplimiento} />
+          ) : (
+            <div className={`${MAP_CONTAINER_CLASSES} space-y-3 overflow-y-auto pr-2`}>
+              {cumplimiento.map((c) => (
+                <button
+                  key={c.estado}
+                  onClick={() => navigate(`/tiendas?estado=${encodeURIComponent(c.estado)}`)}
+                  className="w-full flex items-center gap-4 group hover:bg-surface rounded-lg px-3 py-2 transition-colors"
+                >
+                  <span className="text-sm font-medium text-text-primary w-36 text-left truncate">
+                    {c.estado}
+                  </span>
+                  <div className="flex-1">
+                    <ProgressBar value={c.cumplimiento} size="sm" />
+                  </div>
+                  <span className="text-sm font-semibold text-text-primary w-12 text-right">
+                    {c.cumplimiento}%
+                  </span>
+                  <span className="text-xs text-text-muted w-20 text-right">
+                    {c.total_tiendas} tienda{c.total_tiendas !== 1 ? 's' : ''}
+                  </span>
+                  {c.tramites_criticos > 0 && (
+                    <Badge variant="critical" size="sm">
+                      {c.tramites_criticos} crít.
+                    </Badge>
+                  )}
+                  <ArrowRight className="w-4 h-4 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              ))}
+            </div>
+          )
         ) : null}
       </div>
 
@@ -230,9 +259,8 @@ export function DashboardPage() {
                       <p className="text-xs text-text-muted">
                         {formatDate(tramite.fecha_vencimiento)}
                       </p>
-                      <p className={`text-xs font-semibold ${
-                        days < 0 ? 'text-danger' : days <= 15 ? 'text-warning' : 'text-text-secondary'
-                      }`}>
+                      <p className={`text-xs font-semibold ${days < 0 ? 'text-danger' : days <= 15 ? 'text-warning' : 'text-text-secondary'
+                        }`}>
                         {days < 0
                           ? `${Math.abs(days)} días vencido`
                           : days === 0
@@ -279,11 +307,10 @@ function MetricCard({
   return (
     <div
       onClick={onClick}
-      className={`bg-surface-card rounded-xl border border-border p-5 transition-all ${
-        onClick
-          ? 'cursor-pointer hover:shadow-card-hover hover:border-border-strong'
-          : ''
-      }`}
+      className={`bg-surface-card rounded-xl border border-border p-5 transition-all ${onClick
+        ? 'cursor-pointer hover:shadow-card-hover hover:border-border-strong'
+        : ''
+        }`}
     >
       <div className="flex items-start justify-between">
         <div>
