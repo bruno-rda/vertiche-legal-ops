@@ -9,6 +9,8 @@ export interface User {
   nombre: string;
   email: string;
   rol: UserRole;
+  tiendas_asignadas?: string[];
+  fecha_ingreso?: string;
 }
 
 export type TramiteEstado =

@@ -69,6 +69,11 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
   - **Features:** Interactive SVG map of Mexico with 32 states colored by compliance level. Custom tooltip showing state metrics. Toggle view between map and list in the dashboard. Shared layout dimensions extracted for easy maintainability.
   - **Mock handlers:** Used existing `cumplimiento-por-estado` mock data.
 
+- **Iteration 13 — Operator Scoping & Profiles ✅**
+  - **Components:** ProfilePage, EmptyState
+  - **Features:** Operator-scoped data visibility across all global views. Context-aware empty states for unassigned operators. Read-only user profile page with assigned stores summary. Admin-only "Operador encargado" filter in the Tiendas list including a "Sin asignar" option.
+  - **Mock handlers:** Centralized token parsing (`getUserFromRequest`) to auto-filter `tiendas`, `tramites`, `alertas`, `documentos`, and `dashboard` data based on the caller's `tiendas_asignadas`.
+
 ---
 
 ## 3. Backlog
@@ -115,26 +120,6 @@ Each metric is displayed as a card with a large number, a label, and a subtle tr
 Below the metric cards, a simple activity timeline shows the last 20 actions this operator has taken (document uploads, state changes, alert resolutions) with timestamp, action description, and the tienda involved. Each tienda name in the timeline is a clickable link.
 
 Add mock data that makes these metrics feel realistic and varied across different operators.
-
-- Operator-scoped data visibility
-
-OPERATOR role users see only data related to their assigned tiendas across the entire application. This scoping applies to every data surface: dashboard metrics and charts reflect only their tiendas, the tiendas list shows only their assigned stores, the tramites global page shows only tramites from their tiendas, the alertas page shows only alerts from their tiendas, and the documentos page shows only documents from their tiendas.
-
-The dashboard for an operator should feel purposeful and personal, not like a degraded version of the admin dashboard. The compliance map or chart reflects their assigned states. The metric cards show their scope. No UI element should suggest there is more data they cannot see — the experience should feel complete within their context.
-
-VIEWER role always sees everything with no scoping. ADMIN always sees everything with no scoping.
-
-- Empty state for operator with no assigned stores
-
-When an OPERATOR logs in and has no tiendas assigned yet, every data surface (dashboard, tiendas, tramites, alertas, documentos) shows a consistent, friendly empty state instead of empty tables. The message should be specific to the context: on the dashboard, "Aún no tienes tiendas asignadas. Contacta a un administrador para comenzar." On the tiendas page: "No tienes tiendas asignadas." The empty states should not look like errors. They should use the same EmptyState component already in the design system but with operator-specific messaging. ADMIN users who happen to see a system with no tiendas loaded yet should see slightly different messaging that reflects their role ("No hay tiendas en el sistema todavía.").
-
-- User profile page (all roles)
-
-Every user can access their own profile by clicking their avatar or name in the sidebar. The profile page lives at `/perfil`. It shows: nombre completo, email, rol (badge), and fecha de ingreso al sistema. All fields are read-only. Below the basic info, OPERATOR users see their "Tiendas asignadas" section (item 3) and their "Desempeño" section (item 4). VIEWER and ADMIN users see only the basic info section. The page has a clean, card-based layout with generous spacing. No edit functionality anywhere on this page for any role.
-
-- Operator filter in tiendas list
-
-In the tiendas global list page (`/tiendas`), add a filter by operador encargado. The filter is a searchable dropdown that lists all OPERATOR users. Selecting one filters the table to show only tiendas assigned to that operator. This filter is only visible to ADMIN and VIEWER roles (operators only see their own tiendas so the filter is irrelevant to them). The filter combines with existing filters (estado geográfico, estado de cumplimiento). When an operator filter is active, the active filter badge count should reflect it.
 
 - Allow column sorting in all tables
 

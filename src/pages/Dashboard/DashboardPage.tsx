@@ -11,7 +11,9 @@ import {
   Store, CheckCircle, AlertTriangle, XCircle,
   ArrowRight, Clock, Map, BarChart3,
 } from 'lucide-react';
+import { EmptyState } from '@/components/EmptyState';
 import { MexicoMap, MAP_CONTAINER_CLASSES } from './components/MexicoMap';
+import { useAuthStore } from '@/stores/authStore';
 
 export function DashboardPage() {
   const navigate = useNavigate();
@@ -36,6 +38,33 @@ export function DashboardPage() {
     queryKey: ['dashboard', 'tramites-proximos'],
     queryFn: () => api.get<Tramite[]>('/api/dashboard/tramites-proximos'),
   });
+
+  const user = useAuthStore(s => s.user);
+  const isUnassignedOperator = user?.rol === 'OPERATOR' && (!user.tiendas_asignadas || user.tiendas_asignadas.length === 0);
+
+  if (isUnassignedOperator) {
+    return (
+      <div className="pt-20">
+        <EmptyState 
+          variant="no-data" 
+          title="Sin tiendas asignadas" 
+          description="Aún no tienes tiendas asignadas. Contacta a un administrador para comenzar." 
+        />
+      </div>
+    );
+  }
+
+  if (metrics && metrics.total_tiendas === 0 && user?.rol === 'ADMIN') {
+    return (
+      <div className="pt-20">
+        <EmptyState 
+          variant="no-data" 
+          title="Sin tiendas" 
+          description="No hay tiendas en el sistema todavía." 
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

@@ -10,6 +10,7 @@ import { TableSkeleton } from '@/components/Skeleton';
 import { formatDate, daysRemaining } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
 import { ESTADOS_MEXICO } from '@/lib/constants';
+import { useAuthStore } from '@/stores/authStore';
 
 export function TramitesPage() {
   const navigate = useNavigate();
@@ -58,7 +59,20 @@ export function TramitesPage() {
     setSp(p);
   };
 
+  const user = useAuthStore(s => s.user);
+  const isUnassignedOperator = user?.rol === 'OPERATOR' && (!user.tiendas_asignadas || user.tiendas_asignadas.length === 0);
 
+  if (isUnassignedOperator) {
+    return (
+      <div className="pt-20">
+        <EmptyState 
+          variant="no-data" 
+          title="Sin tiendas asignadas" 
+          description="No tienes tiendas asignadas, por lo que no hay trámites que mostrar." 
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

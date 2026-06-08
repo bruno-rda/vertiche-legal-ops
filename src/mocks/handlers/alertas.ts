@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { mockAlertas } from '../data/alertas';
+import { getUserFromRequest } from '../utils';
 
 
 export const alertasHandlers = [
@@ -13,6 +14,11 @@ export const alertasHandlers = [
     const search = url.searchParams.get('search')?.toLowerCase();
 
     let filtered = [...mockAlertas];
+
+    const user = getUserFromRequest(request);
+    if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
+      filtered = filtered.filter((a) => user.tiendas_asignadas!.includes(a.tienda_id));
+    }
 
     if (search) {
       filtered = filtered.filter((a) =>
@@ -97,8 +103,15 @@ export const alertasHandlers = [
   }),
 
   // Count of active critical alerts (for sidebar badge)
-  http.get('*/api/alertas/count', () => {
-    const criticalCount = mockAlertas.filter((a) => !a.silenciada && !a.resuelta && a.severidad === 'critical').length;
+  http.get('*/api/alertas/count', ({ request }) => {
+    let alertas = [...mockAlertas];
+    const user = getUserFromRequest(request);
+
+    if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
+      alertas = alertas.filter((a) => user.tiendas_asignadas!.includes(a.tienda_id));
+    }
+
+    const criticalCount = alertas.filter((a) => !a.silenciada && !a.resuelta && a.severidad === 'critical').length;
     return HttpResponse.json({ count: criticalCount });
   }),
 ];

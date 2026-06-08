@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '@/api/client';
-import type { Tienda, PaginatedResponse } from '@/types';
+import type { Tienda, PaginatedResponse, User } from '@/types';
 import { Badge } from '@/components/Badge';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Pagination } from '@/components/Pagination';
@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { TableSkeleton } from '@/components/Skeleton';
 import { formatDate } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
 
 const ESTADOS = [
   'Aguascalientes', 'Baja California', 'Chihuahua', 'Ciudad de México',
@@ -24,15 +25,26 @@ export function TiendasPage() {
   const search = sp.get('search') || '';
   const estado = sp.get('estado') || '';
   const ec = sp.get('estado_cumplimiento') || '';
+  const operadorId = sp.get('operador_id') || '';
   const sortBy = sp.get('sort_by') || 'nombre';
   const sortOrder = sp.get('sort_order') || 'asc';
+  
+  const user = useAuthStore(s => s.user);
+
+  const { data: usuarios } = useQuery({
+    queryKey: ['usuarios'],
+    queryFn: () => api.get<User[]>('/api/usuarios'),
+    enabled: user?.rol === 'ADMIN',
+  });
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['tiendas', page, search, estado, ec, sortBy, sortOrder],
+    queryKey: ['tiendas', page, search, estado, ec, operadorId, sortBy, sortOrder],
     queryFn: () => api.get<PaginatedResponse<Tienda>>('/api/tiendas', {
       page, page_size: 25,
       search: search || undefined, estado: estado || undefined,
-      estado_cumplimiento: ec || undefined, sort_by: sortBy, sort_order: sortOrder,
+      estado_cumplimiento: ec || undefined, 
+      operador_id: operadorId || undefined,
+      sort_by: sortBy, sort_order: sortOrder,
     }),
   });
 
@@ -43,7 +55,21 @@ export function TiendasPage() {
     setSp(p);
   };
   const clear = () => setSp({});
-  const hasFilters = search || estado || ec;
+  const hasFilters = search || estado || ec || operadorId;
+
+  const isUnassignedOperator = user?.rol === 'OPERATOR' && (!user.tiendas_asignadas || user.tiendas_asignadas.length === 0);
+
+  if (isUnassignedOperator) {
+    return (
+      <div className="pt-20">
+        <EmptyState 
+          variant="no-data" 
+          title="Sin tiendas asignadas" 
+          description="No tienes tiendas asignadas." 
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -69,6 +95,18 @@ export function TiendasPage() {
           </select>
           <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
         </div>
+        {user?.rol === 'ADMIN' && usuarios && (
+          <div className="relative">
+            <select value={operadorId} onChange={(e) => up('operador_id', e.target.value)} className="appearance-none pl-3 pr-8 py-2 text-sm bg-surface-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer">
+              <option value="">Todos los operadores</option>
+              <option value="unassigned">Sin asignar</option>
+              {usuarios.filter(u => u.rol === 'OPERATOR').map((u) => (
+                <option key={u.id} value={u.id}>{u.nombre}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+          </div>
+        )}
         <div className="relative">
           <select value={`${sortBy}:${sortOrder}`} onChange={(e) => { const [sb, so] = e.target.value.split(':'); const p = new URLSearchParams(sp); p.set('sort_by', sb); p.set('sort_order', so); p.set('page', '1'); setSp(p); }} className="appearance-none pl-3 pr-8 py-2 text-sm bg-surface-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer">
             <option value="nombre:asc">Nombre A-Z</option>

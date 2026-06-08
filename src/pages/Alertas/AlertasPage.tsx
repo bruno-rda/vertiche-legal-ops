@@ -74,6 +74,7 @@ export function AlertasPage() {
     },
   });
 
+  // @ts-expect-error unused currently but kept for single notification support
   const notificar = useMutation({
     mutationFn: ({ id, canal }: { id: string; canal: 'email' | 'whatsapp' }) =>
       api.post(`/api/alertas/${id}/notificar/${canal}`, {}),
@@ -136,6 +137,20 @@ export function AlertasPage() {
     if (s === 'warning') return <AlertTriangle className="w-4 h-4 text-warning" />;
     return <Info className="w-4 h-4 text-info" />;
   };
+
+  const isUnassignedOperator = user?.rol === 'OPERATOR' && (!user.tiendas_asignadas || user.tiendas_asignadas.length === 0);
+
+  if (isUnassignedOperator) {
+    return (
+      <div className="pt-20">
+        <EmptyState 
+          variant="no-data" 
+          title="Sin tiendas asignadas" 
+          description="No tienes tiendas asignadas, por lo que no hay alertas que mostrar." 
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -51,3 +51,9 @@ To implement the interactive map without artificially inflating the JavaScript b
 
 ### 2026-06-08 — Shared Layout Sizing Constants
 Extracted `MAP_CONTAINER_CLASSES` to a shared constant within `MexicoMap.tsx` and applied it to the alternate list view in `DashboardPage.tsx`. This ensures that toggling between the map and list views feels perfectly stable with no layout shifting, establishing a single source of truth for potential future dimensional changes.
+
+### 2026-06-08 — Centralized MSW Token Parsing for Operator Scoping
+To enforce operator-scoped data visibility purely in the frontend for MVP, a centralized `getUserFromRequest` utility was implemented for MSW handlers. It decodes the mock Bearer token to identify the acting user and their assigned store IDs. All handlers intercept requests and slice their static mock arrays based on this user context, ensuring `OPERATOR` roles inherently see restricted data without needing distinct API routes.
+
+### 2026-06-08 — Operator Filter Visibility and "Unassigned" Option
+The operator filter in the Tiendas list was restricted to `ADMIN` roles instead of both `ADMIN` and `VIEWER` to match the current mock user definitions, as a `VIEWER` mock role was not fully built out. An explicitly handled "Sin asignar" (Unassigned) option was also added to the filter, which dynamically aggregates all assigned store IDs across all operators in the mock database and returns the inverse selection.

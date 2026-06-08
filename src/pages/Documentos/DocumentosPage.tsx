@@ -55,6 +55,20 @@ export function DocumentosPage() {
   const clear = () => setSp({});
   const hasFilters = estadoOcr || revision;
 
+  const isUnassignedOperator = user?.rol === 'OPERATOR' && (!user.tiendas_asignadas || user.tiendas_asignadas.length === 0);
+
+  if (isUnassignedOperator) {
+    return (
+      <div className="pt-20">
+        <EmptyState 
+          variant="no-data" 
+          title="Sin tiendas asignadas" 
+          description="No tienes tiendas asignadas, por lo que no hay documentos que mostrar." 
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>

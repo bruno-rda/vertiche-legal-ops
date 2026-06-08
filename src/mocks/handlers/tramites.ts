@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { mockTramites } from '../data/tramites';
 import { mockTiendas } from '../data/tiendas';
+import { getUserFromRequest } from '../utils';
 
 export const tramitesHandlers = [
   // GET /api/tramites — global list with filters
@@ -16,6 +17,11 @@ export const tramitesHandlers = [
     const porVencerDias = url.searchParams.get('por_vencer_dias');
 
     let filtered = [...mockTramites];
+
+    const user = getUserFromRequest(request);
+    if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
+      filtered = filtered.filter((t) => user.tiendas_asignadas!.includes(t.tienda_id));
+    }
 
     if (search) {
       filtered = filtered.filter(

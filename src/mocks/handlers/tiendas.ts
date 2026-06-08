@@ -3,6 +3,8 @@ import { mockTiendas } from '../data/tiendas';
 import { mockTramites } from '../data/tramites';
 import { mockAlertas } from '../data/alertas';
 import { mockDocumentos } from '../data/documentos';
+import { mockUsers } from '../data/users';
+import { getUserFromRequest } from '../utils';
 import type { CumplimientoEstado } from '@/types';
 
 export const tiendasHandlers = [
@@ -16,8 +18,30 @@ export const tiendasHandlers = [
     const estadoCumplimiento = url.searchParams.get('estado_cumplimiento');
     const sortBy = url.searchParams.get('sort_by') || 'nombre';
     const sortOrder = url.searchParams.get('sort_order') || 'asc';
+    const operadorId = url.searchParams.get('operador_id');
 
     let filtered = [...mockTiendas];
+
+    const user = getUserFromRequest(request);
+    if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
+      filtered = filtered.filter(t => user.tiendas_asignadas!.includes(t.id));
+    }
+
+    if (operadorId === 'unassigned') {
+      const assignedStoreIds = new Set(
+        mockUsers
+          .filter(u => u.rol === 'OPERATOR')
+          .flatMap(u => u.tiendas_asignadas || [])
+      );
+      filtered = filtered.filter(t => !assignedStoreIds.has(t.id));
+    } else if (operadorId) {
+      const op = mockUsers.find(u => u.id === operadorId);
+      if (op?.tiendas_asignadas) {
+        filtered = filtered.filter(t => op.tiendas_asignadas!.includes(t.id));
+      } else if (op) {
+        filtered = []; // operator exists but has no stores
+      }
+    }
 
     if (search) {
       filtered = filtered.filter(
@@ -198,11 +222,18 @@ export const tiendasHandlers = [
 
 // Dashboard-specific handler
 export const dashboardHandlers = [
-  http.get('*/api/dashboard/metrics', () => {
-    const total = mockTiendas.length;
-    const enCumplimiento = mockTiendas.filter((t) => t.estado_cumplimiento === 'vigente').length;
-    const porVencer = mockTiendas.filter((t) => t.tramites_por_vencer > 0).length;
-    const enRiesgo = mockTiendas.filter((t) => t.estado_cumplimiento === 'critico').length;
+  http.get('*/api/dashboard/metrics', ({ request }) => {
+    let tiendas = [...mockTiendas];
+    const user = getUserFromRequest(request);
+    
+    if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
+      tiendas = tiendas.filter(t => user.tiendas_asignadas!.includes(t.id));
+    }
+
+    const total = tiendas.length;
+    const enCumplimiento = tiendas.filter((t) => t.estado_cumplimiento === 'vigente').length;
+    const porVencer = tiendas.filter((t) => t.tramites_por_vencer > 0).length;
+    const enRiesgo = tiendas.filter((t) => t.estado_cumplimiento === 'critico').length;
 
     return HttpResponse.json({
       total_tiendas: total,
@@ -213,10 +244,16 @@ export const dashboardHandlers = [
     });
   }),
 
-  http.get('*/api/dashboard/cumplimiento-por-estado', () => {
+  http.get('*/api/dashboard/cumplimiento-por-estado', ({ request }) => {
     const byState = new Map<string, { tiendas: number; cumplimientoSum: number; criticos: number }>();
+    let tiendas = [...mockTiendas];
+    const user = getUserFromRequest(request);
 
-    mockTiendas.forEach((t) => {
+    if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
+      tiendas = tiendas.filter(t => user.tiendas_asignadas!.includes(t.id));
+    }
+
+    tiendas.forEach((t) => {
       const current = byState.get(t.estado) || { tiendas: 0, cumplimientoSum: 0, criticos: 0 };
       current.tiendas++;
       current.cumplimientoSum += t.cumplimiento;
@@ -236,13 +273,27 @@ export const dashboardHandlers = [
     return HttpResponse.json(result);
   }),
 
-  http.get('*/api/dashboard/alertas-recientes', () => {
-    const activas = mockAlertas.filter((a) => !a.silenciada).slice(0, 10);
+  http.get('*/api/dashboard/alertas-recientes', ({ request }) => {
+    let alertas = [...mockAlertas];
+    const user = getUserFromRequest(request);
+
+    if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
+      alertas = alertas.filter(a => user.tiendas_asignadas!.includes(a.tienda_id));
+    }
+
+    const activas = alertas.filter((a) => !a.silenciada).slice(0, 10);
     return HttpResponse.json(activas);
   }),
 
-  http.get('*/api/dashboard/tramites-proximos', () => {
-    const proximos = mockTramites
+  http.get('*/api/dashboard/tramites-proximos', ({ request }) => {
+    let tramites = [...mockTramites];
+    const user = getUserFromRequest(request);
+
+    if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
+      tramites = tramites.filter(t => user.tiendas_asignadas!.includes(t.tienda_id));
+    }
+
+    const proximos = tramites
       .filter((t) => t.estado === 'por_vencer' || t.estado === 'vencido')
       .sort((a, b) => new Date(a.fecha_vencimiento).getTime() - new Date(b.fecha_vencimiento).getTime())
       .slice(0, 10);

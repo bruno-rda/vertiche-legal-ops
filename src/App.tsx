@@ -11,6 +11,7 @@ import { TramitesPage } from '@/pages/Tramites/TramitesPage';
 import { TramiteDetailPage } from '@/pages/Tramites/TramiteDetailPage';
 import { AlertasPage } from '@/pages/Alertas/AlertasPage';
 import { DocumentosPage } from '@/pages/Documentos/DocumentosPage';
+import { ProfilePage } from '@/pages/Profile/ProfilePage';
 import { ToastContainer } from '@/components/Toast';
 import type { ReactNode } from 'react';
 
@@ -54,6 +55,7 @@ export default function App() {
             <Route path="/tramites" element={<TramitesPage />} />
             <Route path="/alertas" element={<AlertasPage />} />
             <Route path="/documentos" element={<DocumentosPage />} />
+            <Route path="/perfil" element={<ProfilePage />} />
           </Route>
 
           {/* Redirects */}

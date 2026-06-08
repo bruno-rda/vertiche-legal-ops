@@ -3,6 +3,7 @@ import { tiendasHandlers, dashboardHandlers } from './handlers/tiendas';
 import { tramitesHandlers } from './handlers/tramites';
 import { alertasHandlers } from './handlers/alertas';
 import { documentosHandlers } from './handlers/documentos';
+import { usuariosHandlers } from './handlers/usuarios';
 
 export const handlers = [
   ...authHandlers,
@@ -11,4 +12,5 @@ export const handlers = [
   ...tramitesHandlers,
   ...alertasHandlers,
   ...documentosHandlers,
+  ...usuariosHandlers,
 ];

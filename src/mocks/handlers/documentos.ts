@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { mockDocumentos } from '../data/documentos';
+import { getUserFromRequest } from '../utils';
 
 export const documentosHandlers = [
   http.get('*/api/documentos', ({ request }) => {
@@ -12,6 +13,11 @@ export const documentosHandlers = [
     const tramiteId = url.searchParams.get('tramite_id');
 
     let filtered = [...mockDocumentos];
+
+    const user = getUserFromRequest(request);
+    if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
+      filtered = filtered.filter((d) => d.tienda_id && user.tiendas_asignadas!.includes(d.tienda_id));
+    }
 
     if (estadoOcr) filtered = filtered.filter((d) => d.estado_ocr === estadoOcr);
     if (revision === 'true') filtered = filtered.filter((d) => d.requiere_revision_manual);
