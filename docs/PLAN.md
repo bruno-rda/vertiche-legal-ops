@@ -79,27 +79,14 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
   - **Features:** Comprehensive user list with a clean, card-based layout (replacing standard tables), role-based badges, and soft-delete/permanent delete capabilities. Implemented an interactive geographic state-based store assignment interface for admins in the operator profile, complete with a sticky save/discard bar and computed changes summary. Added a collapsible read-only store assignment summary grouped by geographic state.
   - **Mock handlers:** User CRUD (`GET /usuarios`, `POST /usuarios`, `PUT /usuarios/:id/status`, `DELETE /usuarios/:id`), and profile assignment mutations (`PUT /usuarios/:id/tiendas`).
 
+- **Iteration 15 — Operator Performance Metrics ✅**
+  - **Components:** OperatorPerformance, ProfilePage
+  - **Features:** A new performance dashboard within the Operator's profile displaying 5 key metrics with trend indicators across selectable time ranges (30 days, current month, 90 days). Added a visually sleek, chronological "Actividad Reciente" timeline with dynamic links to stores and procedures.
+  - **Mock handlers:** Added `GET /api/usuarios/:id/performance` which generates pseudo-random but deterministic data based on the selected user ID and time range.
+
 ---
 
 ## 3. Backlog
-- Operator performance metrics
-
-A "Desempeño" section appears in the operator profile page, visible to ADMIN (for any operator) and to the operator themselves (their own profile only). At the top of the section, a time range selector with three options: "Últimos 30 días", "Mes en curso", and "Últimos 90 días". Changing the range updates all metrics instantly.
-
-The metrics displayed are:
-
-* Documentos cargados: total documents uploaded in the period
-* Trámites resueltos: tramites that moved to `vigente` state during the period while under this operator's responsibility
-* Alertas atendidas: alerts that were silenced or resolved during the period for this operator's tiendas
-* Tiempo promedio de resolución: average time in days between an alert being generated and being resolved, for this operator's tiendas
-* Trámites vencidos bajo responsabilidad: tramites that reached `vencido` state during the period while this operator was assigned to the tienda
-
-Each metric is displayed as a card with a large number, a label, and a subtle trend indicator comparing to the previous equivalent period (e.g. if viewing last 30 days, compare to the 30 days before that). Trend up is green for positive metrics (documentos cargados, trámites resueltos, alertas atendidas) and red for negative ones (trámites vencidos, tiempo promedio). Trend direction for tiempo promedio is inverted: lower is better.
-
-Below the metric cards, a simple activity timeline shows the last 20 actions this operator has taken (document uploads, state changes, alert resolutions) with timestamp, action description, and the tienda involved. Each tienda name in the timeline is a clickable link.
-
-Add mock data that makes these metrics feel realistic and varied across different operators.
-
 - Allow column sorting in all tables
 
 All data tables in the application (tiendas list, tramites global, documentos global, alertas) should support ascending and descending sort by clicking column headers. Sortable columns should have a visual indicator (chevron icon) that shows the current sort direction. Clicking the same column toggles direction. Clicking a different column resets to ascending for that column. Sort state is maintained within the session when navigating back to the page. For paginated tables, sort params are passed to the backend as query parameters. For fully client-side loaded tables, sorting is handled in the browser.

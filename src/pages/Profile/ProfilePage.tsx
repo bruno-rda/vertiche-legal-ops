@@ -6,9 +6,10 @@ import type { User } from '@/types';
 import { Badge } from '@/components/Badge';
 import { Skeleton } from '@/components/Skeleton';
 import { formatDate } from '@/lib/utils';
-import { UserCircle, Mail, Calendar, Store, Activity } from 'lucide-react';
+import { UserCircle, Mail, Calendar, Store } from 'lucide-react';
 import { StoreSummary } from './components/StoreSummary';
 import { StoreAssignment } from './components/StoreAssignment';
+import { OperatorPerformance } from './components/OperatorPerformance';
 import { useState } from 'react';
 
 export function ProfilePage() {
@@ -63,7 +64,7 @@ export function ProfilePage() {
           <div className="w-24 h-24 rounded-full bg-neutral-light flex items-center justify-center shrink-0">
             <UserCircle className="w-12 h-12 text-text-muted" />
           </div>
-          
+
           <div className="flex-1 space-y-6">
             <div>
               <h2 className="text-2xl font-bold text-text-primary flex items-center gap-3">
@@ -97,8 +98,8 @@ export function ProfilePage() {
                   <Store className="w-4 h-4" /> Tiendas asignadas
                 </p>
                 <p className="text-base text-text-primary">
-                  {user.rol === 'OPERATOR' 
-                    ? (user.tiendas_asignadas?.length || 0) 
+                  {user.rol === 'OPERATOR'
+                    ? (user.tiendas_asignadas?.length || 0)
                     : 'Acceso global (Todas)'}
                 </p>
               </div>
@@ -109,30 +110,20 @@ export function ProfilePage() {
 
       {user.rol === 'OPERATOR' && (
         <>
+          <OperatorPerformance userId={user.id} />
+
           {isEditingAssignment && isAdminView ? (
-            <StoreAssignment 
-              user={user} 
-              onCancel={() => setIsEditingAssignment(false)} 
+            <StoreAssignment
+              user={user}
+              onCancel={() => setIsEditingAssignment(false)}
             />
           ) : (
-            <StoreSummary 
-              userId={user.id} 
+            <StoreSummary
+              userId={user.id}
               isAdminView={isAdminView}
               onEditAssignment={() => setIsEditingAssignment(true)}
             />
           )}
-
-          <div className="bg-surface-card rounded-xl border border-border p-6 md:p-8">
-            <div className="flex items-center gap-2 mb-6">
-              <Activity className="w-5 h-5 text-text-primary" />
-              <h2 className="text-xl font-bold text-text-primary">Desempeño</h2>
-            </div>
-            <div className="py-8 text-center bg-surface border border-dashed border-border rounded-lg">
-              <p className="text-sm text-text-secondary">
-                Las métricas de desempeño estarán disponibles en la próxima actualización.
-              </p>
-            </div>
-          </div>
         </>
       )}
     </div>

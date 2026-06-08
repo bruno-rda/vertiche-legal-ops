@@ -170,3 +170,32 @@ export interface LoginResponse {
   token: string;
   user: User;
 }
+
+export interface MetricTrend {
+  value: number;
+  previous_value: number;
+  trend: 'up' | 'down' | 'neutral';
+}
+
+export interface OperatorPerformanceMetrics {
+  documentos_cargados: MetricTrend;
+  tramites_resueltos: MetricTrend;
+  alertas_atendidas: MetricTrend;
+  tiempo_promedio_resolucion: MetricTrend;
+  tramites_vencidos_responsabilidad: MetricTrend;
+}
+
+export interface ActivityTimelineItem {
+  id: string;
+  accion: string;
+  fecha: string;
+  tienda_id: string;
+  tienda_nombre: string;
+  tramite_id?: string;
+  tramite_nombre?: string;
+}
+
+export interface OperatorPerformanceData {
+  metrics: OperatorPerformanceMetrics;
+  timeline: ActivityTimelineItem[];
+}

@@ -148,4 +148,81 @@ export const usuariosHandlers = [
 
     return HttpResponse.json(result);
   }),
+
+  http.get('*/api/usuarios/:id/performance', ({ params, request }) => {
+    const { id } = params;
+    const url = new URL(request.url);
+    const range = url.searchParams.get('range') || '30'; // 30, month, 90
+
+    const user = mockUsers.find((u) => u.id === id);
+    if (!user) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    // Generate deterministic pseudo-random numbers based on user ID and range
+    const seed = typeof id === 'string' 
+      ? id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + (range === '90' ? 90 : range === 'month' ? 15 : 30)
+      : 123;
+    
+    // Helper to generate a number and its previous period value
+    const generateTrend = (base: number) => {
+      const value = Math.floor(base + (seed % (base * 0.5)));
+      const previous_value = Math.floor(value * (0.8 + ((seed % 40) / 100))); // Previous is 80-120% of current
+      
+      let trend: 'up' | 'down' | 'neutral' = 'neutral';
+      if (value > previous_value) trend = 'up';
+      else if (value < previous_value) trend = 'down';
+
+      return { value, previous_value, trend };
+    };
+
+    const metrics = {
+      documentos_cargados: generateTrend(range === '90' ? 120 : 45),
+      tramites_resueltos: generateTrend(range === '90' ? 80 : 25),
+      alertas_atendidas: generateTrend(range === '90' ? 60 : 18),
+      tiempo_promedio_resolucion: generateTrend(range === '90' ? 4 : 3),
+      tramites_vencidos_responsabilidad: generateTrend(range === '90' ? 5 : 2),
+    };
+
+    // Format tiempo_promedio to 1 decimal place
+    metrics.tiempo_promedio_resolucion.value = Math.round((metrics.tiempo_promedio_resolucion.value * 0.8 + (seed % 10) * 0.1) * 10) / 10;
+    metrics.tiempo_promedio_resolucion.previous_value = Math.round((metrics.tiempo_promedio_resolucion.previous_value * 0.8 + (seed % 15) * 0.1) * 10) / 10;
+
+    // Recalculate trend for float values just in case
+    if (metrics.tiempo_promedio_resolucion.value > metrics.tiempo_promedio_resolucion.previous_value) metrics.tiempo_promedio_resolucion.trend = 'up';
+    else if (metrics.tiempo_promedio_resolucion.value < metrics.tiempo_promedio_resolucion.previous_value) metrics.tiempo_promedio_resolucion.trend = 'down';
+    else metrics.tiempo_promedio_resolucion.trend = 'neutral';
+
+    const timeline = Array.from({ length: 20 }).map((_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (i * (range === '90' ? 4 : 1)) - (seed % 2));
+      
+      const actions = [
+        'Documento cargado',
+        'Trámite resuelto',
+        'Alerta atendida',
+        'Estado actualizado',
+        'Documento revisado'
+      ];
+
+      const assignedTiendas = user.tiendas_asignadas?.length 
+        ? mockTiendas.filter(t => user.tiendas_asignadas!.includes(t.id))
+        : mockTiendas;
+        
+      const tienda = assignedTiendas[(seed + i) % assignedTiendas.length] || mockTiendas[0];
+      const tramite = mockTramites.find(t => t.tienda_id === tienda.id) || mockTramites[0];
+
+      return {
+        id: `tl-${id}-${i}`,
+        accion: actions[(seed + i) % actions.length],
+        fecha: date.toISOString(),
+        tienda_id: tienda.id,
+        tienda_nombre: tienda.nombre,
+        tramite_id: tramite?.id,
+        tramite_nombre: tramite?.nombre,
+      };
+    });
+
+    return HttpResponse.json({ metrics, timeline });
+  }),
 ];

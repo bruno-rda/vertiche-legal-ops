@@ -60,3 +60,6 @@ The operator filter in the Tiendas list was restricted to `ADMIN` roles instead 
 
 ### 2026-06-08 — Card-Based Layout over Standard Tables for Users
 Although the initial project requirements specified a "table with columns" for the global `UsuariosPage`, it was decided during implementation to replace the `<table>` structure with a clean, row-card layout. This decision reduces visual clutter (removing dense table headers), aligns the UX closely with the established design language of the `AlertasPage`, and creates a tighter grouping of metadata beside primary identifiers (e.g., placing the creation date and assigned store counts directly inline with the user's email).
+
+### 2026-06-08 — Operator Performance Timeline Design
+The initial plan called for a standard list of 20 timeline items for the operator's recent activity. To prevent visual clutter and maintain the elegant aesthetic of the application, this was adapted into a sleeker, card-less design grouped by explicit date separators. Additionally, an incremental "Cargar más" feature (loading 5 items at a time) was implemented to prevent overwhelming the profile UI instead of loading all 20 items statically at once.
