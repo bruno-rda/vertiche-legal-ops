@@ -39,3 +39,9 @@ To avoid CORS issues and external CDN dependencies that might block rendering of
 
 ### 2026-06-04 — Quick filters converted to Dropdowns
 To ensure URL query param updates do not suffer from stale state/closure bugs (where rapid sequential React updates overwrite each other), the pill buttons in `TramitesPage` were converted to a native select dropdown. This simplifies state management and unifies the UI with the rest of the application's table filters.
+
+### 2026-06-08 — Direct Mutation of Mock Data Array for MSW Sync
+To ensure that store-specific alert queries (e.g., `GET /api/tiendas/:id/alertas`) correctly reflect mutations made from the global alerts page (e.g., `POST /api/alertas/:id/silenciar`), the MSW handlers were updated to directly mutate the underlying `mockAlertas` array using `Object.assign` or direct reassignment, rather than maintaining localized mutable copies. This enables immediate state synchronicity across the app.
+
+### 2026-06-08 — Debounced Expandable Search + Keep Previous Data
+To maintain the "wow" aesthetic of the clean UI while offering powerful bulk triage capabilities, the search function in the Global Alertas page was hidden behind an expandable icon interaction. To prevent the UI from jumping heavily on each keystroke, the input state was separated from the query parameter and debounced by 300ms, combined with React Query's `placeholderData: keepPreviousData` to ensure seamless transitions.

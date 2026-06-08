@@ -6,7 +6,7 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
 
 ## 1. Current Sprint
 
-*(No active sprint currently. Planning for next iteration.)*
+*(No active tasks — Sprint completed)*
 
 ---
 
@@ -59,24 +59,17 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
   - **Features:** Create tramites from tienda Expediente, edit tramite details (permanency, dates), edit tienda details, advanced table filtering (dropdowns for geographic states and quick filters)
   - **Mock handlers:** extended `POST /tiendas/:id/tramites`, `PUT /tramites/:id`, `PUT /tiendas/:id`
 
+- **Iteration 11 — Alertas Workflow & UX Refinement ✅**
+  - **Components:** AlertasPage, TiendaAlertasTab
+  - **Features:** Bulk WhatsApp/Email notifications with visual selection checkboxes, ability to reactivate resolved alerts, debounced expandable search bar for triage, synchronized global/local alert state.
+  - **Mock handlers:** `mockAlertas` array direct mutability, extended `GET /api/alertas` with text search support.
+
 ---
 
 ## 3. Backlog
 - Allow column sorting in all tables
 
 All data tables in the application (tiendas list, tramites global, documentos global, alertas) should support ascending and descending sort by clicking column headers. Sortable columns should have a visual indicator (chevron icon) that shows current sort direction. Clicking the same column header again reverses the direction. Clicking a different header resets to ascending for that column. Sort state should be maintained when the user navigates back to the page within the same session. Sorting is done client-side for tables with full data loaded, and passed as query params to the backend for paginated tables.
-
-- Allow alert silencing from Alertas tab in tienda detail
-
-The Alertas tab in the tienda detail page should support the same silencing action as the global alertas page. Each alert row should have a "Silenciar" button that opens the same SilenciarModal (duration options + optional note). After silencing, the alert moves out of the active list in that tab with the same animation as in the global alerts page.
-
-- Allow reactivation of silenced alerts and mark as resolved
-
-Add a "Resueltas" tab to the alertas page alongside "Activas" and "Silenciadas". An alert can be marked as resolved from any view where it appears (active or silenced). Resolving an alert removes it from both Activas and Silenciadas and moves it to Resueltas, with the timestamp and user who resolved it recorded. Resolved alerts cannot be reactivated. Silenced alerts can be reactivated (remove silence before expiry) via a "Reactivar" button in the Silenciadas tab, which moves them back to Activas. Resolved alerts in the Resueltas tab are read-only and shown in chronological order. Add the same three-tab structure to the Alertas tab inside the tienda detail page.
-
-- WhatsApp and email alert sending
-
-In the global alertas page, each alert in the Activas tab should show which notification channels have already been used for that alert: email and/or WhatsApp, shown as small channel badges (e.g. an envelope icon for email, a phone icon for WhatsApp), greyed out if not yet sent, filled/colored if already sent. Each alert should also have a "Enviar" dropdown button with two options: "Enviar por email" and "Enviar por WhatsApp". Clicking either triggers the corresponding backend action and updates the channel badge state immediately (optimistic update). If the send fails, revert the badge and show an error toast. This feature is only visible to ADMIN and OPERATOR roles. The backend integration for this is not yet defined; for now implement the UI with MSW mocks that simulate success after a short delay.
 
 - User management screen (ADMIN only)
 

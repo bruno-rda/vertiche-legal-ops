@@ -7,12 +7,13 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Skeleton } from '@/components/Skeleton';
 import { EmptyState } from '@/components/EmptyState';
-import { formatDate, timeAgo } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import {
   MapPin, Tag, Download, FileText, AlertTriangle,
   Upload, History, Bell, FolderOpen, Eye
 } from 'lucide-react';
 import { ExpedienteTab } from './components/ExpedienteTab';
+import { TiendaAlertasTab } from './components/TiendaAlertasTab';
 import { TramitesLinks } from '@/components/TramitesLinks';
 import { useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
@@ -92,7 +93,7 @@ export function TiendaDetailPage() {
   const tabs: { key: Tab; label: string; icon: React.ElementType; count?: number }[] = [
     { key: 'expediente', label: 'Expediente', icon: FolderOpen, count: expediente?.tramites.length },
     { key: 'documentos', label: 'Documentos', icon: FileText },
-    { key: 'alertas', label: 'Alertas', icon: Bell, count: alertas?.filter(a => !a.silenciada).length },
+    { key: 'alertas', label: 'Alertas', icon: Bell, count: alertas?.filter(a => !a.silenciada && !a.resuelta).length },
     { key: 'historial', label: 'Historial', icon: History },
   ];
 
@@ -207,17 +208,8 @@ export function TiendaDetailPage() {
         </div>
       )}
 
-      {activeTab === 'alertas' && (
-        <div className="space-y-2">
-          {!alertas || alertas.filter(a => !a.silenciada).length === 0 ? <EmptyState variant="no-data" title="Sin alertas activas" description="No hay alertas activas para esta tienda." /> :
-            alertas.filter(a => !a.silenciada).map(a => (
-              <div key={a.id} className={`bg-surface-card border rounded-lg px-5 py-4 flex items-start gap-3 ${a.severidad === 'critical' ? 'border-l-4 border-l-danger border-border' : 'border-border'}`}>
-                <AlertTriangle className={`w-4 h-4 mt-0.5 shrink-0 ${a.severidad === 'critical' ? 'text-danger' : a.severidad === 'warning' ? 'text-warning' : 'text-info'}`} />
-                <div className="flex-1"><p className="text-sm text-text-primary">{a.mensaje}</p><p className="text-xs text-text-muted mt-1">{timeAgo(a.fecha_generacion)}</p></div>
-                <Badge variant={a.severidad} size="sm" />
-              </div>
-            ))}
-        </div>
+      {activeTab === 'alertas' && alertas && (
+        <TiendaAlertasTab alertas={alertas} tiendaId={id!} />
       )}
 
       {activeTab === 'historial' && (

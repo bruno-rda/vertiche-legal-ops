@@ -95,6 +95,13 @@ export interface Alerta {
   silenciada: boolean;
   silenciada_hasta?: string;
   silenciada_por?: string;
+  resuelta: boolean;
+  fecha_resolucion?: string;
+  resuelta_por?: string;
+  notificaciones_enviadas?: {
+    email: boolean;
+    whatsapp: boolean;
+  };
 }
 
 export interface Observacion {

@@ -24,6 +24,8 @@ function generateAlertas(): Alerta[] {
       mensaje: `El trámite "${t.nombre}" de ${tienda?.nombre} ha vencido y requiere atención inmediata.`,
       fecha_generacion: new Date(Date.now() - Math.floor(Math.random() * 7) * 86400000).toISOString(),
       silenciada: false,
+      resuelta: false,
+      notificaciones_enviadas: { email: false, whatsapp: false },
     });
   });
 
@@ -41,6 +43,8 @@ function generateAlertas(): Alerta[] {
       mensaje: `El trámite "${t.nombre}" de ${tienda?.nombre} está próximo a vencer.`,
       fecha_generacion: new Date(Date.now() - Math.floor(Math.random() * 14) * 86400000).toISOString(),
       silenciada: false,
+      resuelta: false,
+      notificaciones_enviadas: { email: false, whatsapp: false },
     });
   });
 
@@ -64,6 +68,8 @@ function generateAlertas(): Alerta[] {
       mensaje: template.template.replace('{tienda}', tienda.nombre),
       fecha_generacion: new Date(Date.now() - Math.floor(Math.random() * 21) * 86400000).toISOString(),
       silenciada: false,
+      resuelta: false,
+      notificaciones_enviadas: { email: false, whatsapp: false },
     });
   }
 
@@ -82,6 +88,8 @@ function generateAlertas(): Alerta[] {
       silenciada: true,
       silenciada_hasta: new Date(Date.now() + 15 * 86400000).toISOString(),
       silenciada_por: 'usr-001',
+      resuelta: false,
+      notificaciones_enviadas: { email: false, whatsapp: false },
     });
   }
 
