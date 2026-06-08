@@ -127,7 +127,7 @@ export function AppLayout() {
           className={`
             ${sidebarWidth} shrink-0 bg-surface-card border-r border-border
             flex flex-col transition-all duration-200 ease-in-out z-40
-            fixed lg:relative h-[calc(100vh-56px)]
+            fixed lg:relative h-[calc(100vh-64px)] lg:h-full
             ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}
         >
@@ -162,34 +162,14 @@ export function AppLayout() {
 
           {/* Bottom section */}
           <div className="border-t border-border p-3">
-            {!sidebarCollapsed && (
-              <div
-                className="flex items-center gap-2 px-2 mb-1 cursor-pointer hover:bg-neutral-light p-1.5 rounded-lg transition-colors"
-                onClick={() => navigate('/perfil')}
-              >
-                <div className="w-8 h-8 rounded-full bg-neutral-light flex items-center justify-center text-sm font-semibold text-text-secondary">
-                  {user?.nombre.charAt(0)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-text-primary truncate">
-                    {user?.nombre}
-                  </p>
-                  <p className="text-[11px] text-text-muted uppercase tracking-wider">
-                    {user?.rol}
-                  </p>
-                </div>
-              </div>
-            )}
-            <div className="flex items-center gap-1">
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-danger hover:bg-danger-light rounded-lg transition-colors w-full"
-                title="Cerrar sesión"
-              >
-                <LogOut className="w-4 h-4" />
-                {!sidebarCollapsed && <span>Cerrar sesión</span>}
-              </button>
-            </div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-danger hover:bg-danger-light rounded-lg transition-colors w-full"
+              title="Cerrar sesión"
+            >
+              <LogOut className="w-4 h-4" />
+              {!sidebarCollapsed && <span>Cerrar sesión</span>}
+            </button>
           </div>
 
           {/* Collapse toggle — desktop only */}
