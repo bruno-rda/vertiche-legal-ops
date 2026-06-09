@@ -213,16 +213,14 @@ export function TiendaDetailPage() {
       )}
 
       {activeTab === 'historial' && (
-        <div className="space-y-0">
+        <div className="space-y-0 min-h-[400px]">
           {!historial || historial.length === 0 ? <EmptyState variant="no-data" title="Sin historial" description="No hay registros de actividad." /> :
             <div className="relative pl-6 border-l-2 border-border space-y-6">
               {historial.map(h => (
                 <div key={h.id} className="relative">
                   <div className="absolute -left-[25px] w-3 h-3 rounded-full bg-surface-card border-2 border-border" />
-                  <div className="bg-surface-card border border-border rounded-lg px-4 py-3">
-                    <p className="text-sm text-text-primary">{h.detalle || h.accion}</p>
-                    <p className="text-xs text-text-muted mt-1"><span className="font-medium">{h.usuario_nombre}</span> · {formatDate(h.fecha)}</p>
-                  </div>
+                  <p className="text-sm text-text-primary">{h.detalle || h.accion}</p>
+                  <p className="text-xs text-text-muted mt-0.5"><span className="font-medium">{h.usuario_nombre}</span> · {formatDate(h.fecha)}</p>
                 </div>
               ))}
             </div>}
