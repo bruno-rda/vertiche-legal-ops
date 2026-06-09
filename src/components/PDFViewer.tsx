@@ -36,7 +36,7 @@ export function PDFViewer({ url, title, onClose }: PDFViewerProps) {
   }
 
   const changePage = (offset: number) => {
-    setPageNumber(prevPageNumber => {
+    setPageNumber((prevPageNumber) => {
       const newPageNumber = prevPageNumber + offset;
       return Math.max(1, Math.min(newPageNumber, numPages || 1));
     });
@@ -45,8 +45,8 @@ export function PDFViewer({ url, title, onClose }: PDFViewerProps) {
   const previousPage = () => changePage(-1);
   const nextPage = () => changePage(1);
 
-  const zoomIn = () => setScale(prevScale => Math.min(prevScale + 0.25, 3));
-  const zoomOut = () => setScale(prevScale => Math.max(prevScale - 0.25, 0.5));
+  const zoomIn = () => setScale((prevScale) => Math.min(prevScale + 0.25, 3));
+  const zoomOut = () => setScale((prevScale) => Math.max(prevScale - 0.25, 0.5));
 
   const handleDownload = () => {
     const link = document.createElement('a');
@@ -127,7 +127,14 @@ export function PDFViewer({ url, title, onClose }: PDFViewerProps) {
               onClick={onClose}
               className="p-1 hover:bg-neutral-light rounded-full text-text-secondary"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>

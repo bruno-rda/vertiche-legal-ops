@@ -44,12 +44,13 @@ export function MapTooltip({
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-text-secondary">Cumplimiento</span>
                     <span
-                      className={`font-medium ${cumplimiento >= 85
+                      className={`font-medium ${
+                        cumplimiento >= 85
                           ? 'text-success'
                           : cumplimiento >= 60
                             ? 'text-warning'
                             : 'text-danger'
-                        }`}
+                      }`}
                     >
                       {cumplimiento}%
                     </span>
@@ -57,8 +58,9 @@ export function MapTooltip({
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-text-secondary">Trámites críticos</span>
                     <span
-                      className={`font-medium ${criticalCount > 0 ? 'text-danger' : 'text-text-primary'
-                        }`}
+                      className={`font-medium ${
+                        criticalCount > 0 ? 'text-danger' : 'text-text-primary'
+                      }`}
                     >
                       {criticalCount}
                     </span>

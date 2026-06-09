@@ -11,7 +11,12 @@ function getColorClass(value: number): string {
   return 'bg-danger';
 }
 
-export function ProgressBar({ value, size = 'md', showLabel = false, className = '' }: ProgressBarProps) {
+export function ProgressBar({
+  value,
+  size = 'md',
+  showLabel = false,
+  className = '',
+}: ProgressBarProps) {
   const clamped = Math.max(0, Math.min(100, value));
   const heightClass = size === 'sm' ? 'h-1.5' : 'h-2.5';
 

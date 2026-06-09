@@ -16,8 +16,7 @@ export const usuariosHandlers = [
     }
     if (search) {
       filtered = filtered.filter(
-        (u) =>
-          u.nombre.toLowerCase().includes(search) || u.email.toLowerCase().includes(search)
+        (u) => u.nombre.toLowerCase().includes(search) || u.email.toLowerCase().includes(search),
       );
     }
 
@@ -102,44 +101,45 @@ export const usuariosHandlers = [
       return new HttpResponse(null, { status: 404 });
     }
 
-    const assignedTiendas = mockTiendas.filter((t) =>
-      user.tiendas_asignadas?.includes(t.id)
+    const assignedTiendas = mockTiendas.filter((t) => user.tiendas_asignadas?.includes(t.id));
+
+    const resumen = assignedTiendas.reduce(
+      (acc, tienda) => {
+        if (!acc[tienda.estado]) {
+          acc[tienda.estado] = {
+            estado: tienda.estado,
+            total_tiendas: 0,
+            cumplimiento_total: 0,
+            tramites_criticos: 0,
+            tiendas: [],
+            vigentes: 0,
+            por_vencer: 0,
+            criticas: 0,
+          };
+        }
+
+        acc[tienda.estado].total_tiendas++;
+        acc[tienda.estado].cumplimiento_total += tienda.cumplimiento;
+        acc[tienda.estado].tiendas.push({
+          id: tienda.id,
+          nombre: tienda.nombre,
+          municipio: tienda.municipio,
+          estado_cumplimiento: tienda.estado_cumplimiento,
+        });
+
+        if (tienda.estado_cumplimiento === 'vigente') acc[tienda.estado].vigentes++;
+        if (tienda.estado_cumplimiento === 'en_riesgo') acc[tienda.estado].por_vencer++;
+        if (tienda.estado_cumplimiento === 'critico') acc[tienda.estado].criticas++;
+
+        const tiendaTramites = mockTramites.filter((tr) => tr.tienda_id === tienda.id);
+        acc[tienda.estado].tramites_criticos += tiendaTramites.filter(
+          (tr) => tr.estado === 'vencido',
+        ).length;
+
+        return acc;
+      },
+      {} as Record<string, any>,
     );
-
-    const resumen = assignedTiendas.reduce((acc, tienda) => {
-      if (!acc[tienda.estado]) {
-        acc[tienda.estado] = {
-          estado: tienda.estado,
-          total_tiendas: 0,
-          cumplimiento_total: 0,
-          tramites_criticos: 0,
-          tiendas: [],
-          vigentes: 0,
-          por_vencer: 0,
-          criticas: 0,
-        };
-      }
-
-      acc[tienda.estado].total_tiendas++;
-      acc[tienda.estado].cumplimiento_total += tienda.cumplimiento;
-      acc[tienda.estado].tiendas.push({
-        id: tienda.id,
-        nombre: tienda.nombre,
-        municipio: tienda.municipio,
-        estado_cumplimiento: tienda.estado_cumplimiento,
-      });
-
-      if (tienda.estado_cumplimiento === 'vigente') acc[tienda.estado].vigentes++;
-      if (tienda.estado_cumplimiento === 'en_riesgo') acc[tienda.estado].por_vencer++;
-      if (tienda.estado_cumplimiento === 'critico') acc[tienda.estado].criticas++;
-
-      const tiendaTramites = mockTramites.filter((tr) => tr.tienda_id === tienda.id);
-      acc[tienda.estado].tramites_criticos += tiendaTramites.filter(
-        (tr) => tr.estado === 'vencido'
-      ).length;
-
-      return acc;
-    }, {} as Record<string, any>);
 
     const result = Object.values(resumen).map((r: any) => ({
       ...r,
@@ -160,15 +160,17 @@ export const usuariosHandlers = [
     }
 
     // Generate deterministic pseudo-random numbers based on user ID and range
-    const seed = typeof id === 'string' 
-      ? id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) + (range === '90' ? 90 : range === 'month' ? 15 : 30)
-      : 123;
-    
+    const seed =
+      typeof id === 'string'
+        ? id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) +
+          (range === '90' ? 90 : range === 'month' ? 15 : 30)
+        : 123;
+
     // Helper to generate a number and its previous period value
     const generateTrend = (base: number) => {
       const value = Math.floor(base + (seed % (base * 0.5)));
-      const previous_value = Math.floor(value * (0.8 + ((seed % 40) / 100))); // Previous is 80-120% of current
-      
+      const previous_value = Math.floor(value * (0.8 + (seed % 40) / 100)); // Previous is 80-120% of current
+
       let trend: 'up' | 'down' | 'neutral' = 'neutral';
       if (value > previous_value) trend = 'up';
       else if (value < previous_value) trend = 'down';
@@ -185,32 +187,42 @@ export const usuariosHandlers = [
     };
 
     // Format tiempo_promedio to 1 decimal place
-    metrics.tiempo_promedio_resolucion.value = Math.round((metrics.tiempo_promedio_resolucion.value * 0.8 + (seed % 10) * 0.1) * 10) / 10;
-    metrics.tiempo_promedio_resolucion.previous_value = Math.round((metrics.tiempo_promedio_resolucion.previous_value * 0.8 + (seed % 15) * 0.1) * 10) / 10;
+    metrics.tiempo_promedio_resolucion.value =
+      Math.round((metrics.tiempo_promedio_resolucion.value * 0.8 + (seed % 10) * 0.1) * 10) / 10;
+    metrics.tiempo_promedio_resolucion.previous_value =
+      Math.round(
+        (metrics.tiempo_promedio_resolucion.previous_value * 0.8 + (seed % 15) * 0.1) * 10,
+      ) / 10;
 
     // Recalculate trend for float values just in case
-    if (metrics.tiempo_promedio_resolucion.value > metrics.tiempo_promedio_resolucion.previous_value) metrics.tiempo_promedio_resolucion.trend = 'up';
-    else if (metrics.tiempo_promedio_resolucion.value < metrics.tiempo_promedio_resolucion.previous_value) metrics.tiempo_promedio_resolucion.trend = 'down';
+    if (
+      metrics.tiempo_promedio_resolucion.value > metrics.tiempo_promedio_resolucion.previous_value
+    )
+      metrics.tiempo_promedio_resolucion.trend = 'up';
+    else if (
+      metrics.tiempo_promedio_resolucion.value < metrics.tiempo_promedio_resolucion.previous_value
+    )
+      metrics.tiempo_promedio_resolucion.trend = 'down';
     else metrics.tiempo_promedio_resolucion.trend = 'neutral';
 
     const timeline = Array.from({ length: 20 }).map((_, i) => {
       const date = new Date();
-      date.setDate(date.getDate() - (i * (range === '90' ? 4 : 1)) - (seed % 2));
-      
+      date.setDate(date.getDate() - i * (range === '90' ? 4 : 1) - (seed % 2));
+
       const actions = [
         'Documento cargado',
         'Trámite resuelto',
         'Alerta atendida',
         'Estado actualizado',
-        'Documento revisado'
+        'Documento revisado',
       ];
 
-      const assignedTiendas = user.tiendas_asignadas?.length 
-        ? mockTiendas.filter(t => user.tiendas_asignadas!.includes(t.id))
+      const assignedTiendas = user.tiendas_asignadas?.length
+        ? mockTiendas.filter((t) => user.tiendas_asignadas!.includes(t.id))
         : mockTiendas;
-        
+
       const tienda = assignedTiendas[(seed + i) % assignedTiendas.length] || mockTiendas[0];
-      const tramite = mockTramites.find(t => t.tienda_id === tienda.id) || mockTramites[0];
+      const tramite = mockTramites.find((t) => t.tienda_id === tienda.id) || mockTramites[0];
 
       return {
         id: `tl-${id}-${i}`,

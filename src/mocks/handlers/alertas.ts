@@ -2,7 +2,6 @@ import { http, HttpResponse } from 'msw';
 import { mockAlertas } from '../data/alertas';
 import { getUserFromRequest } from '../utils';
 
-
 export const alertasHandlers = [
   http.get('*/api/alertas', ({ request }) => {
     const url = new URL(request.url);
@@ -21,10 +20,11 @@ export const alertasHandlers = [
     }
 
     if (search) {
-      filtered = filtered.filter((a) =>
-        a.mensaje.toLowerCase().includes(search) ||
-        (a.tienda_nombre && a.tienda_nombre.toLowerCase().includes(search)) ||
-        (a.tramite_nombre && a.tramite_nombre.toLowerCase().includes(search))
+      filtered = filtered.filter(
+        (a) =>
+          a.mensaje.toLowerCase().includes(search) ||
+          (a.tienda_nombre && a.tienda_nombre.toLowerCase().includes(search)) ||
+          (a.tramite_nombre && a.tramite_nombre.toLowerCase().includes(search)),
       );
     }
 
@@ -42,7 +42,7 @@ export const alertasHandlers = [
   }),
 
   http.post('*/api/alertas/:id/silenciar', async ({ params, request }) => {
-    const body = await request.json() as { duracion_dias: number; nota?: string };
+    const body = (await request.json()) as { duracion_dias: number; nota?: string };
     const index = mockAlertas.findIndex((a) => a.id === params.id);
     if (index === -1) {
       return HttpResponse.json({ detail: 'Alerta no encontrada' }, { status: 404 });
@@ -111,7 +111,9 @@ export const alertasHandlers = [
       alertas = alertas.filter((a) => user.tiendas_asignadas!.includes(a.tienda_id));
     }
 
-    const criticalCount = alertas.filter((a) => !a.silenciada && !a.resuelta && a.severidad === 'critical').length;
+    const criticalCount = alertas.filter(
+      (a) => !a.silenciada && !a.resuelta && a.severidad === 'critical',
+    ).length;
     return HttpResponse.json({ count: criticalCount });
   }),
 ];

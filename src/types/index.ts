@@ -82,7 +82,11 @@ export interface Documento {
 }
 
 export type AlertaSeveridad = 'info' | 'warning' | 'critical';
-export type AlertaTipo = 'vencimiento_proximo' | 'vencido' | 'inconsistencia' | 'baja_confianza_ocr';
+export type AlertaTipo =
+  | 'vencimiento_proximo'
+  | 'vencido'
+  | 'inconsistencia'
+  | 'baja_confianza_ocr';
 
 export interface Alerta {
   id: string;

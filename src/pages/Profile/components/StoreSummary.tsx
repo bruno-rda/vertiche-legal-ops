@@ -88,14 +88,18 @@ export function StoreSummary({ userId, isAdminView, onEditAssignment }: StoreSum
       ) : (
         <div className="space-y-4">
           <p className="text-sm text-text-secondary font-medium mb-4">
-            {totalTiendas} tiendas asignadas en {totalEstados} {totalEstados === 1 ? 'estado' : 'estados'}.
+            {totalTiendas} tiendas asignadas en {totalEstados}{' '}
+            {totalEstados === 1 ? 'estado' : 'estados'}.
           </p>
-          
+
           <div className="space-y-3">
             {resumen?.map((estadoResumen) => {
               const isExpanded = expandedStates.has(estadoResumen.estado);
               return (
-                <div key={estadoResumen.estado} className="border border-border rounded-lg overflow-hidden bg-surface">
+                <div
+                  key={estadoResumen.estado}
+                  className="border border-border rounded-lg overflow-hidden bg-surface"
+                >
                   <button
                     onClick={() => toggleState(estadoResumen.estado)}
                     className="w-full flex items-center justify-between p-4 hover:bg-neutral-light transition-colors text-left"
@@ -117,13 +121,19 @@ export function StoreSummary({ userId, isAdminView, onEditAssignment }: StoreSum
                     </div>
                     <div className="flex items-center gap-1.5 text-xs">
                       {estadoResumen.criticas > 0 && (
-                        <Badge variant="critico" size="sm">{estadoResumen.criticas}</Badge>
+                        <Badge variant="critico" size="sm">
+                          {estadoResumen.criticas}
+                        </Badge>
                       )}
                       {estadoResumen.por_vencer > 0 && (
-                        <Badge variant="por_vencer" size="sm">{estadoResumen.por_vencer}</Badge>
+                        <Badge variant="por_vencer" size="sm">
+                          {estadoResumen.por_vencer}
+                        </Badge>
                       )}
                       {estadoResumen.vigentes > 0 && (
-                        <Badge variant="vigente" size="sm">{estadoResumen.vigentes}</Badge>
+                        <Badge variant="vigente" size="sm">
+                          {estadoResumen.vigentes}
+                        </Badge>
                       )}
                     </div>
                   </button>

@@ -16,7 +16,12 @@ interface AsociarDocumentoModalProps {
   tiendaId: string;
 }
 
-export function AsociarDocumentoModal({ isOpen, onClose, tramiteId, tiendaId }: AsociarDocumentoModalProps) {
+export function AsociarDocumentoModal({
+  isOpen,
+  onClose,
+  tramiteId,
+  tiendaId,
+}: AsociarDocumentoModalProps) {
   const queryClient = useQueryClient();
   const addToast = useUIStore((s) => s.addToast);
   const [selectedDocIds, setSelectedDocIds] = useState<Set<string>>(new Set());
@@ -25,7 +30,8 @@ export function AsociarDocumentoModal({ isOpen, onClose, tramiteId, tiendaId }: 
   // Fetch all documents for this tienda
   const { data, isLoading, isError } = useQuery({
     queryKey: ['documentos', { tienda_id: tiendaId }],
-    queryFn: () => api.get<PaginatedResponse<Documento>>(`/api/documentos?tienda_id=${tiendaId}&page_size=100`),
+    queryFn: () =>
+      api.get<PaginatedResponse<Documento>>(`/api/documentos?tienda_id=${tiendaId}&page_size=100`),
     enabled: isOpen,
   });
 
@@ -33,7 +39,9 @@ export function AsociarDocumentoModal({ isOpen, onClose, tramiteId, tiendaId }: 
 
   useEffect(() => {
     if (allDocs.length > 0) {
-      const associated = allDocs.filter(doc => doc.tramite_ids.includes(tramiteId)).map(doc => doc.id);
+      const associated = allDocs
+        .filter((doc) => doc.tramite_ids.includes(tramiteId))
+        .map((doc) => doc.id);
       const initialSet = new Set(associated);
       setSelectedDocIds(initialSet);
       setInitialDocIds(new Set(associated));
@@ -56,10 +64,10 @@ export function AsociarDocumentoModal({ isOpen, onClose, tramiteId, tiendaId }: 
       allDocs.forEach((doc) => {
         const wasAssociated = initialDocIds.has(doc.id);
         const isAssociated = selectedDocIds.has(doc.id);
-        
+
         if (wasAssociated && !isAssociated) {
           // Remove association
-          const newTramiteIds = doc.tramite_ids.filter(id => id !== tramiteId);
+          const newTramiteIds = doc.tramite_ids.filter((id) => id !== tramiteId);
           promises.push(api.patch(`/api/documentos/${doc.id}`, { tramite_ids: newTramiteIds }));
         } else if (!wasAssociated && isAssociated) {
           // Add association
@@ -118,7 +126,8 @@ export function AsociarDocumentoModal({ isOpen, onClose, tramiteId, tiendaId }: 
     >
       <div className="space-y-4">
         <p className="text-sm text-text-secondary">
-          Selecciona los documentos del expediente de la tienda que deseas asociar a este trámite. Puedes desmarcar para desvincular.
+          Selecciona los documentos del expediente de la tienda que deseas asociar a este trámite.
+          Puedes desmarcar para desvincular.
         </p>
 
         {isLoading ? (
@@ -126,9 +135,17 @@ export function AsociarDocumentoModal({ isOpen, onClose, tramiteId, tiendaId }: 
             <Skeleton className="h-12 w-full" count={3} />
           </div>
         ) : isError ? (
-          <EmptyState variant="error" title="Error al cargar documentos" description="No se pudieron cargar los documentos del expediente." />
+          <EmptyState
+            variant="error"
+            title="Error al cargar documentos"
+            description="No se pudieron cargar los documentos del expediente."
+          />
         ) : allDocs.length === 0 ? (
-          <EmptyState variant="no-data" title="Sin documentos" description="No hay documentos en la tienda para asociar." />
+          <EmptyState
+            variant="no-data"
+            title="Sin documentos"
+            description="No hay documentos en la tienda para asociar."
+          />
         ) : (
           <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
             {allDocs.map((doc) => (
@@ -143,12 +160,24 @@ export function AsociarDocumentoModal({ isOpen, onClose, tramiteId, tiendaId }: 
                   className="w-4 h-4 text-accent border-border rounded focus:ring-accent"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-text-primary truncate">{doc.nombre_archivo}</p>
+                  <p className="text-sm font-medium text-text-primary truncate">
+                    {doc.nombre_archivo}
+                  </p>
                   <p className="text-xs text-text-muted mt-0.5">
                     Subido por {doc.cargado_por_nombre} el {formatDate(doc.cargado_en)}
                   </p>
                 </div>
-                <Badge variant={doc.estado_ocr === 'completado' ? 'vigente' : doc.estado_ocr === 'procesando' ? 'en_revision' : doc.estado_ocr === 'error' ? 'vencido' : 'warning'}>
+                <Badge
+                  variant={
+                    doc.estado_ocr === 'completado'
+                      ? 'vigente'
+                      : doc.estado_ocr === 'procesando'
+                        ? 'en_revision'
+                        : doc.estado_ocr === 'error'
+                          ? 'vencido'
+                          : 'warning'
+                  }
+                >
                   {doc.estado_ocr === 'baja_confianza' ? 'Revisión manual' : doc.estado_ocr}
                 </Badge>
               </label>

@@ -22,7 +22,9 @@ function generateAlertas(): Alerta[] {
       tramite_id: t.id,
       tramite_nombre: t.nombre,
       mensaje: `El trámite "${t.nombre}" de ${tienda?.nombre} ha vencido y requiere atención inmediata.`,
-      fecha_generacion: new Date(Date.now() - Math.floor(Math.random() * 7) * 86400000).toISOString(),
+      fecha_generacion: new Date(
+        Date.now() - Math.floor(Math.random() * 7) * 86400000,
+      ).toISOString(),
       silenciada: false,
       resuelta: false,
       notificaciones_enviadas: { email: false, whatsapp: false },
@@ -41,7 +43,9 @@ function generateAlertas(): Alerta[] {
       tramite_id: t.id,
       tramite_nombre: t.nombre,
       mensaje: `El trámite "${t.nombre}" de ${tienda?.nombre} está próximo a vencer.`,
-      fecha_generacion: new Date(Date.now() - Math.floor(Math.random() * 14) * 86400000).toISOString(),
+      fecha_generacion: new Date(
+        Date.now() - Math.floor(Math.random() * 14) * 86400000,
+      ).toISOString(),
       silenciada: false,
       resuelta: false,
       notificaciones_enviadas: { email: false, whatsapp: false },
@@ -50,9 +54,24 @@ function generateAlertas(): Alerta[] {
 
   // Add some inconsistency and OCR alerts
   const inconsistencyTypes: { tipo: AlertaTipo; severidad: AlertaSeveridad; template: string }[] = [
-    { tipo: 'inconsistencia', severidad: 'critical', template: 'Se detectó una inconsistencia en el expediente de {tienda}: la dirección registrada no coincide con el permiso.' },
-    { tipo: 'baja_confianza_ocr', severidad: 'warning', template: 'El documento cargado en {tienda} tiene baja confianza de OCR y requiere revisión manual.' },
-    { tipo: 'inconsistencia', severidad: 'warning', template: 'El número de permiso extraído por OCR no coincide con el registro previo en {tienda}.' },
+    {
+      tipo: 'inconsistencia',
+      severidad: 'critical',
+      template:
+        'Se detectó una inconsistencia en el expediente de {tienda}: la dirección registrada no coincide con el permiso.',
+    },
+    {
+      tipo: 'baja_confianza_ocr',
+      severidad: 'warning',
+      template:
+        'El documento cargado en {tienda} tiene baja confianza de OCR y requiere revisión manual.',
+    },
+    {
+      tipo: 'inconsistencia',
+      severidad: 'warning',
+      template:
+        'El número de permiso extraído por OCR no coincide con el registro previo en {tienda}.',
+    },
   ];
 
   for (let i = 0; i < 6; i++) {
@@ -66,7 +85,9 @@ function generateAlertas(): Alerta[] {
       tienda_id: tienda.id,
       tienda_nombre: tienda.nombre,
       mensaje: template.template.replace('{tienda}', tienda.nombre),
-      fecha_generacion: new Date(Date.now() - Math.floor(Math.random() * 21) * 86400000).toISOString(),
+      fecha_generacion: new Date(
+        Date.now() - Math.floor(Math.random() * 21) * 86400000,
+      ).toISOString(),
       silenciada: false,
       resuelta: false,
       notificaciones_enviadas: { email: false, whatsapp: false },
@@ -84,7 +105,9 @@ function generateAlertas(): Alerta[] {
       tienda_id: tienda.id,
       tienda_nombre: tienda.nombre,
       mensaje: `Recordatorio: revisar renovación de trámite en ${tienda.nombre}.`,
-      fecha_generacion: new Date(Date.now() - Math.floor(Math.random() * 30) * 86400000).toISOString(),
+      fecha_generacion: new Date(
+        Date.now() - Math.floor(Math.random() * 30) * 86400000,
+      ).toISOString(),
       silenciada: true,
       silenciada_hasta: new Date(Date.now() + 15 * 86400000).toISOString(),
       silenciada_por: 'usr-001',
@@ -95,7 +118,8 @@ function generateAlertas(): Alerta[] {
 
   return alertas.sort((a, b) => {
     const sevOrder = { critical: 0, warning: 1, info: 2 };
-    if (sevOrder[a.severidad] !== sevOrder[b.severidad]) return sevOrder[a.severidad] - sevOrder[b.severidad];
+    if (sevOrder[a.severidad] !== sevOrder[b.severidad])
+      return sevOrder[a.severidad] - sevOrder[b.severidad];
     return new Date(b.fecha_generacion).getTime() - new Date(a.fecha_generacion).getTime();
   });
 }

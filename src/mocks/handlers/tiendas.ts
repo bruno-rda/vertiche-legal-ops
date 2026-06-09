@@ -24,20 +24,18 @@ export const tiendasHandlers = [
 
     const user = getUserFromRequest(request);
     if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
-      filtered = filtered.filter(t => user.tiendas_asignadas!.includes(t.id));
+      filtered = filtered.filter((t) => user.tiendas_asignadas!.includes(t.id));
     }
 
     if (operadorId === 'unassigned') {
       const assignedStoreIds = new Set(
-        mockUsers
-          .filter(u => u.rol === 'OPERATOR')
-          .flatMap(u => u.tiendas_asignadas || [])
+        mockUsers.filter((u) => u.rol === 'OPERATOR').flatMap((u) => u.tiendas_asignadas || []),
       );
-      filtered = filtered.filter(t => !assignedStoreIds.has(t.id));
+      filtered = filtered.filter((t) => !assignedStoreIds.has(t.id));
     } else if (operadorId) {
-      const op = mockUsers.find(u => u.id === operadorId);
+      const op = mockUsers.find((u) => u.id === operadorId);
       if (op?.tiendas_asignadas) {
-        filtered = filtered.filter(t => op.tiendas_asignadas!.includes(t.id));
+        filtered = filtered.filter((t) => op.tiendas_asignadas!.includes(t.id));
       } else if (op) {
         filtered = []; // operator exists but has no stores
       }
@@ -46,8 +44,7 @@ export const tiendasHandlers = [
     if (search) {
       filtered = filtered.filter(
         (t) =>
-          t.nombre.toLowerCase().includes(search) ||
-          t.municipio.toLowerCase().includes(search)
+          t.nombre.toLowerCase().includes(search) || t.municipio.toLowerCase().includes(search),
       );
     }
     if (estado) {
@@ -96,8 +93,8 @@ export const tiendasHandlers = [
       return HttpResponse.json({ detail: 'Tienda no encontrada' }, { status: 404 });
     }
 
-    const data = await request.json() as any;
-    
+    const data = (await request.json()) as any;
+
     // Update basic fields
     if (data.nombre) tienda.nombre = data.nombre;
     if (data.estado) tienda.estado = data.estado;
@@ -130,7 +127,7 @@ export const tiendasHandlers = [
       return HttpResponse.json({ detail: 'Tienda no encontrada' }, { status: 404 });
     }
 
-    const data = await request.json() as any;
+    const data = (await request.json()) as any;
 
     const newTramite = {
       id: `tramite-${Date.now()}`,
@@ -146,16 +143,18 @@ export const tiendasHandlers = [
       periodo_recurrencia: data.es_recurrente ? data.periodo_recurrencia : undefined,
       observaciones: [],
       documentos: [],
-      historial: [{
-        id: `hist-new-${Date.now()}`,
-        entidad_tipo: 'tramite',
-        entidad_id: `tramite-${Date.now()}`,
-        accion: 'tramite_creado',
-        usuario_id: 'usr-admin',
-        usuario_nombre: 'Admin User',
-        fecha: new Date().toISOString(),
-        detalle: 'Trámite creado manualmente',
-      }],
+      historial: [
+        {
+          id: `hist-new-${Date.now()}`,
+          entidad_tipo: 'tramite',
+          entidad_id: `tramite-${Date.now()}`,
+          accion: 'tramite_creado',
+          usuario_id: 'usr-admin',
+          usuario_nombre: 'Admin User',
+          fecha: new Date().toISOString(),
+          detalle: 'Trámite creado manualmente',
+        },
+      ],
     };
 
     mockTramites.push(newTramite as any);
@@ -225,9 +224,9 @@ export const dashboardHandlers = [
   http.get('*/api/dashboard/metrics', ({ request }) => {
     let tiendas = [...mockTiendas];
     const user = getUserFromRequest(request);
-    
+
     if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
-      tiendas = tiendas.filter(t => user.tiendas_asignadas!.includes(t.id));
+      tiendas = tiendas.filter((t) => user.tiendas_asignadas!.includes(t.id));
     }
 
     const total = tiendas.length;
@@ -245,12 +244,15 @@ export const dashboardHandlers = [
   }),
 
   http.get('*/api/dashboard/cumplimiento-por-estado', ({ request }) => {
-    const byState = new Map<string, { tiendas: number; cumplimientoSum: number; criticos: number }>();
+    const byState = new Map<
+      string,
+      { tiendas: number; cumplimientoSum: number; criticos: number }
+    >();
     let tiendas = [...mockTiendas];
     const user = getUserFromRequest(request);
 
     if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
-      tiendas = tiendas.filter(t => user.tiendas_asignadas!.includes(t.id));
+      tiendas = tiendas.filter((t) => user.tiendas_asignadas!.includes(t.id));
     }
 
     tiendas.forEach((t) => {
@@ -278,7 +280,7 @@ export const dashboardHandlers = [
     const user = getUserFromRequest(request);
 
     if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
-      alertas = alertas.filter(a => user.tiendas_asignadas!.includes(a.tienda_id));
+      alertas = alertas.filter((a) => user.tiendas_asignadas!.includes(a.tienda_id));
     }
 
     const activas = alertas.filter((a) => !a.silenciada).slice(0, 10);
@@ -290,12 +292,14 @@ export const dashboardHandlers = [
     const user = getUserFromRequest(request);
 
     if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
-      tramites = tramites.filter(t => user.tiendas_asignadas!.includes(t.tienda_id));
+      tramites = tramites.filter((t) => user.tiendas_asignadas!.includes(t.tienda_id));
     }
 
     const proximos = tramites
       .filter((t) => t.estado === 'por_vencer' || t.estado === 'vencido')
-      .sort((a, b) => new Date(a.fecha_vencimiento).getTime() - new Date(b.fecha_vencimiento).getTime())
+      .sort(
+        (a, b) => new Date(a.fecha_vencimiento).getTime() - new Date(b.fecha_vencimiento).getTime(),
+      )
       .slice(0, 10);
     return HttpResponse.json(proximos);
   }),

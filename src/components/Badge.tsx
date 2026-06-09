@@ -1,12 +1,12 @@
 import type { TramiteEstado, AlertaSeveridad, EstadoOCR, EstadoCumplimiento } from '@/types';
-import { TRAMITE_ESTADO_LABELS, SEVERIDAD_LABELS, OCR_ESTADO_LABELS, CUMPLIMIENTO_LABELS } from '@/lib/utils';
+import {
+  TRAMITE_ESTADO_LABELS,
+  SEVERIDAD_LABELS,
+  OCR_ESTADO_LABELS,
+  CUMPLIMIENTO_LABELS,
+} from '@/lib/utils';
 
-type BadgeVariant =
-  | TramiteEstado
-  | AlertaSeveridad
-  | EstadoOCR
-  | EstadoCumplimiento
-  | 'default';
+type BadgeVariant = TramiteEstado | AlertaSeveridad | EstadoOCR | EstadoCumplimiento | 'default';
 
 const variantStyles: Record<string, string> = {
   // Tramite states
@@ -61,9 +61,7 @@ export function Badge({ variant, children, className = '', size = 'md', dot = fa
     <span
       className={`inline-flex items-center gap-1 font-medium rounded-full whitespace-nowrap transition-colors duration-200 ${styles} ${sizeClass} ${className}`}
     >
-      {dot && (
-        <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
-      )}
+      {dot && <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />}
       {label}
     </span>
   );

@@ -29,7 +29,7 @@ export function MexicoMap({ data }: MexicoMapProps) {
             id: p.getAttribute('id') || '',
             name: p.getAttribute('name') || '',
             d: p.getAttribute('d') || '',
-          }))
+          })),
         );
       })
       .catch((err) => console.error('Error loading SVG map:', err));
@@ -68,7 +68,12 @@ export function MexicoMap({ data }: MexicoMapProps) {
         <svg
           viewBox="0 0 1000 630"
           className="w-full h-full drop-shadow-md"
-          style={{ stroke: 'var(--color-surface-card)', strokeWidth: 1, strokeLinecap: 'round', strokeLinejoin: 'round' }}
+          style={{
+            stroke: 'var(--color-surface-card)',
+            strokeWidth: 1,
+            strokeLinecap: 'round',
+            strokeLinejoin: 'round',
+          }}
         >
           <g>
             {paths.map((p) => {

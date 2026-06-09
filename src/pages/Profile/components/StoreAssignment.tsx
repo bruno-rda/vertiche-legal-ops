@@ -13,7 +13,9 @@ interface StoreAssignmentProps {
 }
 
 export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set(user.tiendas_asignadas || []));
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(
+    () => new Set(user.tiendas_asignadas || []),
+  );
   const [expandedStates, setExpandedStates] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
   const { addToast, sidebarCollapsed } = useUIStore();
@@ -25,11 +27,14 @@ export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
 
   const groupedTiendas = useMemo(() => {
     if (!todasLasTiendas?.data) return {};
-    return todasLasTiendas.data.reduce((acc, tienda) => {
-      if (!acc[tienda.estado]) acc[tienda.estado] = [];
-      acc[tienda.estado].push(tienda);
-      return acc;
-    }, {} as Record<string, Tienda[]>);
+    return todasLasTiendas.data.reduce(
+      (acc, tienda) => {
+        if (!acc[tienda.estado]) acc[tienda.estado] = [];
+        acc[tienda.estado].push(tienda);
+        return acc;
+      },
+      {} as Record<string, Tienda[]>,
+    );
   }, [todasLasTiendas?.data]);
 
   const changesSummary = useMemo(() => {
@@ -42,10 +47,10 @@ export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
     for (const id of originalSet) {
       if (!selectedIds.has(id)) removed++;
     }
-    return { 
-      added, 
-      removed, 
-      hasChanges: added > 0 || removed > 0 
+    return {
+      added,
+      removed,
+      hasChanges: added > 0 || removed > 0,
     };
   }, [user.tiendas_asignadas, selectedIds]);
 
@@ -106,7 +111,10 @@ export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
   const stateNames = Object.keys(groupedTiendas).sort();
 
   return (
-    <div className="bg-surface-card rounded-xl border border-border p-6 md:p-8 pb-24 relative" id="tiendas-assignment">
+    <div
+      className="bg-surface-card rounded-xl border border-border p-6 md:p-8 pb-24 relative"
+      id="tiendas-assignment"
+    >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-2">
           <Store className="w-5 h-5 text-text-primary" />
@@ -122,9 +130,10 @@ export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
 
       <div className="space-y-4">
         <p className="text-sm text-text-secondary">
-          Selecciona las tiendas que este operador debe gestionar. Los cambios solo se aplicarán al guardar.
+          Selecciona las tiendas que este operador debe gestionar. Los cambios solo se aplicarán al
+          guardar.
         </p>
-        
+
         <div className="space-y-3">
           {stateNames.map((estado) => {
             const tiendas = groupedTiendas[estado];
@@ -134,7 +143,10 @@ export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
             const isPartiallyAssigned = assignedCount > 0 && assignedCount < tiendas.length;
 
             return (
-              <div key={estado} className="border border-border rounded-lg overflow-hidden bg-surface">
+              <div
+                key={estado}
+                className="border border-border rounded-lg overflow-hidden bg-surface"
+              >
                 <div className="flex items-center hover:bg-neutral-light transition-colors pr-4">
                   <button
                     onClick={() => toggleState(estado)}
@@ -202,8 +214,12 @@ export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
                               className="w-4 h-4 mt-0.5 rounded border-border text-accent focus:ring-accent/20"
                             />
                             <div className="flex-1">
-                              <p className="font-medium text-sm text-text-primary">{tienda.nombre}</p>
-                              <p className="text-xs text-text-secondary mt-0.5">{tienda.municipio}</p>
+                              <p className="font-medium text-sm text-text-primary">
+                                {tienda.nombre}
+                              </p>
+                              <p className="text-xs text-text-secondary mt-0.5">
+                                {tienda.municipio}
+                              </p>
                             </div>
                             <Badge variant={tienda.estado_cumplimiento} size="sm" />
                           </label>
@@ -220,7 +236,9 @@ export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
 
       {/* Sticky Action Bar */}
       {changesSummary.hasChanges && (
-        <div className={`fixed bottom-0 left-0 right-0 ${sidebarCollapsed ? 'lg:left-16' : 'lg:left-[220px]'} bg-surface-card border-t border-border py-3 px-4 sm:px-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40 flex items-center justify-between transition-all duration-200 ease-in-out`}>
+        <div
+          className={`fixed bottom-0 left-0 right-0 ${sidebarCollapsed ? 'lg:left-16' : 'lg:left-[220px]'} bg-surface-card border-t border-border py-3 px-4 sm:px-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40 flex items-center justify-between transition-all duration-200 ease-in-out`}
+        >
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-text-primary">Cambios sin guardar</span>
             <div className="flex gap-2">

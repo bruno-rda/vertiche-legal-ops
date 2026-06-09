@@ -1,41 +1,41 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ─── Vertiche Design Tokens ─── */
 @theme {
   /* Colors — Editorial Executive palette */
-  --color-surface: #F7F7F5;
-  --color-surface-card: #FFFFFF;
-  --color-border: #E5E5E0;
-  --color-border-strong: #D1D1CB;
+  --color-surface: #f7f7f5;
+  --color-surface-card: #ffffff;
+  --color-border: #e5e5e0;
+  --color-border-strong: #d1d1cb;
 
   --color-text-primary: #111111;
-  --color-text-secondary: #6B6B66;
-  --color-text-muted: #9C9C96;
+  --color-text-secondary: #6b6b66;
+  --color-text-muted: #9c9c96;
 
   --color-accent: #111111;
-  --color-accent-hover: #2A2A2A;
+  --color-accent-hover: #2a2a2a;
 
   /* Semantic — Status colors */
-  --color-success: #2D6A4F;
-  --color-success-light: #D8F3DC;
-  --color-success-muted: #40916C;
+  --color-success: #2d6a4f;
+  --color-success-light: #d8f3dc;
+  --color-success-muted: #40916c;
 
-  --color-warning: #B45309;
-  --color-warning-light: #FEF3C7;
-  --color-warning-muted: #D97706;
+  --color-warning: #b45309;
+  --color-warning-light: #fef3c7;
+  --color-warning-muted: #d97706;
 
-  --color-danger: #8B1A1A;
-  --color-danger-light: #FEE2E2;
-  --color-danger-muted: #B91C1C;
+  --color-danger: #8b1a1a;
+  --color-danger-light: #fee2e2;
+  --color-danger-muted: #b91c1c;
 
-  --color-info: #6B6B66;
-  --color-info-light: #F3F4F6;
+  --color-info: #6b6b66;
+  --color-info-light: #f3f4f6;
 
-  --color-neutral: #9C9C96;
-  --color-neutral-light: #F0F0EC;
+  --color-neutral: #9c9c96;
+  --color-neutral-light: #f0f0ec;
 
-  --color-blue: #2563EB;
-  --color-blue-light: #DBEAFE;
+  --color-blue: #2563eb;
+  --color-blue-light: #dbeafe;
 
   /* Spacing */
   --spacing-page: 2rem;
@@ -111,20 +111,35 @@ body {
 
 /* Skeleton shimmer animation */
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @utility animate-shimmer {
   animation: shimmer 1.5s ease-in-out infinite;
-  background: linear-gradient(90deg, var(--color-neutral-light) 25%, var(--color-border) 50%, var(--color-neutral-light) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-light) 25%,
+    var(--color-border) 50%,
+    var(--color-neutral-light) 75%
+  );
   background-size: 200% 100%;
 }
 
 /* Toast slide-in */
 @keyframes slide-in-right {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @utility animate-slide-in {

@@ -102,12 +102,8 @@ export function AppLayout() {
               {user?.nombre.charAt(0)}
             </div>
             <div className="text-right">
-              <p className="text-sm font-medium text-text-primary leading-tight">
-                {user?.nombre}
-              </p>
-              <p className="text-[11px] text-text-muted uppercase tracking-wider">
-                {user?.rol}
-              </p>
+              <p className="text-sm font-medium text-text-primary leading-tight">{user?.nombre}</p>
+              <p className="text-[11px] text-text-muted uppercase tracking-wider">{user?.rol}</p>
             </div>
           </div>
         </div>
@@ -138,9 +134,10 @@ export function AppLayout() {
                 to={item.to}
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group relative ${isActive
-                    ? 'bg-neutral-light text-text-primary'
-                    : 'text-text-secondary hover:bg-neutral-light hover:text-text-primary'
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors group relative ${
+                    isActive
+                      ? 'bg-neutral-light text-text-primary'
+                      : 'text-text-secondary hover:bg-neutral-light hover:text-text-primary'
                   }`
                 }
               >
@@ -148,10 +145,11 @@ export function AppLayout() {
                 {!sidebarCollapsed && <span>{item.label}</span>}
                 {item.badge && alertCount && alertCount.count > 0 && (
                   <span
-                    className={`ml-auto min-w-[20px] h-5 rounded-full text-[11px] font-bold flex items-center justify-center px-1.5 ${sidebarCollapsed
-                      ? 'absolute -top-1 -right-1 bg-danger text-white'
-                      : 'bg-danger/10 text-danger'
-                      }`}
+                    className={`ml-auto min-w-[20px] h-5 rounded-full text-[11px] font-bold flex items-center justify-center px-1.5 ${
+                      sidebarCollapsed
+                        ? 'absolute -top-1 -right-1 bg-danger text-white'
+                        : 'bg-danger/10 text-danger'
+                    }`}
                   >
                     {alertCount.count}
                   </span>

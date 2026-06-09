@@ -3,26 +3,32 @@ import type { Tienda } from '@/types';
 import { ESTADOS_MEXICO as estados } from '@/lib/constants';
 
 const municipios: Record<string, string[]> = {
-  'Jalisco': ['Guadalajara', 'Zapopan', 'Tlaquepaque', 'Tonalá'],
+  Jalisco: ['Guadalajara', 'Zapopan', 'Tlaquepaque', 'Tonalá'],
   'Nuevo León': ['Monterrey', 'San Pedro Garza García', 'San Nicolás', 'Apodaca'],
   'Ciudad de México': ['Polanco', 'Santa Fe', 'Coyoacán', 'Roma Norte'],
   'Estado de México': ['Naucalpan', 'Tlalnepantla', 'Ecatepec', 'Metepec'],
-  'Puebla': ['Puebla Centro', 'Angelópolis', 'Cholula'],
-  'Guanajuato': ['León', 'Irapuato', 'Celaya'],
-  'Querétaro': ['Querétaro Centro', 'Juriquilla', 'El Marqués'],
-  'Chihuahua': ['Chihuahua Centro', 'Ciudad Juárez'],
-  'Sonora': ['Hermosillo', 'Ciudad Obregón'],
+  Puebla: ['Puebla Centro', 'Angelópolis', 'Cholula'],
+  Guanajuato: ['León', 'Irapuato', 'Celaya'],
+  Querétaro: ['Querétaro Centro', 'Juriquilla', 'El Marqués'],
+  Chihuahua: ['Chihuahua Centro', 'Ciudad Juárez'],
+  Sonora: ['Hermosillo', 'Ciudad Obregón'],
   'Baja California': ['Tijuana', 'Mexicali', 'Ensenada'],
-  'Yucatán': ['Mérida Centro', 'Mérida Norte'],
-  'Veracruz': ['Veracruz Puerto', 'Xalapa', 'Boca del Río'],
-  'Coahuila': ['Saltillo', 'Torreón'],
-  'Sinaloa': ['Culiacán', 'Mazatlán'],
-  'Aguascalientes': ['Aguascalientes Centro'],
+  Yucatán: ['Mérida Centro', 'Mérida Norte'],
+  Veracruz: ['Veracruz Puerto', 'Xalapa', 'Boca del Río'],
+  Coahuila: ['Saltillo', 'Torreón'],
+  Sinaloa: ['Culiacán', 'Mazatlán'],
+  Aguascalientes: ['Aguascalientes Centro'],
 };
 
 const marcas = [
-  'Cuidado con el Perro', 'Oggi', 'Sahara', 'Non Stop',
-  'Vertiche', 'Milano', 'Brantano', 'Price Shoes',
+  'Cuidado con el Perro',
+  'Oggi',
+  'Sahara',
+  'Non Stop',
+  'Vertiche',
+  'Milano',
+  'Brantano',
+  'Price Shoes',
 ];
 
 function pickRandom<T>(arr: T[], count: number): T[] {
@@ -39,7 +45,8 @@ function generateTienda(index: number): Tienda {
 
   return {
     id: `tienda-${String(index + 1).padStart(3, '0')}`,
-    nombre: `Vertiche ${municipio} ${index > 14 ? (Math.floor(index / 15) + 1).toString() : ''}`.trim(),
+    nombre:
+      `Vertiche ${municipio} ${index > 14 ? (Math.floor(index / 15) + 1).toString() : ''}`.trim(),
     estado,
     municipio,
     direccion: `Av. Principal #${100 + index}, Col. Centro, ${municipio}, ${estado}`,

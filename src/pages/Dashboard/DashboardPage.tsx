@@ -8,8 +8,14 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { Skeleton } from '@/components/Skeleton';
 import { formatDate, daysRemaining, timeAgo, formatPercent } from '@/lib/utils';
 import {
-  Store, CheckCircle, AlertTriangle, XCircle,
-  ArrowRight, Clock, Map, BarChart3,
+  Store,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  ArrowRight,
+  Clock,
+  Map,
+  BarChart3,
 } from 'lucide-react';
 import { EmptyState } from '@/components/EmptyState';
 import { MexicoMap, MAP_CONTAINER_CLASSES } from './components/MexicoMap';
@@ -39,8 +45,9 @@ export function DashboardPage() {
     queryFn: () => api.get<Tramite[]>('/api/dashboard/tramites-proximos'),
   });
 
-  const user = useAuthStore(s => s.user);
-  const isUnassignedOperator = user?.rol === 'OPERATOR' && (!user.tiendas_asignadas || user.tiendas_asignadas.length === 0);
+  const user = useAuthStore((s) => s.user);
+  const isUnassignedOperator =
+    user?.rol === 'OPERATOR' && (!user.tiendas_asignadas || user.tiendas_asignadas.length === 0);
 
   if (isUnassignedOperator) {
     return (
@@ -126,9 +133,7 @@ export function DashboardPage() {
       <div className="bg-surface-card rounded-xl border border-border p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-semibold text-text-primary">
-              Cumplimiento por estado
-            </h2>
+            <h2 className="text-lg font-semibold text-text-primary">Cumplimiento por estado</h2>
             <p className="text-sm text-text-secondary mt-0.5">
               Nivel de cumplimiento agregado por estado geográfico
             </p>
@@ -136,20 +141,22 @@ export function DashboardPage() {
           <div className="flex bg-surface border border-border rounded-lg p-1">
             <button
               onClick={() => setViewMode('map')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map'
-                ? 'bg-surface-card text-text-primary shadow-sm'
-                : 'text-text-secondary hover:text-text-primary'
-                }`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'map'
+                  ? 'bg-surface-card text-text-primary shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
             >
               <Map className="w-4 h-4" />
               Mapa
             </button>
             <button
               onClick={() => setViewMode('chart')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'chart'
-                ? 'bg-surface-card text-text-primary shadow-sm'
-                : 'text-text-secondary hover:text-text-primary'
-                }`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'chart'
+                  ? 'bg-surface-card text-text-primary shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
             >
               <BarChart3 className="w-4 h-4" />
               Lista
@@ -200,9 +207,7 @@ export function DashboardPage() {
         {/* Recent alerts */}
         <div className="bg-surface-card rounded-xl border border-border p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-text-primary">
-              Alertas recientes
-            </h2>
+            <h2 className="text-lg font-semibold text-text-primary">Alertas recientes</h2>
             <button
               onClick={() => navigate('/alertas')}
               className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1"
@@ -230,9 +235,7 @@ export function DashboardPage() {
                 >
                   <SeverityIcon severidad={alerta.severidad} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-text-primary line-clamp-2">
-                      {alerta.mensaje}
-                    </p>
+                    <p className="text-sm text-text-primary line-clamp-2">{alerta.mensaje}</p>
                     <p className="text-xs text-text-muted mt-0.5">
                       {alerta.tienda_nombre} · {timeAgo(alerta.fecha_generacion)}
                     </p>
@@ -242,18 +245,14 @@ export function DashboardPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-text-muted py-8 text-center">
-              No hay alertas activas
-            </p>
+            <p className="text-sm text-text-muted py-8 text-center">No hay alertas activas</p>
           )}
         </div>
 
         {/* Upcoming expirations */}
         <div className="bg-surface-card rounded-xl border border-border p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-text-primary">
-              Trámites próximos a vencer
-            </h2>
+            <h2 className="text-lg font-semibold text-text-primary">Trámites próximos a vencer</h2>
             <button
               onClick={() => navigate('/tramites?solo_vencidos=false&por_vencer_dias=30')}
               className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1"
@@ -280,22 +279,26 @@ export function DashboardPage() {
                       <p className="text-sm font-medium text-text-primary truncate">
                         {tramite.nombre}
                       </p>
-                      <p className="text-xs text-text-muted truncate">
-                        {tramite.tienda_nombre}
-                      </p>
+                      <p className="text-xs text-text-muted truncate">{tramite.tienda_nombre}</p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-xs text-text-muted">
                         {formatDate(tramite.fecha_vencimiento)}
                       </p>
-                      <p className={`text-xs font-semibold ${days < 0 ? 'text-danger' : days <= 15 ? 'text-warning' : 'text-text-secondary'
-                        }`}>
+                      <p
+                        className={`text-xs font-semibold ${
+                          days < 0
+                            ? 'text-danger'
+                            : days <= 15
+                              ? 'text-warning'
+                              : 'text-text-secondary'
+                        }`}
+                      >
                         {days < 0
                           ? `${Math.abs(days)} días vencido`
                           : days === 0
                             ? 'Vence hoy'
-                            : `${days} días restantes`
-                        }
+                            : `${days} días restantes`}
                       </p>
                     </div>
                     <Badge variant={tramite.estado} size="sm" />
@@ -336,18 +339,15 @@ function MetricCard({
   return (
     <div
       onClick={onClick}
-      className={`bg-surface-card rounded-xl border border-border p-5 transition-all ${onClick
-        ? 'cursor-pointer hover:shadow-card-hover hover:border-border-strong'
-        : ''
-        }`}
+      className={`bg-surface-card rounded-xl border border-border p-5 transition-all ${
+        onClick ? 'cursor-pointer hover:shadow-card-hover hover:border-border-strong' : ''
+      }`}
     >
       <div className="flex items-start justify-between">
         <div>
           <p className="font-display text-3xl text-text-primary">{value}</p>
           <p className="text-sm text-text-secondary mt-1">{label}</p>
-          {subtitle && (
-            <p className={`text-xs font-semibold mt-0.5 ${color}`}>{subtitle}</p>
-          )}
+          {subtitle && <p className={`text-xs font-semibold mt-0.5 ${color}`}>{subtitle}</p>}
         </div>
         <div className={`w-10 h-10 rounded-xl ${bgColor} flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${color}`} />

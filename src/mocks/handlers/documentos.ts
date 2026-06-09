@@ -16,7 +16,9 @@ export const documentosHandlers = [
 
     const user = getUserFromRequest(request);
     if (user?.rol === 'OPERATOR' && user.tiendas_asignadas) {
-      filtered = filtered.filter((d) => d.tienda_id && user.tiendas_asignadas!.includes(d.tienda_id));
+      filtered = filtered.filter(
+        (d) => d.tienda_id && user.tiendas_asignadas!.includes(d.tienda_id),
+      );
     }
 
     if (estadoOcr) filtered = filtered.filter((d) => d.estado_ocr === estadoOcr);
@@ -45,13 +47,13 @@ export const documentosHandlers = [
     if (docIndex === -1) {
       return HttpResponse.json({ detail: 'Documento no encontrado' }, { status: 404 });
     }
-    const updates = await request.json() as any;
-    
+    const updates = (await request.json()) as any;
+
     // Auto-populate tramite_nombres if tramite_ids is updated
     if (updates.tramite_ids) {
       const { mockTramites } = await import('../data/tramites');
       updates.tramite_nombres = updates.tramite_ids.map((id: string) => {
-        const t = mockTramites.find(t => t.id === id);
+        const t = mockTramites.find((t) => t.id === id);
         return t ? t.nombre : 'Trámite';
       });
     }
@@ -62,7 +64,7 @@ export const documentosHandlers = [
 
   http.post('*/api/documentos/upload', async ({ request }) => {
     const formData = await request.formData().catch(() => null);
-    
+
     let tramite_ids: string[] = [];
     let tramite_nombres: string[] = [];
     let file = null;
@@ -70,10 +72,10 @@ export const documentosHandlers = [
       file = formData.get('file');
       const ids = formData.getAll('tramite_ids');
       if (ids.length > 0) {
-        tramite_ids = ids.map(id => id.toString());
+        tramite_ids = ids.map((id) => id.toString());
         const { mockTramites } = await import('../data/tramites');
-        tramite_nombres = tramite_ids.map(id => {
-          const t = mockTramites.find(t => t.id === id);
+        tramite_nombres = tramite_ids.map((id) => {
+          const t = mockTramites.find((t) => t.id === id);
           return t ? t.nombre : 'Trámite';
         });
       }
@@ -99,7 +101,7 @@ export const documentosHandlers = [
     if (docIndex === -1) {
       return HttpResponse.json({ detail: 'Documento no encontrado' }, { status: 404 });
     }
-    const { nombre_archivo } = await request.json() as any;
+    const { nombre_archivo } = (await request.json()) as any;
     mockDocumentos[docIndex].nombre_archivo = nombre_archivo;
     return HttpResponse.json(mockDocumentos[docIndex]);
   }),
@@ -109,8 +111,8 @@ export const documentosHandlers = [
     if (docIndex === -1) {
       return HttpResponse.json({ detail: 'Documento no encontrado' }, { status: 404 });
     }
-    const { datos_extraidos } = await request.json() as any;
-    
+    const { datos_extraidos } = (await request.json()) as any;
+
     // Update the values and set confidence to 100 since it was manually reviewed
     const updatedFields: any = {};
     for (const [key, value] of Object.entries(datos_extraidos)) {
@@ -119,21 +121,21 @@ export const documentosHandlers = [
 
     mockDocumentos[docIndex].datos_extraidos = {
       ...mockDocumentos[docIndex].datos_extraidos,
-      ...updatedFields
+      ...updatedFields,
     };
     mockDocumentos[docIndex].estado_ocr = 'completado';
     mockDocumentos[docIndex].requiere_revision_manual = false;
-    
+
     return HttpResponse.json(mockDocumentos[docIndex]);
   }),
 
   http.post('*/api/tiendas/:id/documentos', async ({ params, request }) => {
-    const { fileName, tramiteIds } = await request.json() as any;
-    
+    const { fileName, tramiteIds } = (await request.json()) as any;
+
     // Auto-populate tramite_nombres
     const { mockTramites } = await import('../data/tramites');
     const tramiteNombres = tramiteIds.map((id: string) => {
-      const t = mockTramites.find(t => t.id === id);
+      const t = mockTramites.find((t) => t.id === id);
       return t ? t.nombre : 'Trámite';
     });
 
@@ -150,7 +152,7 @@ export const documentosHandlers = [
       cargado_en: new Date().toISOString(),
       tienda_id: params.id,
     };
-    
+
     mockDocumentos.push(newDoc);
     return HttpResponse.json(newDoc);
   }),

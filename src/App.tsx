@@ -49,12 +49,24 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           {/* Auth routes */}
-          <Route element={<PublicRoute><AuthLayout /></PublicRoute>}>
+          <Route
+            element={
+              <PublicRoute>
+                <AuthLayout />
+              </PublicRoute>
+            }
+          >
             <Route path="/login" element={<LoginPage />} />
           </Route>
 
           {/* App routes */}
-          <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+          <Route
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/tiendas" element={<TiendasPage />} />
             <Route path="/tiendas/:id" element={<TiendaDetailPage />} />
@@ -63,7 +75,14 @@ export default function App() {
             <Route path="/alertas" element={<AlertasPage />} />
             <Route path="/documentos" element={<DocumentosPage />} />
             <Route path="/perfil" element={<ProfilePage />} />
-            <Route path="/usuarios" element={<AdminRoute><UsuariosPage /></AdminRoute>} />
+            <Route
+              path="/usuarios"
+              element={
+                <AdminRoute>
+                  <UsuariosPage />
+                </AdminRoute>
+              }
+            />
           </Route>
 
           {/* Redirects */}

@@ -91,9 +91,11 @@ export function UsuariosPage() {
             Inactivos ({inactivos.length})
           </button>
         </div>
-        
+
         <div className="flex items-center gap-3">
-          <div className={`flex items-center border transition-all duration-300 ease-in-out rounded-lg overflow-hidden ${isSearchExpanded ? 'w-64 border-border bg-surface-card shadow-sm' : 'w-10 border-transparent hover:border-border bg-transparent cursor-pointer'}`}>
+          <div
+            className={`flex items-center border transition-all duration-300 ease-in-out rounded-lg overflow-hidden ${isSearchExpanded ? 'w-64 border-border bg-surface-card shadow-sm' : 'w-10 border-transparent hover:border-border bg-transparent cursor-pointer'}`}
+          >
             <button
               onClick={() => {
                 setIsSearchExpanded(true);
@@ -139,10 +141,7 @@ export function UsuariosPage() {
         type={activeTab === 'inactivos' ? 'inactivos' : 'activos'}
       />
 
-      <InviteUserModal
-        isOpen={isInviteModalOpen}
-        onClose={() => setIsInviteModalOpen(false)}
-      />
+      <InviteUserModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} />
     </div>
   );
 }

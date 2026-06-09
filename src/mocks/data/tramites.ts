@@ -14,7 +14,6 @@ const tramiteNames = [
   { nombre: 'Registro REPSE', tipo: 'federal' as const },
 ];
 
-
 function randomDate(daysFromNow: number): string {
   const d = new Date();
   d.setDate(d.getDate() + daysFromNow);
@@ -32,7 +31,7 @@ function generateTramitesForTienda(tiendaId: string, tiendaNombre: string): Tram
     const estadoIndex = Math.random();
     let estado: TramiteEstado;
     if (estadoIndex < 0.35) estado = 'vigente';
-    else if (estadoIndex < 0.50) estado = 'por_vencer';
+    else if (estadoIndex < 0.5) estado = 'por_vencer';
     else if (estadoIndex < 0.65) estado = 'vencido';
     else if (estadoIndex < 0.75) estado = 'en_revision';
     else if (estadoIndex < 0.85) estado = 'presentado';
@@ -41,8 +40,10 @@ function generateTramitesForTienda(tiendaId: string, tiendaNombre: string): Tram
 
     let fechaVencimiento: string;
     if (estado === 'vencido') fechaVencimiento = randomDate(-Math.floor(Math.random() * 60) - 1);
-    else if (estado === 'por_vencer') fechaVencimiento = randomDate(Math.floor(Math.random() * 28) + 1);
-    else if (estado === 'vigente') fechaVencimiento = randomDate(Math.floor(Math.random() * 300) + 60);
+    else if (estado === 'por_vencer')
+      fechaVencimiento = randomDate(Math.floor(Math.random() * 28) + 1);
+    else if (estado === 'vigente')
+      fechaVencimiento = randomDate(Math.floor(Math.random() * 300) + 60);
     else fechaVencimiento = randomDate(Math.floor(Math.random() * 180) + 30);
 
     return {
@@ -65,21 +66,21 @@ function generateTramitesForTienda(tiendaId: string, tiendaNombre: string): Tram
 }
 
 export const mockTramites: Tramite[] = mockTiendas.flatMap((t) =>
-  generateTramitesForTienda(t.id, t.nombre)
+  generateTramitesForTienda(t.id, t.nombre),
 );
 
 // Update tiendas with the generated tramites data to maintain consistency
 mockTiendas.forEach((tienda) => {
-  const tramites = mockTramites.filter(t => t.tienda_id === tienda.id);
-  
+  const tramites = mockTramites.filter((t) => t.tienda_id === tienda.id);
+
   tienda.total_tramites = tramites.length;
-  tienda.tramites_vencidos = tramites.filter(t => t.estado === 'vencido').length;
-  tienda.tramites_por_vencer = tramites.filter(t => t.estado === 'por_vencer').length;
-  
+  tienda.tramites_vencidos = tramites.filter((t) => t.estado === 'vencido').length;
+  tienda.tramites_por_vencer = tramites.filter((t) => t.estado === 'por_vencer').length;
+
   // Calculate cumplimiento based on tramites (weight: vencidos hurt more)
-  const penalty = (tienda.tramites_vencidos * 25) + (tienda.tramites_por_vencer * 10);
+  const penalty = tienda.tramites_vencidos * 25 + tienda.tramites_por_vencer * 10;
   tienda.cumplimiento = Math.max(0, 100 - penalty);
-  
+
   if (tienda.cumplimiento >= 85) tienda.estado_cumplimiento = 'vigente';
   else if (tienda.cumplimiento >= 60) tienda.estado_cumplimiento = 'en_riesgo';
   else tienda.estado_cumplimiento = 'critico';

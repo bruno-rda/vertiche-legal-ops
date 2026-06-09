@@ -24,19 +24,24 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
   const [isVencidosOpen, setIsVencidosOpen] = useState(false);
   const [isNuevoTramiteOpen, setIsNuevoTramiteOpen] = useState(false);
 
-  const activos = expediente.tramites.filter(t => t.estado !== 'vencido');
-  const vencidos = expediente.tramites.filter(t => t.estado === 'vencido');
+  const activos = expediente.tramites.filter((t) => t.estado !== 'vencido');
+  const vencidos = expediente.tramites.filter((t) => t.estado === 'vencido');
 
   const emptyStateContent = (
     <div className="space-y-4">
-      <EmptyState variant="no-data" title="Sin trámites" description="Esta tienda no tiene trámites registrados." />
+      <EmptyState
+        variant="no-data"
+        title="Sin trámites"
+        description="Esta tienda no tiene trámites registrados."
+      />
       {isAdmin && (
         <div className="flex justify-center">
           <button
             onClick={() => setIsNuevoTramiteOpen(true)}
             className="flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover transition-colors"
           >
-            <Plus className="w-4 h-4" />Nuevo trámite
+            <Plus className="w-4 h-4" />
+            Nuevo trámite
           </button>
         </div>
       )}
@@ -46,8 +51,11 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
   const renderTramite = (t: Tramite) => {
     const days = daysRemaining(t.fecha_vencimiento);
     return (
-      <div key={t.id} onClick={() => navigate(`/tiendas/${tiendaId}/tramites/${t.id}`)}
-        className="bg-surface-card border border-border rounded-lg px-5 py-4 flex items-center gap-4 hover:shadow-card-hover hover:border-border-strong cursor-pointer transition-all mb-2">
+      <div
+        key={t.id}
+        onClick={() => navigate(`/tiendas/${tiendaId}/tramites/${t.id}`)}
+        className="bg-surface-card border border-border rounded-lg px-5 py-4 flex items-center gap-4 hover:shadow-card-hover hover:border-border-strong cursor-pointer transition-all mb-2"
+      >
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-text-primary">{t.nombre}</p>
           <p className="text-xs text-text-muted mt-0.5 capitalize">{t.tipo}</p>
@@ -55,8 +63,14 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
         <Badge variant={t.estado} size="sm" />
         <div className="text-right shrink-0">
           <p className="text-xs text-text-muted">{formatDate(t.fecha_vencimiento)}</p>
-          <p className={`text-xs font-semibold ${days < 0 ? 'text-danger' : days <= 15 ? 'text-warning' : 'text-text-secondary'}`}>
-            {days < 0 ? `${Math.abs(days)}d vencido` : days === 0 ? 'Vence hoy' : `${days}d restantes`}
+          <p
+            className={`text-xs font-semibold ${days < 0 ? 'text-danger' : days <= 15 ? 'text-warning' : 'text-text-secondary'}`}
+          >
+            {days < 0
+              ? `${Math.abs(days)}d vencido`
+              : days === 0
+                ? 'Vence hoy'
+                : `${days}d restantes`}
           </p>
         </div>
         <ChevronRight className="w-4 h-4 text-text-muted" />
@@ -87,7 +101,8 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
             onClick={() => setIsNuevoTramiteOpen(true)}
             className="flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover transition-colors"
           >
-            <Plus className="w-4 h-4" />Nuevo trámite
+            <Plus className="w-4 h-4" />
+            Nuevo trámite
           </button>
         </div>
       )}
@@ -98,8 +113,12 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
             onClick={() => setIsActivosOpen(!isActivosOpen)}
             className="w-full flex items-center justify-between p-4 bg-surface-card hover:bg-neutral-light transition-colors"
           >
-            <h2 className="text-base font-semibold text-text-primary">Trámites activos ({activos.length})</h2>
-            <ChevronDown className={`w-5 h-5 text-text-muted transition-transform ${isActivosOpen ? 'rotate-180' : ''}`} />
+            <h2 className="text-base font-semibold text-text-primary">
+              Trámites activos ({activos.length})
+            </h2>
+            <ChevronDown
+              className={`w-5 h-5 text-text-muted transition-transform ${isActivosOpen ? 'rotate-180' : ''}`}
+            />
           </button>
           <AnimatePresence initial={false}>
             {isActivosOpen && (
@@ -110,9 +129,7 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="p-4 pt-4 space-y-2">
-                  {activos.map(renderTramite)}
-                </div>
+                <div className="p-4 pt-4 space-y-2">{activos.map(renderTramite)}</div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -126,8 +143,12 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
             onClick={() => setIsVencidosOpen(!isVencidosOpen)}
             className="w-full flex items-center justify-between p-4 bg-danger-light/20 hover:bg-danger-light/30 transition-colors"
           >
-            <h2 className="text-base font-semibold text-danger">Trámites vencidos ({vencidos.length})</h2>
-            <ChevronDown className={`w-5 h-5 text-danger transition-transform ${isVencidosOpen ? 'rotate-180' : ''}`} />
+            <h2 className="text-base font-semibold text-danger">
+              Trámites vencidos ({vencidos.length})
+            </h2>
+            <ChevronDown
+              className={`w-5 h-5 text-danger transition-transform ${isVencidosOpen ? 'rotate-180' : ''}`}
+            />
           </button>
           <AnimatePresence initial={false}>
             {isVencidosOpen && (
@@ -138,9 +159,7 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="p-4 pt-4 space-y-2">
-                  {vencidos.map(renderTramite)}
-                </div>
+                <div className="p-4 pt-4 space-y-2">{vencidos.map(renderTramite)}</div>
               </motion.div>
             )}
           </AnimatePresence>

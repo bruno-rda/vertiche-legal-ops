@@ -13,28 +13,34 @@ type FormData = {
   es_permanente: boolean;
 };
 
-export function TramiteEditModal({ 
-  isOpen, 
-  onClose, 
-  tramite 
-}: { 
-  isOpen: boolean; 
-  onClose: () => void; 
+export function TramiteEditModal({
+  isOpen,
+  onClose,
+  tramite,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
   tramite: Tramite;
 }) {
   const queryClient = useQueryClient();
-  const addToast = useUIStore(s => s.addToast);
-  
+  const addToast = useUIStore((s) => s.addToast);
+
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingData, setPendingData] = useState<FormData | null>(null);
 
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<FormData>({
     defaultValues: {
       nombre: tramite.nombre,
       fecha_inicio: tramite.fecha_inicio.split('T')[0],
       fecha_vencimiento: tramite.fecha_vencimiento ? tramite.fecha_vencimiento.split('T')[0] : '',
       es_permanente: tramite.es_permanente || false,
-    }
+    },
   });
 
   const isPermanente = watch('es_permanente');
@@ -48,14 +54,16 @@ export function TramiteEditModal({
     },
     onError: () => {
       addToast({ type: 'error', message: 'Error al actualizar el trámite' });
-    }
+    },
   });
 
   const onSubmit = (data: FormData) => {
-    const originalVencimiento = tramite.fecha_vencimiento ? tramite.fecha_vencimiento.split('T')[0] : '';
+    const originalVencimiento = tramite.fecha_vencimiento
+      ? tramite.fecha_vencimiento.split('T')[0]
+      : '';
     const dateChanged = data.fecha_vencimiento !== originalVencimiento;
     const permanencyChanged = data.es_permanente !== (tramite.es_permanente || false);
-    
+
     if (dateChanged || permanencyChanged) {
       setPendingData(data);
       setShowConfirm(true);
@@ -76,19 +84,21 @@ export function TramiteEditModal({
       <Modal isOpen={isOpen} onClose={() => setShowConfirm(false)} title="Confirmar cambios">
         <div className="space-y-4">
           <p className="text-sm text-text-secondary">
-            Estás a punto de modificar la fecha de vencimiento o la condición de permanencia del trámite. 
-            {pendingData?.es_permanente && ' Al ser permanente, este trámite no generará alertas de vencimiento.'}
-            {' '}¿Confirmar?
+            Estás a punto de modificar la fecha de vencimiento o la condición de permanencia del
+            trámite.
+            {pendingData?.es_permanente &&
+              ' Al ser permanente, este trámite no generará alertas de vencimiento.'}{' '}
+            ¿Confirmar?
           </p>
           <div className="flex justify-end gap-3 pt-4">
-            <button 
+            <button
               type="button"
               onClick={() => setShowConfirm(false)}
               className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-neutral-light rounded-lg transition-colors"
             >
               Cancelar
             </button>
-            <button 
+            <button
               type="button"
               onClick={handleConfirm}
               disabled={mutation.isPending}
@@ -106,7 +116,9 @@ export function TramiteEditModal({
     <Modal isOpen={isOpen} onClose={onClose} title="Editar Trámite">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-text-primary mb-1">Nombre del trámite</label>
+          <label className="block text-sm font-medium text-text-primary mb-1">
+            Nombre del trámite
+          </label>
           <input
             type="text"
             {...register('nombre', { required: 'Este campo es requerido' })}
@@ -117,24 +129,32 @@ export function TramiteEditModal({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-1">Fecha de inicio</label>
+            <label className="block text-sm font-medium text-text-primary mb-1">
+              Fecha de inicio
+            </label>
             <input
               type="date"
               {...register('fecha_inicio', { required: 'Requerido' })}
               className="w-full h-10 px-3 bg-surface border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
             />
-            {errors.fecha_inicio && <p className="text-xs text-danger mt-1">{errors.fecha_inicio.message}</p>}
+            {errors.fecha_inicio && (
+              <p className="text-xs text-danger mt-1">{errors.fecha_inicio.message}</p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-1">Fecha de vencimiento</label>
+            <label className="block text-sm font-medium text-text-primary mb-1">
+              Fecha de vencimiento
+            </label>
             <input
               type="date"
               {...register('fecha_vencimiento', { required: !isPermanente ? 'Requerido' : false })}
               disabled={isPermanente}
               className="w-full h-10 px-3 bg-surface border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent disabled:opacity-50 disabled:bg-neutral-light"
             />
-            {errors.fecha_vencimiento && <p className="text-xs text-danger mt-1">{errors.fecha_vencimiento.message}</p>}
+            {errors.fecha_vencimiento && (
+              <p className="text-xs text-danger mt-1">{errors.fecha_vencimiento.message}</p>
+            )}
           </div>
         </div>
 

@@ -6,7 +6,7 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
 
 ## 1. Current Sprint
 
-*(No active tasks — Sprint completed)*
+_(No active tasks — Sprint completed)_
 
 ---
 
@@ -87,6 +87,7 @@ This is the implementation plan and tracking document for the Vertiche Legal Pla
 ---
 
 ## 3. Backlog
+
 - Allow column sorting in all tables
 
 All data tables in the application (tiendas list, tramites global, documentos global, alertas) should support ascending and descending sort by clicking column headers. Sortable columns should have a visual indicator (chevron icon) that shows the current sort direction. Clicking the same column toggles direction. Clicking a different column resets to ascending for that column. Sort state is maintained within the session when navigating back to the page. For paginated tables, sort params are passed to the backend as query parameters. For fully client-side loaded tables, sorting is handled in the browser.

@@ -12,13 +12,7 @@ type FormData = {
   rol: UserRole;
 };
 
-export function InviteUserModal({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+export function InviteUserModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const queryClient = useQueryClient();
   const addToast = useUIStore((s) => s.addToast);
 
@@ -65,9 +59,7 @@ export function InviteUserModal({
             placeholder="Ej. Ana García"
             className="w-full h-10 px-3 bg-surface border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
           />
-          {errors.nombre && (
-            <p className="text-xs text-danger mt-1">{errors.nombre.message}</p>
-          )}
+          {errors.nombre && <p className="text-xs text-danger mt-1">{errors.nombre.message}</p>}
         </div>
 
         <div>
@@ -86,9 +78,7 @@ export function InviteUserModal({
             placeholder="ana@vertiche.com"
             className="w-full h-10 px-3 bg-surface border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
           />
-          {errors.email && (
-            <p className="text-xs text-danger mt-1">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="text-xs text-danger mt-1">{errors.email.message}</p>}
         </div>
 
         <div>

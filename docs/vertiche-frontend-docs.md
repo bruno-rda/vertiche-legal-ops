@@ -1,5 +1,7 @@
 # Vertiche — Documentación de Frontend
+
 ### Plataforma de Cumplimiento Legal para Red Nacional de Tiendas
+
 **Versión:** 1.0 — MVP  
 **Fecha:** Mayo 2026  
 **Destinatario:** Antigravity (implementación frontend)
@@ -69,6 +71,7 @@ El sistema es de uso exclusivo del equipo central de Vertiche. Las sucursales no
 El backend maneja la flexibilidad de roles. El frontend debe contemplar al menos tres niveles de permiso y adaptar la UI según el rol del usuario autenticado:
 
 #### `ADMIN`
+
 - Acceso total al sistema
 - Puede crear, editar y eliminar entidades (tiendas, trámites, documentos, usuarios)
 - Puede configurar alertas y ver logs de auditoría
@@ -76,6 +79,7 @@ El backend maneja la flexibilidad de roles. El frontend debe contemplar al menos
 - Puede gestionar usuarios del sistema
 
 #### `OPERATOR`
+
 - Puede cargar documentos
 - Puede ver el estado de trámites y expedientes
 - Puede ver y silenciar alertas propias
@@ -83,6 +87,7 @@ El backend maneja la flexibilidad de roles. El frontend debe contemplar al menos
 - No puede gestionar usuarios
 
 #### `VIEWER` (vista ejecutiva)
+
 - Solo lectura
 - Acceso al dashboard general y métricas de cumplimiento
 - No puede cargar documentos ni modificar nada
@@ -107,6 +112,7 @@ La referencia visual de Vertiche es: blanco y negro predominante, tipografía en
 ### Dirección estética: Editorial Ejecutivo
 
 **Paleta de color:**
+
 - Fondo base: blanco roto o gris muy claro (`#F7F7F5` o similar). No blanco puro.
 - Texto principal: negro casi puro (`#111111`)
 - Superficie de tarjetas y paneles: blanco (`#FFFFFF`) con sombra muy sutil
@@ -119,11 +125,13 @@ La referencia visual de Vertiche es: blanco y negro predominante, tipografía en
 **No usar:** azules corporativos genéricos, gradientes de colores, paletas multi-color, fondos oscuros en la aplicación principal.
 
 **Tipografía:**
+
 - Display / headings: fuente con carácter editorial, de alta legibilidad en tamaños grandes. Candidatos: `Instrument Serif`, `DM Serif Display`, `Playfair Display`. Usada para títulos de sección y números grandes en el dashboard.
 - UI / cuerpo: fuente sans-serif geométrica y limpia pero no genérica. Candidatos: `Geist`, `Neue Haas Grotesk`, `DM Sans`. Usada en etiquetas, tablas, botones, navegación.
 - Monoespaciada (opcional): para IDs, fechas técnicas, códigos de trámite.
 
 **Espaciado y proporciones:**
+
 - Generoso. El sistema maneja mucha información; el espacio en blanco es el principal herramienta para que no se sienta abrumador.
 - Márgenes de contenido amplios. Padding interno de tarjetas holgado.
 - Tipografía bien jerarquizada: tamaños claros entre h1, h2, label, body, caption.
@@ -154,18 +162,18 @@ El dashboard debe tener un elemento visual memorable. La propuesta es una **visu
 
 ### Stack
 
-| Capa | Tecnología |
-|---|---|
-| Framework | React 18+ |
-| Routing | React Router v6 |
-| Estado global | Zustand (preferido por simplicidad) o React Query + Context |
-| Data fetching | React Query (TanStack Query) — manejo de cache, loading, error, refetch |
-| Formularios | React Hook Form + Zod para validación |
-| UI base | Componentes propios sobre primitivos (Radix UI para accesibilidad) |
-| Styling | Tailwind CSS o CSS Modules (consistente en todo el proyecto) |
-| Animaciones | Framer Motion para transiciones de página y elementos complejos; CSS para microinteracciones simples |
-| Cliente API | Generado desde `openapi.json` con `openapi-typescript` o `orval` |
-| Mocking | MSW (Mock Service Worker) — ver sección 12 |
+| Capa          | Tecnología                                                                                           |
+| ------------- | ---------------------------------------------------------------------------------------------------- |
+| Framework     | React 18+                                                                                            |
+| Routing       | React Router v6                                                                                      |
+| Estado global | Zustand (preferido por simplicidad) o React Query + Context                                          |
+| Data fetching | React Query (TanStack Query) — manejo de cache, loading, error, refetch                              |
+| Formularios   | React Hook Form + Zod para validación                                                                |
+| UI base       | Componentes propios sobre primitivos (Radix UI para accesibilidad)                                   |
+| Styling       | Tailwind CSS o CSS Modules (consistente en todo el proyecto)                                         |
+| Animaciones   | Framer Motion para transiciones de página y elementos complejos; CSS para microinteracciones simples |
+| Cliente API   | Generado desde `openapi.json` con `openapi-typescript` o `orval`                                     |
+| Mocking       | MSW (Mock Service Worker) — ver sección 12                                                           |
 
 ### Principios de arquitectura frontend
 
@@ -179,6 +187,7 @@ Todos los datos remotos pasan por React Query. Nada se guarda en estado local si
 Seguir el patrón: `Page → Section → Component → Primitive`. Las páginas solo ensamblan secciones. Las secciones contienen lógica de layout. Los componentes son reutilizables y sin side effects de datos.
 
 **4. Separación estricta de capas:**
+
 ```
 /src
   /api          → cliente generado + hooks de React Query
@@ -237,23 +246,24 @@ El sidebar es colapsable a íconos para maximizar el área de contenido. El esta
 ### Breadcrumbs
 
 Presentes en todas las páginas de detalle. Ejemplo:
+
 ```
 Tiendas  /  Tienda Centro Monterrey  /  Expediente  /  Licencia de Funcionamiento
 ```
 
 ### Rutas del MVP
 
-| Ruta | Descripción |
-|---|---|
-| `/` | Redirige a `/dashboard` |
-| `/dashboard` | Vista general de cumplimiento |
-| `/tiendas` | Listado y búsqueda de tiendas |
-| `/tiendas/:id` | Ficha de tienda + expediente |
-| `/tiendas/:id/tramites/:tramiteId` | Detalle de un trámite específico |
-| `/tramites` | Vista global de todos los trámites (filtrable) |
-| `/alertas` | Centro de alertas |
-| `/documentos` | Vista global de documentos cargados |
-| `/login` | Autenticación |
+| Ruta                               | Descripción                                    |
+| ---------------------------------- | ---------------------------------------------- |
+| `/`                                | Redirige a `/dashboard`                        |
+| `/dashboard`                       | Vista general de cumplimiento                  |
+| `/tiendas`                         | Listado y búsqueda de tiendas                  |
+| `/tiendas/:id`                     | Ficha de tienda + expediente                   |
+| `/tiendas/:id/tramites/:tramiteId` | Detalle de un trámite específico               |
+| `/tramites`                        | Vista global de todos los trámites (filtrable) |
+| `/alertas`                         | Centro de alertas                              |
+| `/documentos`                      | Vista global de documentos cargados            |
+| `/login`                           | Autenticación                                  |
 
 ---
 
@@ -262,6 +272,7 @@ Tiendas  /  Tienda Centro Monterrey  /  Expediente  /  Licencia de Funcionamient
 Estas son las entidades centrales del sistema. Los campos exactos deben derivarse del `openapi.json` del backend; esto es una descripción funcional para guiar decisiones de UI.
 
 ### `Tienda`
+
 Unidad mínima de gestión. Representa una sucursal física de Vertiche.
 
 ```typescript
@@ -281,6 +292,7 @@ Unidad mínima de gestión. Representa una sucursal física de Vertiche.
 ```
 
 ### `Tramite`
+
 Representa un permiso o licencia específica que una tienda debe mantener vigente.
 
 ```typescript
@@ -300,7 +312,7 @@ Representa un permiso o licencia específica que una tienda debe mantener vigent
   asignado_a?: string      // usuario_id responsable
 }
 
-type TramiteEstado = 
+type TramiteEstado =
   | 'pendiente_documentacion'
   | 'en_revision'
   | 'presentado'
@@ -311,6 +323,7 @@ type TramiteEstado =
 ```
 
 ### `Expediente`
+
 Agrupación de todos los trámites de una tienda. Existe como entidad explícita en el backend.
 
 ```typescript
@@ -324,6 +337,7 @@ Agrupación de todos los trámites de una tienda. Existe como entidad explícita
 ```
 
 ### `Documento`
+
 Archivo PDF asociado a uno o más trámites.
 
 ```typescript
@@ -347,6 +361,7 @@ Archivo PDF asociado a uno o más trámites.
 ```
 
 ### `Alerta`
+
 Generada por el motor de reglas del backend.
 
 ```typescript
@@ -366,6 +381,7 @@ Generada por el motor de reglas del backend.
 ```
 
 ### `HistorialItem`
+
 Registro de auditoría de cada acción sobre un trámite o documento.
 
 ```typescript
@@ -394,7 +410,9 @@ Registro de auditoría de cada acción sobre un trámite o documento.
 **Secciones:**
 
 #### Métricas globales (fila superior)
+
 Cuatro tarjetas de número grande con etiqueta:
+
 - **Tiendas totales** — número absoluto
 - **En cumplimiento** — número + porcentaje del total
 - **Por vencer** — número de tiendas con al menos un trámite por vencer
@@ -403,13 +421,16 @@ Cuatro tarjetas de número grande con etiqueta:
 Cada tarjeta usa el color del sistema de estados correspondiente. Las tarjetas de "Por vencer" y "En riesgo crítico" son clickeables y filtran la tabla inferior.
 
 #### Visualización de cumplimiento por estado (elemento "wow")
+
 Mapa SVG de México con los 32 estados. Cada estado recibe un color basado en el nivel de cumplimiento agregado de sus tiendas:
+
 - Verde oscuro: >85% cumplimiento
 - Ámbar: 60–85%
 - Rojo oscuro: <60%
 - Gris claro: sin tiendas en ese estado
 
 Interacciones:
+
 - Hover: tooltip con nombre del estado, # tiendas, % cumplimiento, # trámites críticos
 - Click: navega a `/tiendas?estado=[nombre]` (lista de tiendas de ese estado)
 - Transición de color animada con CSS (fill transition 300ms)
@@ -417,7 +438,9 @@ Interacciones:
 Si el mapa SVG no está disponible en el MVP, reemplazar con un gráfico de barras horizontales ordenadas por nivel de cumplimiento (de peor a mejor), con la misma lógica de color. El gráfico debe ser igualmente clickeable para filtrar.
 
 #### Alertas recientes
+
 Lista de las últimas 10 alertas activas (no silenciadas), ordenadas por severidad y luego por fecha. Cada fila muestra:
+
 - Ícono de severidad (color del sistema)
 - Mensaje de la alerta
 - Nombre de la tienda (link a `/tiendas/:id`)
@@ -425,7 +448,9 @@ Lista de las últimas 10 alertas activas (no silenciadas), ordenadas por severid
 - Botón "Ver todas" → `/alertas`
 
 #### Trámites próximos a vencer
+
 Tabla compacta de los 10 trámites más urgentes por vencer. Columnas:
+
 - Tienda
 - Nombre del trámite
 - Fecha de vencimiento
@@ -439,6 +464,7 @@ Tabla compacta de los 10 trámites más urgentes por vencer. Columnas:
 **Propósito:** Encontrar y acceder a cualquier tienda de la red.
 
 **Controles superiores:**
+
 - Buscador por nombre de tienda (búsqueda en tiempo real, debounce 300ms)
 - Filtro por estado de México (dropdown de selección única)
 - Filtro por estado de cumplimiento (`vigente` / `en_riesgo` / `critico`)
@@ -446,6 +472,7 @@ Tabla compacta de los 10 trámites más urgentes por vencer. Columnas:
 
 **Vista de resultados:**
 Tabla con las siguientes columnas:
+
 - Nombre de tienda
 - Estado (geográfico)
 - Municipio
@@ -456,6 +483,7 @@ Tabla con las siguientes columnas:
 Cada fila es clickeable → `/tiendas/:id`
 
 **Estados vacíos:**
+
 - Sin resultados de búsqueda: mensaje claro + botón para limpiar filtros
 - Cargando: skeleton de 8 filas
 - Error de red: mensaje con botón de reintento
@@ -469,6 +497,7 @@ Cada fila es clickeable → `/tiendas/:id`
 **Propósito:** Ver el estado completo del expediente de una tienda y gestionar sus trámites y documentos.
 
 **Header de la tienda:**
+
 - Nombre de la tienda (grande)
 - Estado y municipio
 - Marcas que operan en ella
@@ -476,14 +505,17 @@ Cada fila es clickeable → `/tiendas/:id`
 - % de cumplimiento con indicador visual circular o barra
 
 **Tabs principales:**
+
 ```
 [ Expediente ]  [ Documentos ]  [ Alertas ]  [ Historial ]
 ```
 
 #### Tab: Expediente
+
 Lista de todos los trámites de la tienda, agrupados por tipo (federal, estatal, municipal) o en una sola lista filtrable.
 
 Cada trámite se muestra como una fila o tarjeta con:
+
 - Nombre del trámite
 - Estado actual (badge con color del sistema)
 - Fecha de vencimiento
@@ -493,9 +525,11 @@ Cada trámite se muestra como una fila o tarjeta con:
 Filtros dentro del tab: por estado del trámite, por tipo jurisdiccional.
 
 #### Tab: Documentos
+
 Lista de todos los documentos cargados en el expediente de esta tienda.
 
 Cada documento muestra:
+
 - Nombre del archivo
 - Estado OCR (badge: procesando / completado / baja confianza / error)
 - Trámites asociados (links)
@@ -506,9 +540,11 @@ Cada documento muestra:
 Botón principal (visible para ADMIN y OPERATOR): **"Cargar documento"** → abre modal de carga.
 
 #### Tab: Alertas
+
 Alertas activas específicas de esta tienda. Misma estructura que el centro de alertas pero filtrado. Permite silenciar alertas desde aquí.
 
 #### Tab: Historial
+
 Log cronológico de todas las acciones sobre el expediente de esta tienda. Muestra quién hizo qué y cuándo. Solo lectura.
 
 ---
@@ -520,6 +556,7 @@ Log cronológico de todas las acciones sobre el expediente de esta tienda. Muest
 **Secciones:**
 
 **Información del trámite:**
+
 - Nombre, tipo, jurisdicción
 - Estado actual (badge editable por ADMIN)
 - Fechas de inicio y vencimiento
@@ -528,6 +565,7 @@ Log cronológico de todas las acciones sobre el expediente de esta tienda. Muest
 
 **Observaciones del motor de reglas:**
 Si el expediente tiene observaciones, aparecen como una sección destacada con:
+
 - Descripción de la observación
 - Severidad
 - Botón "Escalar a alerta" (solo ADMIN) — convierte la observación en una alerta activa
@@ -537,6 +575,7 @@ Lista de documentos vinculados a este trámite específico. Botón para asociar 
 
 **Datos extraídos por OCR:**
 Si hay documentos con OCR completado, tabla de datos extraídos:
+
 - Campo (ej. "Fecha de vigencia")
 - Valor extraído
 - Botón de edición (solo ADMIN) — abre inline edit o modal de corrección
@@ -553,6 +592,7 @@ Timeline vertical de todas las acciones sobre este trámite, con fecha, usuario 
 **Propósito:** Vista cruzada de todos los trámites de toda la red, para encontrar patrones, urgencias y gestión masiva.
 
 **Filtros:**
+
 - Búsqueda por nombre de trámite o tienda
 - Filtro por estado del trámite
 - Filtro por estado geográfico
@@ -574,17 +614,20 @@ Clickeable por fila → `/tiendas/:id/tramites/:tramiteId`
 **Propósito:** Vista completa de todas las alertas activas del sistema. Es el primer lugar al que va el equipo legal al iniciar su día.
 
 **Tabs:**
+
 ```
 [ Activas ]  [ Silenciadas ]
 ```
 
 **Filtros (tab Activas):**
+
 - Por severidad (info / warning / critical)
 - Por tipo de alerta
 - Por estado geográfico
 - Por tienda
 
 **Cada alerta muestra:**
+
 - Ícono y color de severidad
 - Tipo de alerta
 - Mensaje descriptivo
@@ -594,6 +637,7 @@ Clickeable por fila → `/tiendas/:id/tramites/:tramiteId`
 - Acciones: **Ir al trámite** | **Silenciar** (abre modal)
 
 **Modal de silenciar alerta:**
+
 - Duración: 7 días / 15 días / 30 días / fecha personalizada
 - Campo de nota opcional (queda en historial)
 - Confirmación
@@ -608,6 +652,7 @@ Lista de alertas silenciadas con fecha de expiración del silencio y quién la s
 **Propósito:** Visibilidad global de todos los documentos del sistema.
 
 **Filtros:**
+
 - Por estado OCR
 - Por `requiere_revision_manual`
 - Por tienda
@@ -617,6 +662,7 @@ Lista de alertas silenciadas con fecha de expiración del silencio y quién la s
 Nombre | Tienda | Estado OCR | Cargado por | Fecha | Trámites asociados | Acciones
 
 **Acciones por documento:**
+
 - Descargar
 - Ver datos extraídos
 - Si `requiere_revision_manual`: botón "Revisar" → abre modal de revisión OCR
@@ -645,6 +691,7 @@ Después del login exitoso, redirige a `/dashboard`.
 6. Toma acción (carga documento / escala observación / silencia alerta)
 
 **Consideraciones UX:**
+
 - El path Dashboard → Alerta → Trámite debe ser de 2 clicks máximo
 - El botón "Ir al trámite" en una alerta debe ser el CTA más prominente
 - Al silenciar una alerta, no debe desaparecer abruptamente; debe moverse con animación al tab "Silenciadas"
@@ -667,6 +714,7 @@ Después del login exitoso, redirige a `/dashboard`.
 9. Si el OCR termina con `baja_confianza`, aparece banner de advertencia en el documento
 
 **Consideraciones UX:**
+
 - El modal de carga debe ser grande y cómodo (no un tooltip pequeño)
 - Mostrar claramente qué trámites tiene la tienda para que el usuario seleccione correctamente
 - Si el archivo no es PDF, mostrar error inmediato antes de intentar el upload
@@ -688,6 +736,7 @@ Después del login exitoso, redirige a `/dashboard`.
 7. El historial del trámite registra la corrección y quién la hizo
 
 **Consideraciones UX:**
+
 - Este flujo es crítico para la integridad de los datos. Debe sentirse seguro y deliberado
 - La corrección debe requerir confirmación si se modifican fechas de vigencia (son datos sensibles)
 - Después de guardar, mostrar confirmación clara de éxito
@@ -703,6 +752,7 @@ Después del login exitoso, redirige a `/dashboard`.
 5. Usuario puede ordenar y explorar pero no puede modificar nada
 
 **Consideraciones UX:**
+
 - Para VIEWER, todos los botones de acción están ocultos o deshabilitados (no solo bloqueados)
 - El dashboard debe ser legible y comunicar el estado general en menos de 10 segundos de lectura
 - Los números grandes y el mapa deben funcionar como una "pantalla de control" ejecutiva
@@ -715,32 +765,32 @@ El backend determina los estados. El frontend los representa de manera consisten
 
 ### Estados de trámite y su representación visual
 
-| Estado | Label en UI | Color | Ícono |
-|---|---|---|---|
-| `pendiente_documentacion` | Pendiente | Gris | Círculo vacío |
-| `en_revision` | En revisión | Azul neutro | Reloj |
-| `presentado` | Presentado | Azul neutro | Flecha hacia arriba |
-| `en_espera_resolucion` | En espera | Ámbar | Pausa |
-| `vigente` | Vigente | Verde oscuro | Check |
-| `por_vencer` | Por vencer | Ámbar | Advertencia |
-| `vencido` | Vencido | Rojo oscuro | X |
+| Estado                    | Label en UI | Color        | Ícono               |
+| ------------------------- | ----------- | ------------ | ------------------- |
+| `pendiente_documentacion` | Pendiente   | Gris         | Círculo vacío       |
+| `en_revision`             | En revisión | Azul neutro  | Reloj               |
+| `presentado`              | Presentado  | Azul neutro  | Flecha hacia arriba |
+| `en_espera_resolucion`    | En espera   | Ámbar        | Pausa               |
+| `vigente`                 | Vigente     | Verde oscuro | Check               |
+| `por_vencer`              | Por vencer  | Ámbar        | Advertencia         |
+| `vencido`                 | Vencido     | Rojo oscuro  | X                   |
 
 ### Estados de alerta
 
-| Severidad | Color de fondo | Color de texto | Uso |
-|---|---|---|---|
-| `info` | Gris claro | Gris oscuro | Cambios informativos |
-| `warning` | Ámbar muy claro | Ámbar oscuro | Por vencer, baja confianza OCR |
-| `critical` | Rojo muy claro | Rojo oscuro | Vencido, inconsistencia grave |
+| Severidad  | Color de fondo  | Color de texto | Uso                            |
+| ---------- | --------------- | -------------- | ------------------------------ |
+| `info`     | Gris claro      | Gris oscuro    | Cambios informativos           |
+| `warning`  | Ámbar muy claro | Ámbar oscuro   | Por vencer, baja confianza OCR |
+| `critical` | Rojo muy claro  | Rojo oscuro    | Vencido, inconsistencia grave  |
 
 ### Estados OCR
 
-| Estado | Label | Color | Acción sugerida |
-|---|---|---|---|
-| `procesando` | Procesando... | Gris con spinner | Esperar |
-| `completado` | Procesado | Verde | — |
-| `baja_confianza` | Requiere revisión | Ámbar | Botón "Revisar" |
-| `error` | Error de procesamiento | Rojo | Botón "Reintentar" o "Cargar manualmente" |
+| Estado           | Label                  | Color            | Acción sugerida                           |
+| ---------------- | ---------------------- | ---------------- | ----------------------------------------- |
+| `procesando`     | Procesando...          | Gris con spinner | Esperar                                   |
+| `completado`     | Procesado              | Verde            | —                                         |
+| `baja_confianza` | Requiere revisión      | Ámbar            | Botón "Revisar"                           |
+| `error`          | Error de procesamiento | Rojo             | Botón "Reintentar" o "Cargar manualmente" |
 
 ### Componente Badge
 
@@ -796,9 +846,8 @@ Para el MVP, la estrategia más simple y robusta es polling. Una vez que un docu
 useQuery({
   queryKey: ['documento', documentoId],
   queryFn: () => fetchDocumento(documentoId),
-  refetchInterval: (data) => 
-    data?.estado_ocr === 'procesando' ? 5000 : false,
-})
+  refetchInterval: (data) => (data?.estado_ocr === 'procesando' ? 5000 : false),
+});
 ```
 
 Si el backend implementa WebSockets o Server-Sent Events, el frontend puede migrar a ese modelo sin cambios en la UI.
@@ -806,11 +855,13 @@ Si el backend implementa WebSockets o Server-Sent Events, el frontend puede migr
 ### Estados de UI durante el procesamiento
 
 Cuando un documento está en `procesando`:
+
 - La fila del documento muestra un spinner sutil junto al badge de estado
 - Los datos extraídos muestran un skeleton loader
 - El botón "Ver datos extraídos" está deshabilitado con tooltip "El documento está siendo procesado"
 
 Cuando termina el procesamiento:
+
 - Si el usuario está en la pantalla, el estado se actualiza automáticamente (React Query refetch)
 - Si el resultado es `baja_confianza`, aparece un toast de advertencia: "El documento [nombre] requiere revisión manual"
 - Si el resultado es `completado`, aparece un toast de éxito sutil
@@ -871,6 +922,7 @@ npx orval --input https://api.vertiche.com/openapi.json --output src/api
 ```
 
 Esto genera:
+
 - Tipos TypeScript para todas las entidades
 - Funciones de fetch tipadas para cada endpoint
 - (Opcionalmente) hooks de React Query por endpoint
@@ -878,6 +930,7 @@ Esto genera:
 ### Autenticación
 
 El backend define el mecanismo. El frontend debe soportar:
+
 - JWT almacenado en `httpOnly cookie` (preferido por seguridad) o en memoria (no en localStorage)
 - Interceptor de peticiones que agrega el token en el header `Authorization: Bearer {token}`
 - Interceptor de respuesta que detecta 401 y redirige a `/login`
@@ -885,15 +938,15 @@ El backend define el mecanismo. El frontend debe soportar:
 
 ### Manejo de errores HTTP
 
-| Código | Comportamiento en UI |
-|---|---|
-| 400 | Mostrar mensaje de error de validación en el formulario correspondiente |
-| 401 | Redirigir a `/login` |
-| 403 | Mostrar mensaje "No tienes permisos para esta acción" (toast error) |
-| 404 | Mostrar pantalla de "No encontrado" con link de regreso |
-| 422 | Mapear errores de validación de FastAPI a campos del formulario |
-| 500 | Toast de error genérico + botón "Reintentar" si aplica |
-| Network error | Toast de error de conectividad con reintento automático (React Query) |
+| Código        | Comportamiento en UI                                                    |
+| ------------- | ----------------------------------------------------------------------- |
+| 400           | Mostrar mensaje de error de validación en el formulario correspondiente |
+| 401           | Redirigir a `/login`                                                    |
+| 403           | Mostrar mensaje "No tienes permisos para esta acción" (toast error)     |
+| 404           | Mostrar pantalla de "No encontrado" con link de regreso                 |
+| 422           | Mapear errores de validación de FastAPI a campos del formulario         |
+| 500           | Toast de error genérico + botón "Reintentar" si aplica                  |
+| Network error | Toast de error de conectividad con reintento automático (React Query)   |
 
 ---
 
@@ -913,22 +966,22 @@ El backend define el mecanismo. El frontend debe soportar:
 
 ## 15. Glosario
 
-| Término | Definición en el contexto de Vertiche |
-|---|---|
-| **Tienda** | Sucursal física de Vertiche donde operan una o más marcas |
-| **Expediente** | Conjunto de todos los trámites y documentos de una tienda |
-| **Trámite** | Permiso, licencia u obligación legal que una tienda debe mantener vigente |
-| **Documento** | Archivo PDF cargado al sistema, asociado a uno o más trámites |
-| **OCR** | Proceso automático de extracción de datos del documento (fecha de vigencia, número de permiso, etc.) |
-| **Motor de reglas** | Componente del backend que valida expedientes, detecta inconsistencias y genera alertas |
-| **ETL** | Proceso automático que extrae requisitos regulatorios de fuentes gubernamentales |
-| **Alerta** | Notificación generada por el motor de reglas ante un vencimiento próximo, vencimiento, o inconsistencia |
-| **Silenciar alerta** | Acción de posponer temporalmente una alerta, con duración y nota de justificación |
-| **Cumplimiento** | Porcentaje de trámites vigentes sobre el total requerido para una tienda o región |
+| Término                | Definición en el contexto de Vertiche                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Tienda**             | Sucursal física de Vertiche donde operan una o más marcas                                                    |
+| **Expediente**         | Conjunto de todos los trámites y documentos de una tienda                                                    |
+| **Trámite**            | Permiso, licencia u obligación legal que una tienda debe mantener vigente                                    |
+| **Documento**          | Archivo PDF cargado al sistema, asociado a uno o más trámites                                                |
+| **OCR**                | Proceso automático de extracción de datos del documento (fecha de vigencia, número de permiso, etc.)         |
+| **Motor de reglas**    | Componente del backend que valida expedientes, detecta inconsistencias y genera alertas                      |
+| **ETL**                | Proceso automático que extrae requisitos regulatorios de fuentes gubernamentales                             |
+| **Alerta**             | Notificación generada por el motor de reglas ante un vencimiento próximo, vencimiento, o inconsistencia      |
+| **Silenciar alerta**   | Acción de posponer temporalmente una alerta, con duración y nota de justificación                            |
+| **Cumplimiento**       | Porcentaje de trámites vigentes sobre el total requerido para una tienda o región                            |
 | **Baja confianza OCR** | Condición en la que el sistema no pudo leer el documento con suficiente certeza y recomienda revisión manual |
-| **Observación** | Resultado del motor de reglas al detectar una inconsistencia en un expediente |
-| **Historial** | Log de auditoría cronológico de todas las acciones sobre un trámite o expediente |
+| **Observación**        | Resultado del motor de reglas al detectar una inconsistencia en un expediente                                |
+| **Historial**          | Log de auditoría cronológico de todas las acciones sobre un trámite o expediente                             |
 
 ---
 
-*Fin del documento. Versión 1.0 — MVP de Vertiche Legal Compliance Platform.*
+_Fin del documento. Versión 1.0 — MVP de Vertiche Legal Compliance Platform._

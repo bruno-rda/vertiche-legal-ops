@@ -15,16 +15,21 @@ interface DocumentUploadModalProps {
   tramites: Tramite[];
 }
 
-export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: DocumentUploadModalProps) {
+export function DocumentUploadModal({
+  isOpen,
+  onClose,
+  tiendaId,
+  tramites,
+}: DocumentUploadModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
   const [selectedTramites, setSelectedTramites] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const addToast = useUIStore(s => s.addToast);
+  const addToast = useUIStore((s) => s.addToast);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -49,10 +54,13 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
           if (progress >= 100) {
             clearInterval(interval);
             // After progress hits 100, make the actual API call
-            api.post(`/tiendas/${tiendaId}/documentos`, {
-              fileName: data.fileName,
-              tramiteIds: data.tramiteIds,
-            }).then(resolve).catch(reject);
+            api
+              .post(`/tiendas/${tiendaId}/documentos`, {
+                fileName: data.fileName,
+                tramiteIds: data.tramiteIds,
+              })
+              .then(resolve)
+              .catch(reject);
           }
         }, 150);
       });
@@ -74,7 +82,7 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
         type: 'error',
         message: 'Error al cargar el documento',
       });
-    }
+    },
   });
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -91,7 +99,7 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
 
   const handleFileSelect = (selectedFile: File | undefined) => {
     if (!selectedFile) return;
-    
+
     if (selectedFile.type !== 'application/pdf') {
       setError('Solo se permiten archivos PDF');
       return;
@@ -100,14 +108,12 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
     setError(null);
     setFile(selectedFile);
     // Remove extension for the descriptive name
-    setFileName(selectedFile.name.replace(/\.[^/.]+$/, ""));
+    setFileName(selectedFile.name.replace(/\.[^/.]+$/, ''));
   };
 
   const handleToggleTramite = (tramiteId: string) => {
-    setSelectedTramites(prev => 
-      prev.includes(tramiteId) 
-        ? prev.filter(id => id !== tramiteId)
-        : [...prev, tramiteId]
+    setSelectedTramites((prev) =>
+      prev.includes(tramiteId) ? prev.filter((id) => id !== tramiteId) : [...prev, tramiteId],
     );
   };
 
@@ -127,7 +133,7 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
 
     setIsUploading(true);
     setError(null);
-    
+
     mutation.mutate({ file, fileName, tramiteIds: selectedTramites });
   };
 
@@ -173,8 +179,10 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
             className={clsx(
-              "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
-              error ? "border-danger bg-danger-light/10" : "border-border hover:bg-neutral-light hover:border-text-secondary"
+              'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
+              error
+                ? 'border-danger bg-danger-light/10'
+                : 'border-border hover:bg-neutral-light hover:border-text-secondary',
             )}
           >
             <input
@@ -187,7 +195,9 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
             <div className="mx-auto w-12 h-12 bg-surface-card border border-border rounded-full flex items-center justify-center mb-4">
               <Upload className="w-6 h-6 text-text-muted" />
             </div>
-            <h3 className="text-sm font-medium text-text-primary mb-1">Haz clic o arrastra un PDF aquí</h3>
+            <h3 className="text-sm font-medium text-text-primary mb-1">
+              Haz clic o arrastra un PDF aquí
+            </h3>
             <p className="text-xs text-text-muted">Solo archivos PDF (max. 10MB)</p>
           </div>
         ) : (
@@ -196,7 +206,9 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
               <FileText className="w-5 h-5 text-text-secondary" />
             </div>
             <div className="flex-1 min-w-0">
-              <label className="block text-xs font-medium text-text-secondary mb-1">Nombre descriptivo del documento</label>
+              <label className="block text-xs font-medium text-text-secondary mb-1">
+                Nombre descriptivo del documento
+              </label>
               <input
                 type="text"
                 value={fileName}
@@ -250,8 +262,11 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {tramites.map(tramite => (
-                    <label key={tramite.id} className="flex items-center gap-3 p-3 hover:bg-neutral-light cursor-pointer transition-colors">
+                  {tramites.map((tramite) => (
+                    <label
+                      key={tramite.id}
+                      className="flex items-center gap-3 p-3 hover:bg-neutral-light cursor-pointer transition-colors"
+                    >
                       <input
                         type="checkbox"
                         checked={selectedTramites.includes(tramite.id)}
@@ -259,7 +274,9 @@ export function DocumentUploadModal({ isOpen, onClose, tiendaId, tramites }: Doc
                         className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-text-primary truncate">{tramite.nombre}</p>
+                        <p className="text-sm font-medium text-text-primary truncate">
+                          {tramite.nombre}
+                        </p>
                         <p className="text-xs text-text-muted capitalize">{tramite.tipo}</p>
                       </div>
                     </label>

@@ -32,18 +32,19 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
   const [documentToView, setDocumentToView] = useState<Documento | null>(null);
 
   const updateNameMutation = useMutation({
-    mutationFn: async ({ docId, newName }: { docId: string, newName: string }) => {
+    mutationFn: async ({ docId, newName }: { docId: string; newName: string }) => {
       return api.post(`/documentos/${docId}/rename`, { nombre_archivo: newName });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documentos', { tramite_id: tramiteId }] });
-    }
+    },
   });
 
   // Poll every 5s if there's any document processing
   const { data, isLoading } = useQuery({
     queryKey: ['documentos', { tramite_id: tramiteId }],
-    queryFn: () => api.get<PaginatedResponse<Documento>>(`/api/documentos?tramite_id=${tramiteId}&page_size=50`),
+    queryFn: () =>
+      api.get<PaginatedResponse<Documento>>(`/api/documentos?tramite_id=${tramiteId}&page_size=50`),
     refetchInterval: (query) => {
       const hasProcessing = query.state.data?.data.some((d) => d.estado_ocr === 'procesando');
       return hasProcessing ? 5000 : false;
@@ -68,7 +69,7 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
     onSettled: () => {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
-    }
+    },
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,7 +97,9 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
             >
               <Link className="w-4 h-4" /> Asociar existente
             </button>
-            <label className={`px-3 py-1.5 text-sm font-medium text-white bg-accent hover:bg-accent-hover rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+            <label
+              className={`px-3 py-1.5 text-sm font-medium text-white bg-accent hover:bg-accent-hover rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
+            >
               <UploadCloud className="w-4 h-4" />
               {isUploading ? 'Cargando...' : 'Cargar nuevo'}
               <input
@@ -112,9 +115,15 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
       </div>
 
       {isLoading ? (
-        <div className="space-y-2"><Skeleton className="h-12 w-full" count={2} /></div>
+        <div className="space-y-2">
+          <Skeleton className="h-12 w-full" count={2} />
+        </div>
       ) : documentos.length === 0 ? (
-        <EmptyState variant="no-data" title="Sin documentos" description="No hay documentos asociados a este trámite." />
+        <EmptyState
+          variant="no-data"
+          title="Sin documentos"
+          description="No hay documentos asociados a este trámite."
+        />
       ) : (
         <div className="border border-border rounded-lg overflow-hidden">
           <table className="w-full text-left text-sm whitespace-nowrap">
@@ -138,7 +147,17 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
                     />
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant={doc.estado_ocr === 'completado' ? 'vigente' : doc.estado_ocr === 'procesando' ? 'en_revision' : doc.estado_ocr === 'error' ? 'vencido' : 'warning'}>
+                    <Badge
+                      variant={
+                        doc.estado_ocr === 'completado'
+                          ? 'vigente'
+                          : doc.estado_ocr === 'procesando'
+                            ? 'en_revision'
+                            : doc.estado_ocr === 'error'
+                              ? 'vencido'
+                              : 'warning'
+                      }
+                    >
                       {doc.estado_ocr === 'baja_confianza' ? 'Revisión manual' : doc.estado_ocr}
                     </Badge>
                   </td>
@@ -146,12 +165,16 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
                   <td className="px-4 py-3 text-text-secondary">{formatDate(doc.cargado_en)}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="p-1.5 text-text-muted hover:text-text-primary rounded-md transition-colors" title="Descargar documento">
+                      <button
+                        className="p-1.5 text-text-muted hover:text-text-primary rounded-md transition-colors"
+                        title="Descargar documento"
+                      >
                         <Download className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setDocumentToView(doc)}
-                        className="p-1.5 text-text-muted hover:text-text-primary rounded-md transition-colors" title="Ver documento"
+                        className="p-1.5 text-text-muted hover:text-text-primary rounded-md transition-colors"
+                        title="Ver documento"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -160,7 +183,8 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
                           onClick={() => setDocumentToReview(doc)}
                           className="flex items-center gap-1 px-2 py-1 bg-warning-light text-warning-dark text-xs font-medium rounded-md hover:bg-warning/20 transition-colors ml-1"
                         >
-                          <AlertTriangle className="w-3.5 h-3.5" />Revisar
+                          <AlertTriangle className="w-3.5 h-3.5" />
+                          Revisar
                         </button>
                       )}
                     </div>

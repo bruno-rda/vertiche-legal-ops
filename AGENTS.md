@@ -6,12 +6,12 @@ Operational guide for AI agents making changes to this codebase. Read this entir
 
 ## 1. Source of Truth
 
-| Document | Purpose |
-|---|---|
-| `vertiche-frontend-docs.md` | Product requirements, entity definitions, roles, UI/UX principles, business rules. **Read before any feature work.** |
-| `DECISIONS.md` | All technical and design decisions made during implementation that are **not** explicit in the docs. Check here before re-deciding something. |
-| `PLAN.md` | Implementation iterations and current MVP scope. |
-| `AGENTS.md` | This file. Coding standards and agent workflow. |
+| Document                    | Purpose                                                                                                                                       |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vertiche-frontend-docs.md` | Product requirements, entity definitions, roles, UI/UX principles, business rules. **Read before any feature work.**                          |
+| `DECISIONS.md`              | All technical and design decisions made during implementation that are **not** explicit in the docs. Check here before re-deciding something. |
+| `PLAN.md`                   | Implementation iterations and current MVP scope.                                                                                              |
+| `AGENTS.md`                 | This file. Coding standards and agent workflow.                                                                                               |
 
 > **Rule:** If you make a decision not covered in the above docs, add it to `DECISIONS.md` with the date and your reasoning.
 
@@ -19,18 +19,18 @@ Operational guide for AI agents making changes to this codebase. Read this entir
 
 ## 2. Tech Stack
 
-| Concern | Tool |
-|---|---|
-| Framework | React 19 + TypeScript (`~6.0.2`) |
-| Build | Vite 8 |
-| Styling | **Tailwind CSS v4** via `@tailwindcss/vite` plugin |
-| Routing | React Router v7 |
-| Server state | TanStack Query v5 |
-| Client state | Zustand v5 |
-| Forms | React Hook Form + Zod |
-| Animations | Framer Motion |
-| Icons | lucide-react |
-| Mocking | MSW v2 (browser mode) |
+| Concern      | Tool                                               |
+| ------------ | -------------------------------------------------- |
+| Framework    | React 19 + TypeScript (`~6.0.2`)                   |
+| Build        | Vite 8                                             |
+| Styling      | **Tailwind CSS v4** via `@tailwindcss/vite` plugin |
+| Routing      | React Router v7                                    |
+| Server state | TanStack Query v5                                  |
+| Client state | Zustand v5                                         |
+| Forms        | React Hook Form + Zod                              |
+| Animations   | Framer Motion                                      |
+| Icons        | lucide-react                                       |
+| Mocking      | MSW v2 (browser mode)                              |
 
 **Do not introduce new libraries** without a strong reason. Document any addition in `DECISIONS.md`.
 
@@ -38,11 +38,11 @@ Operational guide for AI agents making changes to this codebase. Read this entir
 
 ## 3. Language Policy — Strict
 
-| Context | Language |
-|---|---|
+| Context                                                                                               | Language    |
+| ----------------------------------------------------------------------------------------------------- | ----------- |
 | All UI text (labels, buttons, placeholders, empty states, toasts, errors, table headers, page titles) | **Spanish** |
-| Code: variable names, function names, types, comments, prop names | **English** |
-| Console logs and thrown errors in logic code | English |
+| Code: variable names, function names, types, comments, prop names                                     | **English** |
+| Console logs and thrown errors in logic code                                                          | English     |
 
 This rule is **non-negotiable**. Any user-visible string must be in Spanish, including aria-labels and title attributes on interactive elements.
 
@@ -102,11 +102,11 @@ Blue:          blue, blue-light (used for in-progress states only)
 
 This pattern is **systemic** and must be consistent everywhere:
 
-| Threshold | Color |
-|---|---|
-| ≥ 85% | `text-success` / `bg-success-light` |
-| 60–84% | `text-warning` / `bg-warning-light` |
-| < 60% | `text-danger` / `bg-danger-light` |
+| Threshold | Color                               |
+| --------- | ----------------------------------- |
+| ≥ 85%     | `text-success` / `bg-success-light` |
+| 60–84%    | `text-warning` / `bg-warning-light` |
+| < 60%     | `text-danger` / `bg-danger-light`   |
 
 The `ProgressBar` component implements this automatically. Use it.
 
@@ -180,11 +180,11 @@ All generated data lives in `src/mocks/data/`. When adding new fields to an enti
 
 ### Mock credentials (for testing)
 
-| Role | Email | Password |
-|---|---|---|
-| ADMIN | `ana.garcia@vertiche.com` | `admin123` |
-| OPERATOR | `carlos.mendoza@vertiche.com` | `operator123` |
-| VIEWER | `maria.fernandez@vertiche.com` | `viewer123` |
+| Role     | Email                          | Password      |
+| -------- | ------------------------------ | ------------- |
+| ADMIN    | `ana.garcia@vertiche.com`      | `admin123`    |
+| OPERATOR | `carlos.mendoza@vertiche.com`  | `operator123` |
+| VIEWER   | `maria.fernandez@vertiche.com` | `viewer123`   |
 
 ---
 
@@ -192,21 +192,23 @@ All generated data lives in `src/mocks/data/`. When adding new fields to an enti
 
 ### Zustand stores
 
-| Store | Holds |
-|---|---|
-| `authStore` | `user`, `token`, `isAuthenticated`, `login()`, `logout()` |
-| `uiStore` | `sidebarCollapsed` (persisted to `localStorage`), toast queue |
+| Store       | Holds                                                         |
+| ----------- | ------------------------------------------------------------- |
+| `authStore` | `user`, `token`, `isAuthenticated`, `login()`, `logout()`     |
+| `uiStore`   | `sidebarCollapsed` (persisted to `localStorage`), toast queue |
 
 **Do not** add new Zustand stores for server data — that is React Query's job. New client-side global state (e.g., a user preference) can go in `uiStore`.
 
 ### URL as state for filters
 
 All filter, sort, and pagination state on list pages lives in `useSearchParams`. This ensures:
+
 - The URL is shareable and deep-linkable.
 - Browser back/forward works correctly.
 - Filters survive a page refresh.
 
 Pattern used in every list page:
+
 ```typescript
 const [sp, setSp] = useSearchParams();
 const up = (key: string, value: string) => {
@@ -229,6 +231,7 @@ Defined in `src/App.tsx`:
 - Auth is **in-memory only** — it is lost on page refresh (intentional for MVP; see `DECISIONS.md`).
 
 Route structure:
+
 ```
 /login                              → LoginPage (PublicRoute + AuthLayout)
 /dashboard                          → DashboardPage

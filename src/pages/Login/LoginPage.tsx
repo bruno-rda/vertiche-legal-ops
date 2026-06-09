@@ -62,15 +62,11 @@ export function LoginPage() {
             className="w-full px-4 py-2.5 text-sm bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all placeholder:text-text-muted"
             autoComplete="email"
           />
-          {errors.email && (
-            <p className="mt-1 text-xs text-danger">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="mt-1 text-xs text-danger">{errors.email.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text-primary mb-1.5">
-            Contraseña
-          </label>
+          <label className="block text-sm font-medium text-text-primary mb-1.5">Contraseña</label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -87,9 +83,7 @@ export function LoginPage() {
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
-          {errors.password && (
-            <p className="mt-1 text-xs text-danger">{errors.password.message}</p>
-          )}
+          {errors.password && <p className="mt-1 text-xs text-danger">{errors.password.message}</p>}
         </div>
 
         <button

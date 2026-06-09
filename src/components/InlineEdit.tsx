@@ -54,8 +54,8 @@ export function InlineEdit({ value, onSave, className, inputClassName }: InlineE
         onBlur={handleSave}
         onKeyDown={handleKeyDown}
         className={clsx(
-          "px-2 py-1 border border-text-primary rounded focus:outline-none focus:ring-1 focus:ring-text-primary bg-surface",
-          inputClassName || "text-sm w-full max-w-[300px]"
+          'px-2 py-1 border border-text-primary rounded focus:outline-none focus:ring-1 focus:ring-text-primary bg-surface',
+          inputClassName || 'text-sm w-full max-w-[300px]',
         )}
       />
     );
@@ -63,7 +63,10 @@ export function InlineEdit({ value, onSave, className, inputClassName }: InlineE
 
   return (
     <div
-      className={clsx("group flex items-center gap-2 cursor-pointer hover:bg-neutral-light px-2 py-1 -ml-2 rounded transition-colors", className)}
+      className={clsx(
+        'group flex items-center gap-2 cursor-pointer hover:bg-neutral-light px-2 py-1 -ml-2 rounded transition-colors',
+        className,
+      )}
       onClick={() => setIsEditing(true)}
       title="Click to edit"
     >

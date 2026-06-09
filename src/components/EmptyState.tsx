@@ -8,7 +8,7 @@ const variants = {
     defaultTitle: 'Sin resultados',
     defaultDescription: 'No se encontraron elementos que coincidan con tu búsqueda.',
   },
-  'error': {
+  error: {
     icon: WifiOff,
     defaultTitle: 'Error de conexión',
     defaultDescription: 'No se pudieron cargar los datos. Verifica tu conexión e intenta de nuevo.',
@@ -42,7 +42,9 @@ export function EmptyState({
   const Icon = config.icon;
 
   return (
-    <div className={`flex flex-col items-center justify-center py-16 px-4 text-center ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center py-16 px-4 text-center ${className}`}
+    >
       <div className="w-14 h-14 rounded-2xl bg-neutral-light flex items-center justify-center mb-4">
         <Icon className="w-7 h-7 text-text-muted" />
       </div>

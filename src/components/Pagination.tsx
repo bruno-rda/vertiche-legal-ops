@@ -46,14 +46,12 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
               key={p}
               onClick={() => onPageChange(p)}
               className={`min-w-[32px] h-8 rounded-md text-sm font-medium transition-colors ${
-                p === page
-                  ? 'bg-accent text-white'
-                  : 'text-text-secondary hover:bg-neutral-light'
+                p === page ? 'bg-accent text-white' : 'text-text-secondary hover:bg-neutral-light'
               }`}
             >
               {p}
             </button>
-          )
+          ),
         )}
         <button
           onClick={() => onPageChange(page + 1)}

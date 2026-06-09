@@ -16,10 +16,7 @@ export function Skeleton({ className = '', variant = 'line', count = 1 }: Skelet
   return (
     <div className="flex flex-col gap-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div
-          key={i}
-          className={`${baseClass} ${variantClass[variant]} ${className}`}
-        />
+        <div key={i} className={`${baseClass} ${variantClass[variant]} ${className}`} />
       ))}
     </div>
   );

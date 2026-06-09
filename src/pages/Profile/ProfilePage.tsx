@@ -26,7 +26,7 @@ export function ProfilePage() {
   const { data: userProfile, isLoading } = useQuery({
     queryKey: ['usuario', userId],
     queryFn: () => {
-      // If it's the current user, we can just use the auth store data initially, 
+      // If it's the current user, we can just use the auth store data initially,
       // but to keep it fresh, let's fetch.
       return api.get<User>(`/api/usuarios/${userId}`);
     },
@@ -55,7 +55,9 @@ export function ProfilePage() {
           {isOwnProfile ? 'Mi Perfil' : 'Perfil de Usuario'}
         </h1>
         <p className="text-sm text-text-secondary mt-1">
-          {isOwnProfile ? 'Información de cuenta y configuración' : 'Información y asignaciones del usuario'}
+          {isOwnProfile
+            ? 'Información de cuenta y configuración'
+            : 'Información y asignaciones del usuario'}
         </p>
       </div>
 
@@ -70,11 +72,21 @@ export function ProfilePage() {
               <h2 className="text-2xl font-bold text-text-primary flex items-center gap-3">
                 {user.nombre}
                 {user.estado === 'inactivo' && (
-                  <Badge variant="default" className="bg-danger-light text-danger">Inactivo</Badge>
+                  <Badge variant="default" className="bg-danger-light text-danger">
+                    Inactivo
+                  </Badge>
                 )}
               </h2>
               <div className="flex items-center gap-3 mt-2">
-                <Badge variant={user.rol === 'ADMIN' ? 'vigente' : user.rol === 'OPERATOR' ? 'en_revision' : 'info'}>
+                <Badge
+                  variant={
+                    user.rol === 'ADMIN'
+                      ? 'vigente'
+                      : user.rol === 'OPERATOR'
+                        ? 'en_revision'
+                        : 'info'
+                  }
+                >
                   {user.rol}
                 </Badge>
                 <span className="text-sm text-text-secondary flex items-center gap-1.5">
@@ -99,7 +111,7 @@ export function ProfilePage() {
                 </p>
                 <p className="text-base text-text-primary">
                   {user.rol === 'OPERATOR'
-                    ? (user.tiendas_asignadas?.length || 0)
+                    ? user.tiendas_asignadas?.length || 0
                     : 'Acceso global (Todas)'}
                 </p>
               </div>
@@ -113,10 +125,7 @@ export function ProfilePage() {
           <OperatorPerformance userId={user.id} />
 
           {isEditingAssignment && isAdminView ? (
-            <StoreAssignment
-              user={user}
-              onCancel={() => setIsEditingAssignment(false)}
-            />
+            <StoreAssignment user={user} onCancel={() => setIsEditingAssignment(false)} />
           ) : (
             <StoreSummary
               userId={user.id}

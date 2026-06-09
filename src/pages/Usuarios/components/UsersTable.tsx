@@ -31,8 +31,9 @@ export function UsersTable({ users, isLoading, type }: UsersTableProps) {
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
       addToast({
         type: 'success',
-        message: `Usuario ${variables.estado === 'activo' ? 'reactivado' : 'desactivado'
-          } exitosamente`,
+        message: `Usuario ${
+          variables.estado === 'activo' ? 'reactivado' : 'desactivado'
+        } exitosamente`,
       });
     },
     onError: () => {
@@ -87,7 +88,16 @@ export function UsersTable({ users, isLoading, type }: UsersTableProps) {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-text-primary">{user.nombre}</span>
-                <Badge variant={user.rol === 'ADMIN' ? 'vigente' : user.rol === 'OPERATOR' ? 'en_revision' : 'info'} size="sm">
+                <Badge
+                  variant={
+                    user.rol === 'ADMIN'
+                      ? 'vigente'
+                      : user.rol === 'OPERATOR'
+                        ? 'en_revision'
+                        : 'info'
+                  }
+                  size="sm"
+                >
                   {user.rol}
                 </Badge>
               </div>
@@ -96,14 +106,16 @@ export function UsersTable({ users, isLoading, type }: UsersTableProps) {
                 {user.rol === 'OPERATOR' && (
                   <>
                     <span>&middot;</span>
-                    <span>{user.tiendas_asignadas?.length || 0} {user.tiendas_asignadas?.length === 1 ? 'tienda' : 'tiendas'}</span>
+                    <span>
+                      {user.tiendas_asignadas?.length || 0}{' '}
+                      {user.tiendas_asignadas?.length === 1 ? 'tienda' : 'tiendas'}
+                    </span>
                   </>
                 )}
               </div>
             </div>
 
             <div className="flex items-center justify-between sm:justify-end gap-6 sm:w-1/2 shrink-0">
-
               <div className="flex items-center gap-2">
                 {user.id !== currentUser?.id && (
                   <button
@@ -115,13 +127,18 @@ export function UsersTable({ users, isLoading, type }: UsersTableProps) {
                       });
                     }}
                     disabled={toggleStatusMutation.isPending}
-                    className={`p-2 rounded-md transition-colors ${type === 'activos'
-                      ? 'text-danger hover:bg-danger-light'
-                      : 'text-success hover:bg-success-light'
-                      }`}
+                    className={`p-2 rounded-md transition-colors ${
+                      type === 'activos'
+                        ? 'text-danger hover:bg-danger-light'
+                        : 'text-success hover:bg-success-light'
+                    }`}
                     title={type === 'activos' ? 'Desactivar usuario' : 'Reactivar usuario'}
                   >
-                    {type === 'activos' ? <PowerOff className="w-5 h-5" /> : <Power className="w-5 h-5" />}
+                    {type === 'activos' ? (
+                      <PowerOff className="w-5 h-5" />
+                    ) : (
+                      <Power className="w-5 h-5" />
+                    )}
                   </button>
                 )}
                 {type === 'inactivos' && user.id !== currentUser?.id && (
@@ -154,7 +171,9 @@ export function UsersTable({ users, isLoading, type }: UsersTableProps) {
             <h3 className="font-semibold text-lg">¿Estás seguro?</h3>
           </div>
           <p className="text-sm text-text-secondary">
-            Vas a eliminar permanentemente a <span className="font-medium text-text-primary">{userToDelete?.nombre}</span>. Esta acción no se puede deshacer y el usuario perderá el acceso al sistema.
+            Vas a eliminar permanentemente a{' '}
+            <span className="font-medium text-text-primary">{userToDelete?.nombre}</span>. Esta
+            acción no se puede deshacer y el usuario perderá el acceso al sistema.
           </p>
           <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
             <button

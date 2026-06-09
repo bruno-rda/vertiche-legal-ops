@@ -27,7 +27,7 @@ export const tramitesHandlers = [
       filtered = filtered.filter(
         (t) =>
           t.nombre.toLowerCase().includes(search) ||
-          (t.tienda_nombre?.toLowerCase().includes(search) ?? false)
+          (t.tienda_nombre?.toLowerCase().includes(search) ?? false),
       );
     }
     if (estado) filtered = filtered.filter((t) => t.estado === estado);
@@ -45,14 +45,14 @@ export const tramitesHandlers = [
 
     // Filter by geographic state (requires looking up the tienda)
     if (estadoGeo) {
-      const tiendaIds = new Set(
-        mockTiendas.filter((s) => s.estado === estadoGeo).map((s) => s.id)
-      );
+      const tiendaIds = new Set(mockTiendas.filter((s) => s.estado === estadoGeo).map((s) => s.id));
       filtered = filtered.filter((t) => tiendaIds.has(t.tienda_id));
     }
 
     // Default sort: by expiration ascending
-    filtered.sort((a, b) => new Date(a.fecha_vencimiento).getTime() - new Date(b.fecha_vencimiento).getTime());
+    filtered.sort(
+      (a, b) => new Date(a.fecha_vencimiento).getTime() - new Date(b.fecha_vencimiento).getTime(),
+    );
 
     const total = filtered.length;
     const totalPages = Math.ceil(total / pageSize);
@@ -63,7 +63,7 @@ export const tramitesHandlers = [
     const { mockDocumentos } = await import('../data/documentos');
     data = data.map((t) => ({
       ...t,
-      documentos: mockDocumentos.filter((d) => d.tramite_ids.includes(t.id))
+      documentos: mockDocumentos.filter((d) => d.tramite_ids.includes(t.id)),
     }));
 
     return HttpResponse.json({ data, total, page, page_size: pageSize, total_pages: totalPages });
@@ -86,7 +86,8 @@ export const tramitesHandlers = [
       observaciones: [
         {
           id: `obs-${tramite.id}-1`,
-          descripcion: 'La fecha de vigencia del documento no coincide con la registrada en el sistema.',
+          descripcion:
+            'La fecha de vigencia del documento no coincide con la registrada en el sistema.',
           severidad: 'warning',
           fecha: new Date(Date.now() - 3 * 86400000).toISOString(),
         },
@@ -123,13 +124,14 @@ export const tramitesHandlers = [
       return HttpResponse.json({ detail: 'Trámite no encontrado' }, { status: 404 });
     }
 
-    const updates = await request.json() as any;
+    const updates = (await request.json()) as any;
     const tramite = mockTramites[tramiteIndex];
-    
+
     // Update fields
     if (updates.nombre !== undefined) tramite.nombre = updates.nombre;
     if (updates.fecha_inicio !== undefined) tramite.fecha_inicio = updates.fecha_inicio;
-    if (updates.fecha_vencimiento !== undefined) tramite.fecha_vencimiento = updates.fecha_vencimiento;
+    if (updates.fecha_vencimiento !== undefined)
+      tramite.fecha_vencimiento = updates.fecha_vencimiento;
     if (updates.es_permanente !== undefined) {
       tramite.es_permanente = updates.es_permanente;
       if (tramite.es_permanente) {
@@ -140,10 +142,13 @@ export const tramitesHandlers = [
 
     // Calculate new status if not permanente
     if (!tramite.es_permanente && tramite.fecha_vencimiento) {
-      const days = Math.ceil((new Date(tramite.fecha_vencimiento).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
+      const days = Math.ceil(
+        (new Date(tramite.fecha_vencimiento).getTime() - new Date().getTime()) / (1000 * 3600 * 24),
+      );
       if (days < 0) tramite.estado = 'vencido';
       else if (days <= 15) tramite.estado = 'por_vencer';
-      else if (tramite.estado === 'vencido' || tramite.estado === 'por_vencer') tramite.estado = 'vigente';
+      else if (tramite.estado === 'vencido' || tramite.estado === 'por_vencer')
+        tramite.estado = 'vigente';
     }
 
     // In a real app we'd add to historial here
