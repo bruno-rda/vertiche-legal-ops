@@ -45,10 +45,10 @@ export function DashboardPage() {
   if (isUnassignedOperator) {
     return (
       <div className="pt-20">
-        <EmptyState 
-          variant="no-data" 
-          title="Sin tiendas asignadas" 
-          description="Aún no tienes tiendas asignadas. Contacta a un administrador para comenzar." 
+        <EmptyState
+          variant="no-data"
+          title="Sin tiendas asignadas"
+          description="Aún no tienes tiendas asignadas. Contacta a un administrador para comenzar."
         />
       </div>
     );
@@ -57,10 +57,10 @@ export function DashboardPage() {
   if (metrics && metrics.total_tiendas === 0 && user?.rol === 'ADMIN') {
     return (
       <div className="pt-20">
-        <EmptyState 
-          variant="no-data" 
-          title="Sin tiendas" 
-          description="No hay tiendas en el sistema todavía." 
+        <EmptyState
+          variant="no-data"
+          title="Sin tiendas"
+          description="No hay tiendas en el sistema todavía."
         />
       </div>
     );

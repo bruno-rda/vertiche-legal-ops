@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { CumplimientoEstado } from '@/types';
 import { MapTooltip } from './MapTooltip';
 
-export const MAP_CONTAINER_CLASSES = 'relative w-full aspect-[1000/630] max-h-[650px]';
+export const MAP_CONTAINER_CLASSES = 'relative w-full max-h-[650px]';
 
 interface MexicoMapProps {
   data: CumplimientoEstado[];
@@ -57,7 +57,7 @@ export function MexicoMap({ data }: MexicoMapProps) {
 
   return (
     <div
-      className={`${MAP_CONTAINER_CLASSES} flex items-center justify-center bg-surface rounded-xl p-4 overflow-hidden`}
+      className={`${MAP_CONTAINER_CLASSES} aspect-[1000/630] flex items-center justify-center bg-surface rounded-xl p-4 overflow-hidden`}
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setHoveredState(null)}
