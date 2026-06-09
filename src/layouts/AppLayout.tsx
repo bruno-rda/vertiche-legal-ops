@@ -164,10 +164,10 @@ export function AppLayout() {
           <div className="border-t border-border p-3">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-danger hover:bg-danger-light rounded-lg transition-colors w-full"
+              className="flex items-center gap-2 px-3 py-2 h-9 text-sm text-text-secondary hover:text-danger hover:bg-danger-light rounded-lg transition-colors w-full overflow-hidden whitespace-nowrap"
               title="Cerrar sesión"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4 shrink-0" />
               {!sidebarCollapsed && <span>Cerrar sesión</span>}
             </button>
           </div>

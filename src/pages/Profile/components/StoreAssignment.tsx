@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import { Badge } from '@/components/Badge';
@@ -13,17 +13,10 @@ interface StoreAssignmentProps {
 }
 
 export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set(user.tiendas_asignadas || []));
   const [expandedStates, setExpandedStates] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
-  const addToast = useUIStore((s) => s.addToast);
-
-  // Initialize selectedIds from user's assigned stores
-  useEffect(() => {
-    if (user.tiendas_asignadas) {
-      setSelectedIds(new Set(user.tiendas_asignadas));
-    }
-  }, [user.tiendas_asignadas]);
+  const { addToast, sidebarCollapsed } = useUIStore();
 
   const { data: todasLasTiendas, isLoading } = useQuery({
     queryKey: ['tiendas', 'all-for-assignment'],
@@ -227,7 +220,7 @@ export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
 
       {/* Sticky Action Bar */}
       {changesSummary.hasChanges && (
-        <div className="fixed bottom-0 left-0 right-0 lg:left-[220px] bg-surface-card border-t border-border p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40 flex items-center justify-between">
+        <div className={`fixed bottom-0 left-0 right-0 ${sidebarCollapsed ? 'lg:left-16' : 'lg:left-[220px]'} bg-surface-card border-t border-border py-3 px-4 sm:px-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40 flex items-center justify-between transition-all duration-200 ease-in-out`}>
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-text-primary">Cambios sin guardar</span>
             <div className="flex gap-2">
