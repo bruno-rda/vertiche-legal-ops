@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { listDocumentos, renameDocumento } from '@/client/sdk.gen';
+import { listDocumentos } from '@/client/sdk.gen';
 import type { Documento } from '@/client/types.gen';
 import type { PaginatedResponseDocumento } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
@@ -8,14 +8,12 @@ import { Pagination } from '@/components/Pagination';
 import { EmptyState } from '@/components/EmptyState';
 import { TableSkeleton } from '@/components/Skeleton';
 import { formatDate } from '@/lib/utils';
-import { Download, ChevronDown, AlertTriangle, Eye } from 'lucide-react';
+import { ChevronDown, FileSearch, Edit2 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { Modal } from '@/components/Modal';
 import { PDFViewer } from '@/components/PDFViewer';
 import { OCRReviewModal } from '@/components/OCRReviewModal';
-import { InlineEdit } from '@/components/InlineEdit';
 
 export function DocumentosPage() {
   const navigate = useNavigate();
@@ -24,25 +22,10 @@ export function DocumentosPage() {
   const estadoOcr = sp.get('estado_ocr') || '';
   const revision = sp.get('requiere_revision') || '';
   const { user } = useAuthStore();
-  const queryClient = useQueryClient();
 
   const [documentToReview, setDocumentToReview] = useState<Documento | null>(null);
   const [documentToView, setDocumentToView] = useState<Documento | null>(null);
-
-  const updateNameMutation = useMutation({
-    mutationFn: async ({ docId, newName }: { docId: string; newName: string }) => {
-      return (
-        await renameDocumento({
-          path: { id: docId },
-          body: { nombre_archivo: newName },
-          throwOnError: true,
-        })
-      ).data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['documentos'] });
-    },
-  });
+  const [documentToEdit, setDocumentToEdit] = useState<Documento | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['documentos', page, estadoOcr, revision],
@@ -139,33 +122,44 @@ export function DocumentosPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    {['Archivo', 'Tienda', 'Estado OCR', 'Cargado por', 'Fecha', 'Acciones'].map(
-                      (h) => (
-                        <th
-                          key={h}
-                          className="text-left text-xs font-semibold text-text-secondary uppercase tracking-wider px-4 py-3"
-                        >
-                          {h}
-                        </th>
-                      ),
-                    )}
+                    {[
+                      { label: 'Archivo', className: 'w-48' },
+                      { label: 'Tienda', className: '' },
+                      { label: 'Estado OCR', className: '' },
+                      { label: 'Cargado por', className: '' },
+                      { label: 'Fecha', className: '' },
+                      { label: 'Acciones', className: 'text-center' },
+                    ].map((h) => (
+                      <th
+                        key={h.label}
+                        className={`text-left text-xs font-semibold text-text-secondary uppercase tracking-wider px-4 py-3 ${h.className}`}
+                      >
+                        {h.label}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {data.data.map((d) => (
                     <tr
                       key={d.id}
-                      onClick={() => navigate(`/tiendas/${d.tienda_id}?tab=documentos`)}
+                      onClick={() => setDocumentToView(d)}
                       className="border-b border-border last:border-b-0 hover:bg-surface/60 transition-colors cursor-pointer"
                     >
-                      <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
-                        <InlineEdit
-                          value={d.nombre_archivo}
-                          onSave={(newName) => updateNameMutation.mutate({ docId: d.id, newName })}
-                          className="text-sm font-medium text-text-primary w-fit max-w-[200px]"
-                        />
+                      <td className="px-4 py-3.5 w-48">
+                        <span className="text-sm font-medium text-text-primary block truncate max-w-[200px]">
+                          {d.nombre_archivo}
+                        </span>
                       </td>
-                      <td className="px-4 py-3.5 text-sm text-text-secondary">{d.tienda_nombre}</td>
+                      <td
+                        className="px-4 py-3.5 text-sm text-text-secondary hover:underline hover:text-text-primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/tiendas/${d.tienda_id}?tab=documentos`);
+                        }}
+                      >
+                        {d.tienda_nombre}
+                      </td>
                       <td className="px-4 py-3.5">
                         <Badge variant={d.estado_ocr} size="sm" />
                       </td>
@@ -175,28 +169,23 @@ export function DocumentosPage() {
                       <td className="px-4 py-3.5 text-sm text-text-muted">
                         {formatDate(d.cargado_en)}
                       </td>
-                      <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center gap-2">
-                          <button
-                            className="p-1.5 hover:bg-neutral-light rounded-md transition-colors"
-                            title="Descargar"
-                          >
-                            <Download className="w-4 h-4 text-text-secondary" />
-                          </button>
-                          <button
-                            onClick={() => setDocumentToView(d)}
-                            className="p-1.5 hover:bg-neutral-light rounded-md transition-colors"
-                            title="Ver PDF"
-                          >
-                            <Eye className="w-4 h-4 text-text-secondary" />
-                          </button>
-                          {d.requiere_revision_manual && user?.rol === 'ADMIN' && (
+                      <td className="px-4 py-3.5 text-center" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-center gap-2">
+                          {d.requiere_revision_manual && user?.rol === 'ADMIN' ? (
                             <button
                               onClick={() => setDocumentToReview(d)}
-                              className="flex items-center gap-1 px-2 py-1 bg-warning-light text-warning-dark text-xs font-medium rounded-md hover:bg-warning/20 transition-colors"
+                              className="p-1.5 bg-warning-light hover:bg-warning/20 text-warning-dark rounded-md transition-colors"
+                              title="Revisar"
                             >
-                              <AlertTriangle className="w-3.5 h-3.5" />
-                              Revisar
+                              <FileSearch className="w-4 h-4" />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => setDocumentToEdit(d)}
+                              className="p-1.5 hover:bg-neutral-light rounded-md transition-colors"
+                              title="Editar"
+                            >
+                              <Edit2 className="w-4 h-4 text-text-secondary" />
                             </button>
                           )}
                         </div>
@@ -227,6 +216,16 @@ export function DocumentosPage() {
           isOpen={!!documentToReview}
           onClose={() => setDocumentToReview(null)}
           documento={documentToReview}
+          mode="review"
+        />
+      )}
+
+      {documentToEdit && (
+        <OCRReviewModal
+          isOpen={!!documentToEdit}
+          onClose={() => setDocumentToEdit(null)}
+          documento={documentToEdit}
+          mode="edit"
         />
       )}
 
@@ -236,7 +235,7 @@ export function DocumentosPage() {
         title="Ver Documento"
         size="xl"
       >
-        <div className="h-[75vh]">
+        <div className="h-full">
           {documentToView && (
             <PDFViewer url={documentToView.url} title={documentToView.nombre_archivo} />
           )}

@@ -15,7 +15,7 @@ const sizeClasses = {
   sm: 'max-w-md',
   md: 'max-w-lg',
   lg: 'max-w-2xl',
-  xl: 'max-w-[90vw]',
+  xl: 'max-w-[90vw] w-[90vw] h-[85vh]',
 };
 
 export function Modal({ isOpen, onClose, title, children, size = 'md', footer }: ModalProps) {
@@ -72,7 +72,9 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', footer }:
             </div>
 
             {/* Body */}
-            <div className="px-6 py-4 overflow-y-auto flex-1">{children}</div>
+            <div className={`px-6 py-4 flex-1 ${size === 'xl' ? 'overflow-hidden flex flex-col min-h-0' : 'overflow-y-auto'}`}>
+              {children}
+            </div>
 
             {/* Footer */}
             {footer && (

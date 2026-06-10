@@ -6,7 +6,6 @@ import {
   getAlertasForTienda,
   getDocumentosForTienda,
   getHistorialForTienda,
-  renameDocumento,
 } from '@/client/sdk.gen';
 import type { Documento } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
@@ -17,15 +16,13 @@ import { EmptyState } from '@/components/EmptyState';
 import { formatDate } from '@/lib/utils';
 import {
   MapPin,
-  Tag,
-  Download,
-  FileText,
-  AlertTriangle,
-  Upload,
-  History,
-  Bell,
   FolderOpen,
-  Eye,
+  FileText,
+  Bell,
+  History,
+  Tag,
+  Upload,
+  FileSearch,
 } from 'lucide-react';
 import { ExpedienteTab } from './components/ExpedienteTab';
 import { TiendaAlertasTab } from './components/TiendaAlertasTab';
@@ -37,9 +34,11 @@ import { DocumentUploadModal } from './components/DocumentUploadModal';
 import { OCRReviewModal } from '@/components/OCRReviewModal';
 import { Modal } from '@/components/Modal';
 import { PDFViewer } from '@/components/PDFViewer';
-import { InlineEdit } from '@/components/InlineEdit';
-import { Edit2 } from 'lucide-react';
+import { Edit2, Trash2 } from 'lucide-react';
 import { TiendaEditModal } from './components/TiendaEditModal';
+import { ConfirmModal } from '@/components/ConfirmModal';
+import { deleteDocumento } from '@/client/sdk.gen';
+import { useUIStore } from '@/stores/uiStore';
 
 type Tab = 'expediente' | 'documentos' | 'alertas' | 'historial';
 
@@ -54,22 +53,25 @@ export function TiendaDetailPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [documentToReview, setDocumentToReview] = useState<Documento | null>(null);
   const [documentToView, setDocumentToView] = useState<Documento | null>(null);
+  const [documentToEdit, setDocumentToEdit] = useState<Documento | null>(null);
+  const [documentToDelete, setDocumentToDelete] = useState<Documento | null>(null);
+
+  const addToast = useUIStore((s) => s.addToast);
 
   const isAdmin = user?.rol === 'ADMIN';
 
-  const updateNameMutation = useMutation({
-    mutationFn: async ({ docId, newName }: { docId: string; newName: string }) => {
-      return (
-        await renameDocumento({
-          path: { id: docId },
-          body: { nombre_archivo: newName },
-          throwOnError: true,
-        })
-      ).data;
+  const deleteDocMutation = useMutation({
+    mutationFn: async (docId: string) => {
+      return (await deleteDocumento({ path: { id: docId }, throwOnError: true })).data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', id, 'documentos'] });
       queryClient.invalidateQueries({ queryKey: ['tienda', id, 'historial'] });
+      addToast({ type: 'success', message: 'Documento eliminado' });
+      setDocumentToDelete(null);
+    },
+    onError: () => {
+      addToast({ type: 'error', message: 'Error al eliminar el documento' });
     },
   });
 
@@ -234,16 +236,15 @@ export function TiendaDetailPage() {
             documentos.data.map((d) => (
               <div
                 key={d.id}
-                className="bg-surface-card border border-border rounded-lg px-5 py-4 flex items-center gap-4"
+                onClick={() => setDocumentToView(d)}
+                className="bg-surface-card border border-border rounded-lg px-5 py-4 flex items-center gap-4 hover:border-border-strong hover:shadow-sm transition-all cursor-pointer"
               >
                 <FileText className="w-5 h-5 text-text-muted shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <InlineEdit
-                      value={d.nombre_archivo}
-                      onSave={(newName) => updateNameMutation.mutate({ docId: d.id, newName })}
-                      className="text-sm font-medium text-text-primary"
-                    />
+                    <span className="text-sm font-medium text-text-primary truncate">
+                      {d.nombre_archivo}
+                    </span>
                   </div>
                   <p className="text-xs text-text-muted mt-0.5">
                     {d.cargado_por_nombre} · {formatDate(d.cargado_en)}
@@ -257,28 +258,30 @@ export function TiendaDetailPage() {
                   </div>
                 </div>
                 <Badge variant={d.estado_ocr} size="sm" />
-                <div className="flex items-center gap-1">
-                  {d.requiere_revision_manual && user?.rol === 'ADMIN' && (
+                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                  {d.requiere_revision_manual && user?.rol === 'ADMIN' ? (
                     <button
                       onClick={() => setDocumentToReview(d)}
-                      className="flex items-center gap-1 px-2 py-1 bg-warning-light text-warning-dark text-xs font-medium rounded-md hover:bg-warning/20 transition-colors mr-1"
+                      className="p-1.5 bg-warning-light hover:bg-warning/20 text-warning-dark rounded-md transition-colors mr-1"
+                      title="Revisar"
                     >
-                      <AlertTriangle className="w-3.5 h-3.5" />
-                      Revisar
+                      <FileSearch className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setDocumentToEdit(d)}
+                      className="p-1.5 hover:bg-neutral-light rounded-md transition-colors mr-1"
+                      title="Editar"
+                    >
+                      <Edit2 className="w-4 h-4 text-text-secondary" />
                     </button>
                   )}
                   <button
-                    onClick={() => setDocumentToView(d)}
-                    className="p-1.5 hover:bg-neutral-light rounded-md transition-colors"
-                    title="Ver PDF"
+                    onClick={() => setDocumentToDelete(d)}
+                    className="p-1.5 hover:bg-danger-light text-danger rounded-md transition-colors"
+                    title="Eliminar"
                   >
-                    <Eye className="w-4 h-4 text-text-secondary" />
-                  </button>
-                  <button
-                    className="p-1.5 hover:bg-neutral-light rounded-md transition-colors"
-                    title="Descargar"
-                  >
-                    <Download className="w-4 h-4 text-text-secondary" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -328,8 +331,34 @@ export function TiendaDetailPage() {
           isOpen={!!documentToReview}
           onClose={() => setDocumentToReview(null)}
           documento={documentToReview}
+          mode="review"
         />
       )}
+
+      {documentToEdit && (
+        <OCRReviewModal
+          isOpen={!!documentToEdit}
+          onClose={() => setDocumentToEdit(null)}
+          documento={documentToEdit}
+          mode="edit"
+        />
+      )}
+
+      <ConfirmModal
+        isOpen={!!documentToDelete}
+        onClose={() => setDocumentToDelete(null)}
+        onConfirm={() => documentToDelete && deleteDocMutation.mutate(documentToDelete.id)}
+        title="Eliminar documento"
+        message={
+          <>
+            Vas a eliminar permanentemente el documento{' '}
+            <span className="font-medium text-text-primary">{documentToDelete?.nombre_archivo}</span>
+            . Esta acción no se puede deshacer.
+          </>
+        }
+        confirmText="Eliminar permanentemente"
+        isPending={deleteDocMutation.isPending}
+      />
 
       <Modal
         isOpen={!!documentToView}
@@ -337,7 +366,7 @@ export function TiendaDetailPage() {
         title="Ver Documento"
         size="xl"
       >
-        <div className="h-[75vh]">
+        <div className="h-full">
           {documentToView && (
             <PDFViewer url={documentToView.url} title={documentToView.nombre_archivo} />
           )}

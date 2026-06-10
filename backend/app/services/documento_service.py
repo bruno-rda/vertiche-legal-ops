@@ -176,3 +176,22 @@ async def accept_ocr_review(
         payload={"keys_reviewed": list(datos_extraidos.keys())},
     )
     return doc
+
+
+async def delete(db: AsyncSession, id: str, *, actor: Usuario) -> None:
+    doc = await get_by_id(db, id, current_user=actor)
+
+    # Delete file from storage
+    if doc.url:
+        await storage.delete_file(doc.url)
+
+    await documento_repo.delete_by_id(db, id)
+
+    await audit.record(
+        db,
+        actor_id=actor.id,
+        accion="documento.delete",
+        entidad="documento",
+        entidad_id=id,
+        payload={"nombre_archivo": doc.nombre_archivo},
+    )

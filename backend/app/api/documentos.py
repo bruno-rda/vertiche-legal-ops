@@ -117,3 +117,8 @@ async def accept_ocr_review(
         db, id, datos_extraidos=data.datos_extraidos, actor=current_user
     )
     return _serialize_documento(doc)
+
+
+@router.delete("/{id}", status_code=204)
+async def delete_documento(db: DbSession, id: str, current_user: CurrentUser):
+    await documento_service.delete(db, id, actor=current_user)

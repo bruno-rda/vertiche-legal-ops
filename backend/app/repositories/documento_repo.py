@@ -94,3 +94,10 @@ async def set_tramite_ids(
             [{"documento_id": doc_id, "tramite_id": tid} for tid in tramite_ids],
         )
     await db.flush()
+
+
+async def delete_by_id(db: AsyncSession, id: str) -> None:
+    doc = await get_by_id(db, id)
+    if doc:
+        await db.delete(doc)
+        await db.flush()

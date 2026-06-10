@@ -28,3 +28,15 @@ async def save_file(file_content: bytes, original_filename: str) -> str:
 def get_file_url(relative_path: str) -> str:
     """Converts a stored relative path to a URL the frontend can fetch."""
     return f"/media/{relative_path}"
+
+
+async def delete_file(relative_path: str) -> bool:
+    """Deletes file from UPLOAD_DIR."""
+    full_path = os.path.join(settings.upload_dir, relative_path)
+    if os.path.exists(full_path):
+        try:
+            os.remove(full_path)
+            return True
+        except Exception:
+            return False
+    return False
