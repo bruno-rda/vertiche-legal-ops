@@ -70,4 +70,5 @@ async def get_estado_geografico(
             }
         )
 
+    result.sort(key=lambda x: x["cumplimiento"])
     return result
