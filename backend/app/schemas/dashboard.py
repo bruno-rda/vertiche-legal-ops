@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class DashboardMetricsOut(BaseModel):
+class DashboardMetrics(BaseModel):
     total_tiendas: int
     en_cumplimiento: int
     por_vencer: int
@@ -9,7 +9,7 @@ class DashboardMetricsOut(BaseModel):
     porcentaje_cumplimiento: int
 
 
-class CumplimientoEstadoOut(BaseModel):
+class CumplimientoEstado(BaseModel):
     estado: str
     total_tiendas: int
     cumplimiento: int

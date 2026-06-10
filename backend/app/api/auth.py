@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.api.deps import CurrentUser, DbSession
 from app.schemas.auth import LoginResponse
-from app.schemas.usuario import UsuarioOut
+from app.schemas.usuario import Usuario
 from app.services import auth_service
 
 router = APIRouter()
@@ -32,7 +32,7 @@ async def login(
     }
 
 
-@router.get("/me", response_model=UsuarioOut)
+@router.get("/me", response_model=Usuario)
 async def get_me(current_user: CurrentUser):
     tiendas_asignadas = [t.id for t in current_user.tiendas]
     return {

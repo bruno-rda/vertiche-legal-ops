@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.deps import CurrentUser, DbSession
-from app.schemas.alerta import AlertaCountOut, AlertaOut, AlertaSilenciarRequest
+from app.schemas.alerta import Alerta, AlertaCount, AlertaSilenciarRequest
 from app.services import alerta_service
 
 router = APIRouter()
@@ -37,7 +37,7 @@ def _serialize_alerta(a) -> dict:
     }
 
 
-@router.get("", response_model=list[AlertaOut])
+@router.get("", response_model=list[Alerta])
 async def list_alertas(
     db: DbSession,
     current_user: CurrentUser,
@@ -61,13 +61,13 @@ async def list_alertas(
     return [_serialize_alerta(a) for a in items]
 
 
-@router.get("/count/critical", response_model=AlertaCountOut)
+@router.get("/count/critical", response_model=AlertaCount)
 async def count_critical(db: DbSession, current_user: CurrentUser):
     count = await alerta_service.count_active_critical(db, current_user=current_user)
     return {"count": count}
 
 
-@router.post("/{id}/silenciar", response_model=AlertaOut)
+@router.post("/{id}/silenciar", response_model=Alerta)
 async def silenciar(
     db: DbSession, id: str, data: AlertaSilenciarRequest, current_user: CurrentUser
 ):
@@ -77,19 +77,19 @@ async def silenciar(
     return _serialize_alerta(a)
 
 
-@router.post("/{id}/resolver", response_model=AlertaOut)
+@router.post("/{id}/resolver", response_model=Alerta)
 async def resolver(db: DbSession, id: str, current_user: CurrentUser):
     a = await alerta_service.resolver(db, id, actor=current_user)
     return _serialize_alerta(a)
 
 
-@router.post("/{id}/reactivar", response_model=AlertaOut)
+@router.post("/{id}/reactivar", response_model=Alerta)
 async def reactivar(db: DbSession, id: str, current_user: CurrentUser):
     a = await alerta_service.reactivar(db, id, actor=current_user)
     return _serialize_alerta(a)
 
 
-@router.post("/{id}/notificar/{canal}", response_model=AlertaOut)
+@router.post("/{id}/notificar/{canal}", response_model=Alerta)
 async def notificar(db: DbSession, id: str, canal: str, current_user: CurrentUser):
     a = await alerta_service.notificar(db, id, canal=canal, actor=current_user)
     return _serialize_alerta(a)

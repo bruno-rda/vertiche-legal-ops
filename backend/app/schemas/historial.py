@@ -1,11 +1,15 @@
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict
 
+EntidadTipo = Literal["alert", "documento", "tienda", "tramite", "usuario"]
 
-class HistorialOut(BaseModel):
+
+class HistorialItem(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    entidad_tipo: str
+    entidad_tipo: EntidadTipo
     entidad_id: str
     accion: str
     usuario_id: str

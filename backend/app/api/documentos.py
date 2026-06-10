@@ -3,8 +3,8 @@ from fastapi import APIRouter, File, Request, UploadFile
 from app.api.deps import CurrentUser, DbSession
 from app.core.pagination import PaginatedResponse, paginate
 from app.schemas.documento import (
+    Documento,
     DocumentoOcrReview,
-    DocumentoOut,
     DocumentoRename,
     DocumentoUpdate,
 )
@@ -35,7 +35,7 @@ def _serialize_documento(d) -> dict:
     }
 
 
-@router.get("", response_model=PaginatedResponse[DocumentoOut])
+@router.get("", response_model=PaginatedResponse[Documento])
 async def list_documentos(
     db: DbSession,
     current_user: CurrentUser,
@@ -59,7 +59,7 @@ async def list_documentos(
     return paginate([_serialize_documento(d) for d in items], total, page, page_size)
 
 
-@router.post("", response_model=DocumentoOut, status_code=201)
+@router.post("", response_model=Documento, status_code=201)
 async def upload_documento(
     request: Request,
     db: DbSession,
@@ -81,13 +81,13 @@ async def upload_documento(
     return _serialize_documento(doc)
 
 
-@router.get("/{id}", response_model=DocumentoOut)
+@router.get("/{id}", response_model=Documento)
 async def get_documento(db: DbSession, id: str, current_user: CurrentUser):
     doc = await documento_service.get_by_id(db, id, current_user=current_user)
     return _serialize_documento(doc)
 
 
-@router.patch("/{id}", response_model=DocumentoOut)
+@router.patch("/{id}", response_model=Documento)
 async def update_documento(
     db: DbSession, id: str, data: DocumentoUpdate, current_user: CurrentUser
 ):
@@ -99,7 +99,7 @@ async def update_documento(
     return _serialize_documento(doc)
 
 
-@router.post("/{id}/rename", response_model=DocumentoOut)
+@router.post("/{id}/rename", response_model=Documento)
 async def rename_documento(
     db: DbSession, id: str, data: DocumentoRename, current_user: CurrentUser
 ):
@@ -109,7 +109,7 @@ async def rename_documento(
     return _serialize_documento(doc)
 
 
-@router.post("/{id}/ocr-review", response_model=DocumentoOut)
+@router.post("/{id}/ocr-review", response_model=Documento)
 async def accept_ocr_review(
     db: DbSession, id: str, data: DocumentoOcrReview, current_user: CurrentUser
 ):

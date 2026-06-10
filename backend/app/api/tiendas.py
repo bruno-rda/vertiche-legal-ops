@@ -5,11 +5,11 @@ from app.api.deps import CurrentUser, DbSession, RequireAdmin
 from app.api.documentos import _serialize_documento
 from app.api.tramites import _serialize_tramite
 from app.core.pagination import PaginatedResponse, paginate
-from app.schemas.alerta import AlertaOut
-from app.schemas.documento import DocumentoOut
-from app.schemas.historial import HistorialOut
-from app.schemas.tienda import ExpedienteOut, TiendaOut, TiendaUpdate
-from app.schemas.tramite import TramiteCreate, TramiteOut
+from app.schemas.alerta import Alerta
+from app.schemas.documento import Documento
+from app.schemas.historial import HistorialItem
+from app.schemas.tienda import Expediente, Tienda, TiendaUpdate
+from app.schemas.tramite import Tramite, TramiteCreate
 from app.services import (
     alerta_service,
     documento_service,
@@ -39,7 +39,7 @@ def _serialize_tienda(t) -> dict:
     }
 
 
-@router.get("", response_model=PaginatedResponse[TiendaOut])
+@router.get("", response_model=PaginatedResponse[Tienda])
 async def list_tiendas(
     db: DbSession,
     current_user: CurrentUser,
@@ -67,13 +67,13 @@ async def list_tiendas(
     return paginate([_serialize_tienda(t) for t in items], total, page, page_size)
 
 
-@router.get("/{id}", response_model=TiendaOut)
+@router.get("/{id}", response_model=Tienda)
 async def get_tienda(db: DbSession, id: str, current_user: CurrentUser):
     t = await tienda_service.get_by_id(db, id, current_user=current_user)
     return _serialize_tienda(t)
 
 
-@router.put("/{id}", response_model=TiendaOut)
+@router.put("/{id}", response_model=Tienda)
 async def update_tienda(
     db: DbSession, id: str, data: TiendaUpdate, admin: RequireAdmin
 ):
@@ -83,7 +83,7 @@ async def update_tienda(
     return _serialize_tienda(t)
 
 
-@router.get("/{id}/expediente", response_model=ExpedienteOut)
+@router.get("/{id}/expediente", response_model=Expediente)
 async def get_expediente(db: DbSession, id: str, current_user: CurrentUser):
     t = await tienda_service.get_by_id(db, id, current_user=current_user)
 
@@ -100,7 +100,7 @@ async def get_expediente(db: DbSession, id: str, current_user: CurrentUser):
     }
 
 
-@router.post("/{id}/tramites", response_model=TramiteOut, status_code=201)
+@router.post("/{id}/tramites", response_model=Tramite, status_code=201)
 async def create_tramite_for_tienda(
     db: DbSession, id: str, data: TramiteCreate, current_user: CurrentUser
 ):
@@ -112,7 +112,7 @@ async def create_tramite_for_tienda(
     return _serialize_tramite(t)
 
 
-@router.get("/{id}/alertas", response_model=list[AlertaOut])
+@router.get("/{id}/alertas", response_model=list[Alerta])
 async def get_alertas_for_tienda(db: DbSession, id: str, current_user: CurrentUser):
     # Ensure user has access
     await tienda_service.get_by_id(db, id, current_user=current_user)
@@ -120,7 +120,7 @@ async def get_alertas_for_tienda(db: DbSession, id: str, current_user: CurrentUs
     return [_serialize_alerta(a) for a in items]
 
 
-@router.get("/{id}/documentos", response_model=PaginatedResponse[DocumentoOut])
+@router.get("/{id}/documentos", response_model=PaginatedResponse[Documento])
 async def get_documentos_for_tienda(
     db: DbSession,
     id: str,
@@ -136,7 +136,7 @@ async def get_documentos_for_tienda(
     return paginate([_serialize_documento(d) for d in items], total, page, page_size)
 
 
-@router.post("/{id}/documentos", response_model=DocumentoOut, status_code=201)
+@router.post("/{id}/documentos", response_model=Documento, status_code=201)
 async def upload_documento_for_tienda(
     request: Request,
     db: DbSession,
@@ -170,7 +170,7 @@ async def upload_documento_for_tienda(
     return _serialize_documento(doc)
 
 
-@router.get("/{id}/historial", response_model=list[HistorialOut])
+@router.get("/{id}/historial", response_model=list[HistorialItem])
 async def get_historial_for_tienda(db: DbSession, id: str, current_user: CurrentUser):
     # Verify access
     await tienda_service.get_by_id(db, id, current_user=current_user)

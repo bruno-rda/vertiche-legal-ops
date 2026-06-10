@@ -10,14 +10,13 @@ from app.core.exceptions import ConflictError, NotFoundError
 from app.core.security import hash_password
 from app.models.usuario import Usuario
 from app.repositories import historial_repo, usuario_repo
-from app.schemas.usuario import (
+from app.schemas.performance import (
     ActivityTimelineItem,
     MetricTrend,
-    TiendaResumen,
-    UsuarioPerformanceMetrics,
-    UsuarioPerformanceOut,
-    UsuarioResumenTiendasOut,
+    PerformanceData,
+    PerformanceMetrics,
 )
+from app.schemas.usuario import TiendaResumen, UsuarioResumenTiendas
 
 
 async def get_by_id(db: AsyncSession, id: str) -> Usuario:
@@ -126,14 +125,14 @@ async def delete_usuario(db: AsyncSession, id: str, *, actor: Usuario) -> None:
     )
 
 
-async def get_tiendas_resumen(db: AsyncSession, id: str) -> UsuarioResumenTiendasOut:
+async def get_tiendas_resumen(db: AsyncSession, id: str) -> UsuarioResumenTiendas:
     u = await get_by_id(db, id)
     tiendas = u.tiendas
     result = []
     for estado, group in itertools.groupby(tiendas, key=lambda t: t.estado):
         tiendas_list = list(group)
         result.append(
-            UsuarioResumenTiendasOut(
+            UsuarioResumenTiendas(
                 estado=estado,
                 total_tiendas=len(tiendas_list),
                 vigentes=sum(
@@ -152,7 +151,7 @@ async def get_tiendas_resumen(db: AsyncSession, id: str) -> UsuarioResumenTienda
 
 async def get_performance(
     db: AsyncSession, id: str, *, range: Literal["30", "month", "90"]
-) -> UsuarioPerformanceOut:
+) -> PerformanceData:
     if range in ["30", "90"]:
         days = int(range)
         period_start = datetime.now() - timedelta(days=days)
@@ -178,8 +177,8 @@ async def get_performance(
         until=prev_period_end,
     )
 
-    return UsuarioPerformanceOut(
-        metrics=UsuarioPerformanceMetrics(
+    return PerformanceData(
+        metrics=PerformanceMetrics(
             documentos_cargados=MetricTrend(0, 0, "neutral"),
             tramites_resueltos=MetricTrend(0, 0, "neutral"),
             alertas_atendidas=MetricTrend(0, 0, "neutral"),

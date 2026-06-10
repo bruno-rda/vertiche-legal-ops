@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -8,7 +10,10 @@ class TiendaUpdate(BaseModel):
     direccion: str | None = None
 
 
-class TiendaOut(BaseModel):
+TiendaEstadoCumplimiento = Literal["vigente", "en_riesgo", "critico"]
+
+
+class Tienda(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
@@ -18,21 +23,21 @@ class TiendaOut(BaseModel):
     direccion: str
     marcas: list[str]
     cumplimiento: float
-    estado_cumplimiento: str
+    estado_cumplimiento: TiendaEstadoCumplimiento
     total_tramites: int
     tramites_vencidos: int
     tramites_por_vencer: int
     ultima_actualizacion: str
 
 
-class ExpedienteOut(BaseModel):
+class Expediente(BaseModel):
     id: str
     tienda_id: str
-    tramites: list["TramiteOut"]
+    tramites: list["Tramite"]
     cumplimiento: float
     ultima_actualizacion: str
 
 
-from app.schemas.tramite import TramiteOut  # noqa: E402
+from app.schemas.tramite import Tramite  # noqa: E402
 
-ExpedienteOut.model_rebuild()
+Expediente.model_rebuild()

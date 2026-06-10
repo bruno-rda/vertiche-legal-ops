@@ -1,15 +1,18 @@
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict
 
-from app.schemas.documento import DocumentoOut
-from app.schemas.historial import HistorialOut
+from app.schemas.alerta import AlertaSeveridad
+from app.schemas.documento import Documento
+from app.schemas.historial import HistorialItem
 
 
-class ObservacionOut(BaseModel):
+class Observacion(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
     descripcion: str
-    severidad: str
+    severidad: AlertaSeveridad
     fecha: str
 
 
@@ -30,21 +33,34 @@ class TramiteUpdate(BaseModel):
     es_permanente: bool | None = None
 
 
-class TramiteOut(BaseModel):
+TramiteTipo = Literal["federal", "estatal", "municipal"]
+TramiteEstado = Literal[
+    "pendiente_documentacion",
+    "en_revision",
+    "presentado",
+    "en_espera_resolucion",
+    "vigente",
+    "por_vencer",
+    "vencido",
+]
+TramitePeriodoRecurrencia = Literal["anual", "bianual"]
+
+
+class Tramite(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
     tienda_id: str
     tienda_nombre: str | None = None
     nombre: str
-    tipo: str
-    estado: str
+    tipo: TramiteTipo
+    estado: TramiteEstado
     fecha_inicio: str
     fecha_vencimiento: str
     es_permanente: bool | None = None
     es_recurrente: bool
-    periodo_recurrencia: str | None = None
-    observaciones: list[ObservacionOut] = []
-    documentos: list[DocumentoOut] = []
-    historial: list[HistorialOut] = []
+    periodo_recurrencia: TramitePeriodoRecurrencia | None = None
+    observaciones: list[Observacion] = []
+    documentos: list[Documento] = []
+    historial: list[HistorialItem] = []
     asignado_a: str | None = None

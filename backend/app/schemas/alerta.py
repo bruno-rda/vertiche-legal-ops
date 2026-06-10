@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -6,12 +8,26 @@ class AlertaSilenciarRequest(BaseModel):
     nota: str | None = None
 
 
-class AlertaOut(BaseModel):
+AlertaSeveridad = Literal["info", "warning", "critical"]
+AlertaTipo = Literal[
+    "vencimiento_proximo",
+    "vencido",
+    "inconsistencia",
+    "baja_confianza_ocr",
+]
+
+
+class AlertaNotificacionSend(BaseModel):
+    email: bool
+    whatsapp: bool
+
+
+class Alerta(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    tipo: str
-    severidad: str
+    tipo: AlertaTipo
+    severidad: AlertaSeveridad
     tienda_id: str
     tienda_nombre: str | None = None
     tramite_id: str | None = None
@@ -25,8 +41,8 @@ class AlertaOut(BaseModel):
     resuelta: bool
     fecha_resolucion: str | None = None
     resuelta_por: str | None = None
-    notificaciones_enviadas: dict | None = None
+    notificaciones_enviadas: AlertaNotificacionSend | None = None
 
 
-class AlertaCountOut(BaseModel):
+class AlertaCount(BaseModel):
     count: int

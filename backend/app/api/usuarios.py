@@ -3,11 +3,11 @@ from typing import Literal
 from fastapi import APIRouter
 
 from app.api.deps import DbSession, RequireAdmin
+from app.schemas.performance import PerformanceData
 from app.schemas.usuario import (
+    Usuario,
     UsuarioCreate,
-    UsuarioOut,
-    UsuarioPerformanceOut,
-    UsuarioResumenTiendasOut,
+    UsuarioResumenTiendas,
     UsuarioStatusUpdate,
     UsuarioTiendasUpdate,
 )
@@ -16,7 +16,7 @@ from app.services import usuario_service
 router = APIRouter()
 
 
-@router.get("", response_model=list[UsuarioOut])
+@router.get("", response_model=list[Usuario])
 async def list_usuarios(
     db: DbSession,
     _: RequireAdmin,
@@ -38,7 +38,7 @@ async def list_usuarios(
     ]
 
 
-@router.post("", response_model=UsuarioOut, status_code=201)
+@router.post("", response_model=Usuario, status_code=201)
 async def create_usuario(db: DbSession, data: UsuarioCreate, admin: RequireAdmin):
     # In a real app, send an email to set password. For now, we default it to "password"
     user = await usuario_service.create(
@@ -60,7 +60,7 @@ async def create_usuario(db: DbSession, data: UsuarioCreate, admin: RequireAdmin
     }
 
 
-@router.get("/{id}", response_model=UsuarioOut)
+@router.get("/{id}", response_model=Usuario)
 async def get_usuario(db: DbSession, id: str, admin: RequireAdmin):
     u = await usuario_service.get_by_id(db, id)
     return {
@@ -79,19 +79,19 @@ async def delete_usuario(db: DbSession, id: str, admin: RequireAdmin):
     await usuario_service.delete_usuario(db, id, actor=admin)
 
 
-@router.get("/{id}/tiendas-resumen", response_model=list[UsuarioResumenTiendasOut])
+@router.get("/{id}/tiendas-resumen", response_model=list[UsuarioResumenTiendas])
 async def get_tiendas_resumen(db: DbSession, id: str, admin: RequireAdmin):
     return await usuario_service.get_tiendas_resumen(db, id)
 
 
-@router.get("/{id}/performance", response_model=UsuarioPerformanceOut)
+@router.get("/{id}/performance", response_model=PerformanceData)
 async def get_performance(
     db: DbSession, id: str, range: Literal["30", "month", "90"], admin: RequireAdmin
 ):
     return await usuario_service.get_performance(db, id, range=range)
 
 
-@router.put("/{id}/status", response_model=UsuarioOut)
+@router.put("/{id}/status", response_model=Usuario)
 async def update_status(
     db: DbSession, id: str, data: UsuarioStatusUpdate, admin: RequireAdmin
 ):
@@ -107,7 +107,7 @@ async def update_status(
     }
 
 
-@router.put("/{id}/tiendas", response_model=UsuarioOut)
+@router.put("/{id}/tiendas", response_model=Usuario)
 async def update_tiendas(
     db: DbSession, id: str, data: UsuarioTiendasUpdate, admin: RequireAdmin
 ):

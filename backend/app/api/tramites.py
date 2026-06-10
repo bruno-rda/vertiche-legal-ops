@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.api.deps import CurrentUser, DbSession
 from app.core.pagination import PaginatedResponse, paginate
-from app.schemas.tramite import TramiteCreate, TramiteOut, TramiteUpdate
+from app.schemas.tramite import Tramite, TramiteUpdate
 from app.services import tramite_service
 
 router = APIRouter()
@@ -54,7 +54,7 @@ def _serialize_tramite(t) -> dict:
     }
 
 
-@router.get("", response_model=PaginatedResponse[TramiteOut])
+@router.get("", response_model=PaginatedResponse[Tramite])
 async def list_tramites(
     db: DbSession,
     current_user: CurrentUser,
@@ -82,7 +82,7 @@ async def list_tramites(
     return paginate([_serialize_tramite(t) for t in items], total, page, page_size)
 
 
-@router.get("/{id}", response_model=TramiteOut)
+@router.get("/{id}", response_model=Tramite)
 async def get_tramite(db: DbSession, id: str, current_user: CurrentUser):
     t = await tramite_service.get_by_id(db, id, current_user=current_user)
 
@@ -108,7 +108,7 @@ async def get_tramite(db: DbSession, id: str, current_user: CurrentUser):
     return serialized
 
 
-@router.patch("/{id}", response_model=TramiteOut)
+@router.patch("/{id}", response_model=Tramite)
 async def update_tramite(
     db: DbSession, id: str, data: TramiteUpdate, current_user: CurrentUser
 ):

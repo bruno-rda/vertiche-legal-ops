@@ -3,21 +3,21 @@ from typing import Literal
 from pydantic import BaseModel
 
 
-class MetricTrendOut(BaseModel):
+class MetricTrend(BaseModel):
     value: float
     previous_value: float
     trend: Literal["up", "down", "neutral"]
 
 
-class PerformanceMetricsOut(BaseModel):
-    documentos_cargados: MetricTrendOut
-    tramites_resueltos: MetricTrendOut
-    alertas_atendidas: MetricTrendOut
-    tiempo_promedio_resolucion: MetricTrendOut
-    tramites_vencidos_responsabilidad: MetricTrendOut
+class PerformanceMetrics(BaseModel):
+    documentos_cargados: MetricTrend
+    tramites_resueltos: MetricTrend
+    alertas_atendidas: MetricTrend
+    tiempo_promedio_resolucion: MetricTrend
+    tramites_vencidos_responsabilidad: MetricTrend
 
 
-class ActivityTimelineItemOut(BaseModel):
+class ActivityTimelineItem(BaseModel):
     id: str
     accion: str
     fecha: str
@@ -27,6 +27,6 @@ class ActivityTimelineItemOut(BaseModel):
     tramite_nombre: str | None = None
 
 
-class PerformanceDataOut(BaseModel):
-    metrics: PerformanceMetricsOut
-    timeline: list[ActivityTimelineItemOut]
+class PerformanceData(BaseModel):
+    metrics: PerformanceMetrics
+    timeline: list[ActivityTimelineItem]

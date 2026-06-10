@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -9,11 +11,19 @@ class DocumentoRename(BaseModel):
     nombre_archivo: str
 
 
+EstadoOCR = Literal["procesando", "completado", "baja_confianza", "error"]
+
+
+class CampoExtraidoDocumento(BaseModel):
+    value: str
+    confidence: float
+
+
 class DocumentoOcrReview(BaseModel):
     datos_extraidos: dict[str, str]
 
 
-class DocumentoOut(BaseModel):
+class Documento(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
@@ -21,8 +31,8 @@ class DocumentoOut(BaseModel):
     tramite_nombres: list[str] | None = None
     nombre_archivo: str
     url: str
-    estado_ocr: str
-    datos_extraidos: dict | None = None
+    estado_ocr: EstadoOCR
+    datos_extraidos: dict[str, CampoExtraidoDocumento] | None = None
     requiere_revision_manual: bool
     cargado_por: str
     cargado_por_nombre: str | None = None
