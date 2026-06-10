@@ -75,7 +75,9 @@ async def get_documento_url(
     if not doc.ruta_archivo:
         return {"url": ""}
     storage_client = request.app.state.storage_client
-    url = await storage.get_presigned_url(storage_client, doc.ruta_archivo, download=download)
+    url = await storage.get_presigned_url(
+        storage_client, doc.ruta_archivo, download=download
+    )
     return {"url": url}
 
 

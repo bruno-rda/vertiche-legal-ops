@@ -6,9 +6,7 @@ from minio import Minio
 from app.config import settings
 
 
-async def save_file(
-    client: Minio, file_content: bytes, filename: str
-) -> str:
+async def save_file(client: Minio, file_content: bytes, filename: str) -> str:
     file_stream = io.BytesIO(file_content)
     length = len(file_content)
 
