@@ -1,4 +1,4 @@
-from typing import Literal
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict
 
@@ -33,17 +33,25 @@ class TramiteUpdate(BaseModel):
     es_permanente: bool | None = None
 
 
-TramiteTipo = Literal["federal", "estatal", "municipal"]
-TramiteEstado = Literal[
-    "pendiente_documentacion",
-    "en_revision",
-    "presentado",
-    "en_espera_resolucion",
-    "vigente",
-    "por_vencer",
-    "vencido",
-]
-TramitePeriodoRecurrencia = Literal["anual", "bianual"]
+class TramiteTipo(StrEnum):
+    FEDERAL = "federal"
+    ESTATAL = "estatal"
+    MUNICIPAL = "municipal"
+
+
+class TramiteEstado(StrEnum):
+    PENDIENTE_DOCUMENTACION = "pendiente_documentacion"
+    EN_REVISION = "en_revision"
+    PRESENTADO = "presentado"
+    EN_ESPERA_RESOLUCION = "en_espera_resolucion"
+    VIGENTE = "vigente"
+    POR_VENCER = "por_vencer"
+    VENCIDO = "vencido"
+
+
+class TramitePeriodoRecurrencia(StrEnum):
+    ANUAL = "anual"
+    BIANUAL = "bianual"
 
 
 class Tramite(BaseModel):

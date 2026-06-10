@@ -1,9 +1,17 @@
-from typing import Literal
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict
 
-UsuarioRol = Literal["ADMIN", "OPERATOR", "VIEWER"]
-UsuarioEstado = Literal["activo", "inactivo"]
+
+class UsuarioRol(StrEnum):
+    ADMIN = "ADMIN"
+    OPERATOR = "OPERATOR"
+    VIEWER = "VIEWER"
+
+
+class UsuarioEstado(StrEnum):
+    ACTIVO = "activo"
+    INACTIVO = "inactivo"
 
 
 class UsuarioCreate(BaseModel):

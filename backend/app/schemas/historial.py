@@ -1,8 +1,14 @@
-from typing import Literal
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict
 
-EntidadTipo = Literal["alert", "documento", "tienda", "tramite", "usuario"]
+
+class EntidadTipo(StrEnum):
+    ALERTA = "alerta"
+    DOCUMENTO = "documento"
+    TIENDA = "tienda"
+    TRAMITE = "tramite"
+    USUARIO = "usuario"
 
 
 class HistorialItem(BaseModel):

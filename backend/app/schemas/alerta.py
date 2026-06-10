@@ -1,4 +1,4 @@
-from typing import Literal
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict
 
@@ -8,13 +8,17 @@ class AlertaSilenciarRequest(BaseModel):
     nota: str | None = None
 
 
-AlertaSeveridad = Literal["info", "warning", "critical"]
-AlertaTipo = Literal[
-    "vencimiento_proximo",
-    "vencido",
-    "inconsistencia",
-    "baja_confianza_ocr",
-]
+class AlertaSeveridad(StrEnum):
+    INFO = "info"
+    WARNING = "warning"
+    CRITICAL = "critical"
+
+
+class AlertaTipo(StrEnum):
+    VENCIMIENTO_PROXIMO = "vencimiento_proximo"
+    VENCIDO = "vencido"
+    INCONSISTENCIA = "inconsistencia"
+    BAJA_CONFIANZA_OCR = "baja_confianza_ocr"
 
 
 class AlertaNotificacionSend(BaseModel):

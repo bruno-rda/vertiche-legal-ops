@@ -1,6 +1,5 @@
 import itertools
 from datetime import datetime, timedelta
-from typing import Literal
 
 from dateutil.relativedelta import relativedelta
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,6 +14,7 @@ from app.schemas.performance import (
     MetricTrend,
     PerformanceData,
     PerformanceMetrics,
+    RangeType,
 )
 from app.schemas.usuario import TiendaResumen, UsuarioResumenTiendas
 
@@ -150,19 +150,19 @@ async def get_tiendas_resumen(db: AsyncSession, id: str) -> UsuarioResumenTienda
 
 
 async def get_performance(
-    db: AsyncSession, id: str, *, range: Literal["30", "month", "90"]
+    db: AsyncSession, id: str, *, range: RangeType
 ) -> PerformanceData:
-    if range in ["30", "90"]:
-        days = int(range)
-        period_start = datetime.now() - timedelta(days=days)
-        prev_period_start = period_start - timedelta(days=days)
-        prev_period_end = period_start
-
-    elif range == "month":
+    if range == RangeType.CURR_MONTH:
         now = datetime.now()
         period_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         prev_period_start = period_start - relativedelta(months=1)
         prev_period_end = prev_period_start + (now - period_start)
+
+    else:
+        days = int(range)
+        period_start = datetime.now() - timedelta(days=days)
+        prev_period_start = period_start - timedelta(days=days)
+        prev_period_end = period_start
 
     current_records = await historial_repo.get_by_actor(
         db,

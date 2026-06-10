@@ -1,4 +1,4 @@
-from typing import Literal
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict
 
@@ -10,7 +10,10 @@ class TiendaUpdate(BaseModel):
     direccion: str | None = None
 
 
-TiendaEstadoCumplimiento = Literal["vigente", "en_riesgo", "critico"]
+class TiendaEstadoCumplimiento(StrEnum):
+    VIGENTE = "vigente"
+    EN_RIESGO = "en_riesgo"
+    CRITICO = "critico"
 
 
 class Tienda(BaseModel):

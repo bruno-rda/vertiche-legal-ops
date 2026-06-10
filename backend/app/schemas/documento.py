@@ -1,4 +1,4 @@
-from typing import Literal
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict
 
@@ -11,7 +11,11 @@ class DocumentoRename(BaseModel):
     nombre_archivo: str
 
 
-EstadoOCR = Literal["procesando", "completado", "baja_confianza", "error"]
+class EstadoOCR(StrEnum):
+    PROCESANDO = "procesando"
+    COMPLETADO = "completado"
+    BAJA_CONFIANZA = "baja_confianza"
+    ERROR = "error"
 
 
 class CampoExtraidoDocumento(BaseModel):

@@ -90,6 +90,8 @@ async def reactivar_alertas(db: DbSession, id: str, current_user: CurrentUser):
 
 
 @router.post("/{id}/notificar/{canal}", response_model=Alerta)
-async def notificar_alertas(db: DbSession, id: str, canal: str, current_user: CurrentUser):
+async def notificar_alertas(
+    db: DbSession, id: str, canal: str, current_user: CurrentUser
+):
     a = await alerta_service.notificar(db, id, canal=canal, actor=current_user)
     return _serialize_alerta(a)

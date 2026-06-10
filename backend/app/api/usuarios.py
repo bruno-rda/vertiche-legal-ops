@@ -1,9 +1,7 @@
-from typing import Literal
-
 from fastapi import APIRouter
 
 from app.api.deps import DbSession, RequireAdmin
-from app.schemas.performance import PerformanceData
+from app.schemas.performance import PerformanceData, RangeType
 from app.schemas.usuario import (
     Usuario,
     UsuarioCreate,
@@ -86,7 +84,7 @@ async def get_tiendas_resumen(db: DbSession, id: str, admin: RequireAdmin):
 
 @router.get("/{id}/performance", response_model=PerformanceData)
 async def get_performance(
-    db: DbSession, id: str, range: Literal["30", "month", "90"], admin: RequireAdmin
+    db: DbSession, id: str, range: RangeType, admin: RequireAdmin
 ):
     return await usuario_service.get_performance(db, id, range=range)
 
