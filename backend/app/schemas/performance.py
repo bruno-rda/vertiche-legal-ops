@@ -22,11 +22,10 @@ class MetricTrend(BaseModel):
 
 
 class PerformanceMetrics(BaseModel):
-    documentos_cargados: MetricTrend
-    tramites_resueltos: MetricTrend
-    alertas_atendidas: MetricTrend
-    tiempo_promedio_resolucion: MetricTrend
-    tramites_vencidos_responsabilidad: MetricTrend
+    tiempo_medio_resolucion_alertas: MetricTrend
+    tasa_renovacion_proactiva: MetricTrend
+    tasa_incidencia_alertas: MetricTrend
+    tasa_resolucion_alertas: MetricTrend
 
 
 class ActivityTimelineItem(BaseModel):

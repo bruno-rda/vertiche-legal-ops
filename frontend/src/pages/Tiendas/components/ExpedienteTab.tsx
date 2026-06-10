@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronDown } from 'lucide-react';
-import type { Tramite, Expediente } from '@/client/types.gen';
+import type { TramiteResumen, Expediente } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
 import { EmptyState } from '@/components/EmptyState';
 import { formatDate, daysRemaining } from '@/lib/utils';
@@ -48,7 +48,7 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
     </div>
   );
 
-  const renderTramite = (t: Tramite) => {
+  const renderTramite = (t: TramiteResumen) => {
     const days = daysRemaining(t.fecha_vencimiento);
     return (
       <div

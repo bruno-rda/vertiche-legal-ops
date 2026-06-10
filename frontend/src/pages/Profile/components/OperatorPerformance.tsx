@@ -11,12 +11,11 @@ import {
   TrendingDown,
   Minus,
   Clock,
-  FileText,
   CheckCircle,
   AlertTriangle,
-  XCircle,
   Store,
   Plus,
+  Info,
 } from 'lucide-react';
 
 interface OperatorPerformanceProps {
@@ -59,6 +58,7 @@ export function OperatorPerformance({ userId }: OperatorPerformanceProps) {
     icon: React.ReactNode,
     isNegativeMetric = false,
     suffix = '',
+    tooltip = '',
   ) => {
     if (!metric) return <Skeleton count={1} className="h-32" />;
 
@@ -66,19 +66,27 @@ export function OperatorPerformance({ userId }: OperatorPerformanceProps) {
     const trendText =
       metric.trend === 'up'
         ? `+${Math.abs(metric.value - metric.previous_value)
-            .toFixed(isNegativeMetric ? 1 : 0)
-            .replace(/\.0$/, '')}`
+          .toFixed(isNegativeMetric ? 1 : 0)
+          .replace(/\.0$/, '')}`
         : metric.trend === 'down'
           ? `-${Math.abs(metric.previous_value - metric.value)
-              .toFixed(isNegativeMetric ? 1 : 0)
-              .replace(/\.0$/, '')}`
+            .toFixed(isNegativeMetric ? 1 : 0)
+            .replace(/\.0$/, '')}`
           : 'Sin cambio';
 
     return (
       <div className="bg-surface rounded-xl border border-border p-6 flex flex-col hover:border-border-strong transition-colors shadow-sm">
-        <div className="flex items-center gap-3 text-text-secondary mb-4">
+        <div className="flex items-center gap-3 text-text-secondary mb-4 relative">
           <div className="p-2.5 rounded-lg bg-neutral-light text-text-primary">{icon}</div>
-          <span className="text-base font-medium leading-tight">{title}</span>
+          <span className="text-base font-medium leading-tight flex-1">{title}</span>
+          {tooltip && (
+            <div className="group relative ml-auto cursor-help flex items-center">
+              <Info className="w-4 h-4 text-text-muted hover:text-text-primary transition-colors" />
+              <div className="absolute right-0 bottom-full mb-2 w-64 p-3 bg-surface border border-border shadow-lg rounded-lg text-xs text-text-primary opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 pointer-events-none">
+                {tooltip}
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex items-baseline gap-1 mt-auto">
           <span className="text-4xl font-display text-text-primary">{metric.value}</span>
@@ -121,31 +129,28 @@ export function OperatorPerformance({ userId }: OperatorPerformanceProps) {
         <div className="flex items-center bg-surface border border-border rounded-lg p-1">
           <button
             onClick={() => handleRangeChange('30')}
-            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              range === '30'
-                ? 'bg-surface-card shadow-sm text-text-primary'
-                : 'text-text-secondary hover:text-text-primary'
-            }`}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${range === '30'
+              ? 'bg-surface-card shadow-sm text-text-primary'
+              : 'text-text-secondary hover:text-text-primary'
+              }`}
           >
             Últimos 30 días
           </button>
           <button
             onClick={() => handleRangeChange('month')}
-            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              range === 'month'
-                ? 'bg-surface-card shadow-sm text-text-primary'
-                : 'text-text-secondary hover:text-text-primary'
-            }`}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${range === 'month'
+              ? 'bg-surface-card shadow-sm text-text-primary'
+              : 'text-text-secondary hover:text-text-primary'
+              }`}
           >
             Mes en curso
           </button>
           <button
             onClick={() => handleRangeChange('90')}
-            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              range === '90'
-                ? 'bg-surface-card shadow-sm text-text-primary'
-                : 'text-text-secondary hover:text-text-primary'
-            }`}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${range === '90'
+              ? 'bg-surface-card shadow-sm text-text-primary'
+              : 'text-text-secondary hover:text-text-primary'
+              }`}
           >
             Últimos 90 días
           </button>
@@ -158,34 +163,38 @@ export function OperatorPerformance({ userId }: OperatorPerformanceProps) {
         </div>
       ) : (
         <div className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             {renderMetricCard(
-              'Documentos cargados',
-              data?.metrics.documentos_cargados,
-              <FileText className="w-4 h-4" />,
-            )}
-            {renderMetricCard(
-              'Trámites resueltos',
-              data?.metrics.tramites_resueltos,
-              <CheckCircle className="w-4 h-4" />,
-            )}
-            {renderMetricCard(
-              'Alertas atendidas',
-              data?.metrics.alertas_atendidas,
-              <AlertTriangle className="w-4 h-4" />,
-            )}
-            {renderMetricCard(
-              'Tiempo promedio',
-              data?.metrics.tiempo_promedio_resolucion,
+              'MTTR',
+              data?.metrics.tiempo_medio_resolucion_alertas,
               <Clock className="w-4 h-4" />,
               true,
               'días',
+              'Mide el tiempo promedio en días que tardas en resolver las alertas desde su generación. Un menor tiempo indica mayor agilidad en tu respuesta.',
             )}
             {renderMetricCard(
-              'Trámites vencidos',
-              data?.metrics.tramites_vencidos_responsabilidad,
-              <XCircle className="w-4 h-4" />,
+              'Renovación Proactiva',
+              data?.metrics.tasa_renovacion_proactiva,
+              <Activity className="w-4 h-4" />,
+              false,
+              '%',
+              'Porcentaje de trámites que actualizaste con más de 30 días de anticipación a su vencimiento. Un porcentaje alto indica un portafolio saludable y buena previsión.',
+            )}
+            {renderMetricCard(
+              'Incidencia Crítica',
+              data?.metrics.tasa_incidencia_alertas,
+              <AlertTriangle className="w-4 h-4" />,
               true,
+              '/ 100 tr.',
+              'Número de alertas críticas o altas generadas por cada 100 trámites activos en tus tiendas. Un número bajo significa que previenes que los permisos lleguen a estados críticos.',
+            )}
+            {renderMetricCard(
+              'Resolución Alertas',
+              data?.metrics.tasa_resolucion_alertas,
+              <CheckCircle className="w-4 h-4" />,
+              false,
+              '%',
+              'Porcentaje de las alertas generadas que lograste resolver exitosamente en el periodo. Un porcentaje alto significa que mantienes el ritmo de tu carga de trabajo.',
             )}
           </div>
 

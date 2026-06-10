@@ -4,7 +4,7 @@ import { uploadDocumentoForTienda } from '@/client/sdk.gen';
 import { Modal } from '@/components/Modal';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Upload, FileText, X, AlertCircle } from 'lucide-react';
-import type { Tramite } from '@/client/types.gen';
+import type { TramiteResumen } from '@/client/types.gen';
 import { useUIStore } from '@/stores/uiStore';
 import { clsx } from 'clsx';
 
@@ -12,7 +12,7 @@ interface DocumentUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   tiendaId: string;
-  tramites: Tramite[];
+  tramites: TramiteResumen[];
 }
 
 export function DocumentUploadModal({
