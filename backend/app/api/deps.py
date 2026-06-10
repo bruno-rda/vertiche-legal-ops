@@ -9,7 +9,7 @@ from app.database import get_db
 from app.models.usuario import Usuario
 from app.services import auth_service
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 DbSession = Annotated[AsyncSession, Depends(get_db)]
 TokenDep = Annotated[str, Depends(oauth2_scheme)]

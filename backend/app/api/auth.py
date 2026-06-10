@@ -1,7 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.api.deps import CurrentUser, DbSession
-from app.schemas.auth import LoginRequest, LoginResponse
+from app.schemas.auth import LoginResponse
 from app.schemas.usuario import UsuarioOut
 from app.services import auth_service
 
@@ -9,12 +10,16 @@ router = APIRouter()
 
 
 @router.post("/login", response_model=LoginResponse)
-async def login(db: DbSession, creds: LoginRequest):
-    token, user = await auth_service.login(db, creds.email, creds.password)
+async def login(
+    db: DbSession,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+):
+    token, user = await auth_service.login(db, form_data.username, form_data.password)
     # The frontend expects a list of IDs for tiendas_asignadas
     tiendas_asignadas = [t.id for t in user.tiendas]
     return {
-        "token": token,
+        "access_token": token,
+        "token_type": "bearer",
         "user": {
             "id": user.id,
             "nombre": user.nombre,
