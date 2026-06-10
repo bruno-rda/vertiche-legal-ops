@@ -69,6 +69,7 @@ export function TiendaDetailPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', id, 'documentos'] });
+      queryClient.invalidateQueries({ queryKey: ['tienda', id, 'historial'] });
     },
   });
 

@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.api.deps import CurrentUser, DbSession
 from app.core.pagination import PaginatedResponse, paginate
 from app.schemas.tramite import Tramite, TramiteUpdate
-from app.services import tramite_service
+from app.services import tramite_service, historial_service
 
 router = APIRouter()
 
@@ -85,26 +85,8 @@ async def list_tramites(
 @router.get("/{id}", response_model=Tramite)
 async def get_tramite(db: DbSession, id: str, current_user: CurrentUser):
     t = await tramite_service.get_by_id(db, id, current_user=current_user)
-
-    # We must fetch historial here
-    from app.repositories import historial_repo
-
-    hist = await historial_repo.get_by_entity(db, "tramite", t.id)
     serialized = _serialize_tramite(t)
-    serialized["historial"] = [
-        {
-            "id": h.id,
-            "entidad_tipo": h.entidad,
-            "entidad_id": h.entidad_id,
-            "accion": h.accion,
-            "usuario_id": h.actor_id or "system",
-            "usuario_nombre": "Sistema"
-            if not h.actor_id
-            else h.actor_id,  # Simplified for now
-            "fecha": h.timestamp.isoformat(),
-        }
-        for h in hist
-    ]
+    serialized["historial"] = await historial_service.get_history(db, "tramite", t.id)
     return serialized
 
 

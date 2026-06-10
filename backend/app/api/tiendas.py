@@ -16,6 +16,7 @@ from app.services import (
     documento_service,
     tienda_service,
     tramite_service,
+    historial_service,
 )
 
 router = APIRouter()
@@ -189,22 +190,4 @@ async def upload_documento_for_tienda(
 async def get_historial_for_tienda(db: DbSession, id: str, current_user: CurrentUser):
     # Verify access
     await tienda_service.get_by_id(db, id, current_user=current_user)
-
-    from app.repositories import historial_repo
-
-    hist = await historial_repo.get_by_entity(db, "tienda", id)
-
-    return [
-        {
-            "id": h.id,
-            "entidad_tipo": h.entidad,
-            "entidad_id": h.entidad_id,
-            "accion": h.accion,
-            "usuario_id": h.actor_id or "system",
-            "usuario_nombre": "Sistema"
-            if not h.actor_id
-            else h.actor_id,  # Simplified for now
-            "fecha": h.timestamp.isoformat(),
-        }
-        for h in hist
-    ]
+    return await historial_service.get_history(db, "tienda", id)

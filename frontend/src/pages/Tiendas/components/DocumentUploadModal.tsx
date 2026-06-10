@@ -71,6 +71,7 @@ export function DocumentUploadModal({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'documentos'] });
+      queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'historial'] });
       queryClient.invalidateQueries({ queryKey: ['documentos'] });
       addToast({
         type: 'success',

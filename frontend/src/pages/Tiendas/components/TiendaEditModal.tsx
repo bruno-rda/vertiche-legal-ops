@@ -38,6 +38,7 @@ export function TiendaEditModal({
       (await updateTienda({ path: { id: tienda.id }, body: data, throwOnError: true })).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', tienda.id] });
+      queryClient.invalidateQueries({ queryKey: ['tienda', tienda.id, 'historial'] });
       queryClient.invalidateQueries({ queryKey: ['tiendas'] });
       addToast({ type: 'success', message: 'Tienda actualizada exitosamente' });
       onClose();

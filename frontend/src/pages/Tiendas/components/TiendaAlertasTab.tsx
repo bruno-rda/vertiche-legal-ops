@@ -35,6 +35,7 @@ export function TiendaAlertasTab({ alertas, tiendaId }: TiendaAlertasTabProps) {
       ).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'alertas'] });
+      queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'historial'] });
       queryClient.invalidateQueries({ queryKey: ['alertas', 'count'] });
       setSilenciarId(null);
       addToast({ type: 'success', message: 'Alerta silenciada correctamente.' });
@@ -46,6 +47,7 @@ export function TiendaAlertasTab({ alertas, tiendaId }: TiendaAlertasTabProps) {
       (await resolverAlertas({ path: { id }, throwOnError: true })).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'alertas'] });
+      queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'historial'] });
       queryClient.invalidateQueries({ queryKey: ['alertas', 'count'] });
       addToast({ type: 'success', message: 'Alerta marcada como resuelta.' });
     },
@@ -56,6 +58,7 @@ export function TiendaAlertasTab({ alertas, tiendaId }: TiendaAlertasTabProps) {
       (await reactivarAlertas({ path: { id }, throwOnError: true })).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'alertas'] });
+      queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'historial'] });
       queryClient.invalidateQueries({ queryKey: ['alertas', 'count'] });
       addToast({ type: 'success', message: 'Alerta reactivada correctamente.' });
     },

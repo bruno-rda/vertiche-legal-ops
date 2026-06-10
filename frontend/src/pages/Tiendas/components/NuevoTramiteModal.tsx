@@ -46,6 +46,7 @@ export function NuevoTramiteModal({
         .data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'expediente'] });
+      queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'historial'] });
       addToast({ type: 'success', message: 'Trámite creado exitosamente' });
       reset();
       onClose();
