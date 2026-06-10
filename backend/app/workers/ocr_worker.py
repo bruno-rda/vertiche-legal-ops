@@ -3,10 +3,10 @@ import logging
 from arq.connections import RedisSettings
 
 from app.config import settings
-from app.core import audit
+from app.core import audit, storage
 from app.database import AsyncSessionLocal
+from app.integrations.ocr import ocr_engine
 from app.repositories import documento_repo
-from app.workers.ocr_engine import extract_text_mock
 
 logger = logging.getLogger(__name__)
 
@@ -21,31 +21,46 @@ async def process_ocr(ctx, document_id: str):
             return
 
         try:
+            minio_client = storage.get_minio_client()
+            pdf_bytes = await storage.get_file_bytes(minio_client, doc.ruta_archivo)
+
             # Run the OCR extraction
-            datos = await extract_text_mock(doc.url)
+            result = ocr_engine.extract(pdf_bytes)
 
             # Check confidence thresholds
-            requiere_revision = any(
-                field_data["confidence"] < settings.ocr_confidence_threshold
-                for field_data in datos.values()
+            requiere_revision = (
+                result.avg_confidence < settings.ocr_confidence_threshold
             )
+            estado = (
+                "pendiente_extraccion" if not requiere_revision else "baja_confianza"
+            )
+
+            ocr_metrics = {
+                "word_count": result.word_count,
+                "avg_confidence": result.avg_confidence,
+                "method": result.method,
+            }
 
             # Update the document
             doc = await documento_repo.update(
                 db,
                 doc,
-                datos_extraidos=datos,
-                estado_ocr="completado",
+                texto_ocr=result.raw_text,
+                ocr_metrics=ocr_metrics,
+                estado_ocr=estado,
                 requiere_revision_manual=requiere_revision,
             )
 
             await audit.record(
                 db,
-                actor_id="system:ocr_worker",
+                actor_id="system:ocr",
                 accion="documento.ocr_processed",
                 entidad="documento",
                 entidad_id=doc.id,
-                payload={"requiere_revision": requiere_revision},
+                payload={
+                    "requiere_revision": requiere_revision,
+                    "metrics": ocr_metrics,
+                },
             )
 
             await db.commit()

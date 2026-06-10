@@ -23,6 +23,8 @@ class Documento(Base):
     nombre_archivo: Mapped[str] = mapped_column(String(500))
     ruta_archivo: Mapped[str] = mapped_column(Text)
     estado_ocr: Mapped[str] = mapped_column(String(30), default="procesando")
+    texto_ocr: Mapped[str | None] = mapped_column(Text)
+    ocr_metrics: Mapped[dict | None] = mapped_column(JSONB)
     datos_extraidos: Mapped[dict | None] = mapped_column(JSONB)
     requiere_revision_manual: Mapped[bool] = mapped_column(Boolean, default=False)
 

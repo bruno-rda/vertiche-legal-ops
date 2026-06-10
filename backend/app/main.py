@@ -11,6 +11,7 @@ from minio import Minio
 
 from app.api import api_router
 from app.config import settings
+from app.core import storage
 from app.core.exceptions import AppError
 from app.workers.alert_worker import scan_tramites_for_alerts
 
@@ -32,12 +33,7 @@ async def lifespan(app: FastAPI):
     app.state.scheduler = scheduler
 
     # Setup Storage Client
-    app.state.storage_client = Minio(
-        settings.minio_endpoint,
-        access_key=settings.minio_access_key,
-        secret_key=settings.minio_secret_key,
-        secure=settings.minio_secure,
-    )
+    app.state.storage_client: Minio = storage.get_minio_client()
 
     yield
 
