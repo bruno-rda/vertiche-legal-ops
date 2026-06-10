@@ -74,4 +74,3 @@ class ActivityTimelineItem(BaseModel):
 class UsuarioPerformanceOut(BaseModel):
     metrics: UsuarioPerformanceMetrics
     timeline: list[ActivityTimelineItem]
-

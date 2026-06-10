@@ -14,10 +14,10 @@ from app.schemas.tramite import TramiteCreate, TramiteOut, TramiteUpdate
 from app.schemas.usuario import (
     UsuarioCreate,
     UsuarioOut,
+    UsuarioPerformanceOut,
+    UsuarioResumenTiendasOut,
     UsuarioStatusUpdate,
     UsuarioTiendasUpdate,
-    UsuarioResumenTiendasOut,
-    UsuarioPerformanceOut
 )
 
 __all__ = [

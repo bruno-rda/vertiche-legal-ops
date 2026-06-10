@@ -1,22 +1,22 @@
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 import itertools
+from datetime import datetime, timedelta
 from typing import Literal
+
+from dateutil.relativedelta import relativedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import audit
 from app.core.exceptions import ConflictError, NotFoundError
 from app.core.security import hash_password
 from app.models.usuario import Usuario
-from app.repositories import usuario_repo
-from app.repositories import historial_repo
+from app.repositories import historial_repo, usuario_repo
 from app.schemas.usuario import (
-    TiendaResumen,
-    UsuarioResumenTiendasOut,
+    ActivityTimelineItem,
     MetricTrend,
+    TiendaResumen,
     UsuarioPerformanceMetrics,
-    UsuarioPerformanceOut, 
-    ActivityTimelineItem
+    UsuarioPerformanceOut,
+    UsuarioResumenTiendasOut,
 )
 
 
@@ -136,39 +136,46 @@ async def get_tiendas_resumen(db: AsyncSession, id: str) -> UsuarioResumenTienda
             UsuarioResumenTiendasOut(
                 estado=estado,
                 total_tiendas=len(tiendas_list),
-                vigentes=sum(1 for t in tiendas_list if t.estado_cumplimiento == 'vigente'),
-                por_vencer=sum(1 for t in tiendas_list if t.estado_cumplimiento == 'por_vencer'),
-                criticas=sum(1 for t in tiendas_list if t.estado_cumplimiento == 'critico'),
-                tiendas=[
-                    TiendaResumen.model_validate(t)
-                    for t in tiendas_list
-                ],
-        ))
+                vigentes=sum(
+                    1 for t in tiendas_list if t.estado_cumplimiento == "vigente"
+                ),
+                por_vencer=sum(
+                    1 for t in tiendas_list if t.estado_cumplimiento == "por_vencer"
+                ),
+                criticas=sum(
+                    1 for t in tiendas_list if t.estado_cumplimiento == "critico"
+                ),
+                tiendas=[TiendaResumen.model_validate(t) for t in tiendas_list],
+            )
+        )
 
 
 async def get_performance(
-    db: AsyncSession, 
-    id: str, 
-    *,
-    range: Literal['30', 'month', '90']
+    db: AsyncSession, id: str, *, range: Literal["30", "month", "90"]
 ) -> UsuarioPerformanceOut:
-    if range in ['30', '90']:
+    if range in ["30", "90"]:
         days = int(range)
         period_start = datetime.now() - timedelta(days=days)
         prev_period_start = period_start - timedelta(days=days)
         prev_period_end = period_start
 
-    elif range == 'month':
+    elif range == "month":
         now = datetime.now()
         period_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         prev_period_start = period_start - relativedelta(months=1)
         prev_period_end = prev_period_start + (now - period_start)
 
     current_records = await historial_repo.get_by_actor(
-        db, id, since=period_start, until=now,
+        db,
+        id,
+        since=period_start,
+        until=now,
     )
     prev_records = await historial_repo.get_by_actor(
-        db, id, since=prev_period_start, until=prev_period_end,
+        db,
+        id,
+        since=prev_period_start,
+        until=prev_period_end,
     )
 
     return UsuarioPerformanceOut(
@@ -187,5 +194,5 @@ async def get_performance(
                 tienda_id="0",
                 tienda_nombre="Dont click me",
             )
-        ]
+        ],
     )

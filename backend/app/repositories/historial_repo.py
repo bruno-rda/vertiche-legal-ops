@@ -24,9 +24,9 @@ async def get_by_actor(
     stmt = (
         select(Historial)
         .where(
-            (Historial.actor_id == actor_id) &
-            (Historial.timestamp >= since) &
-            (Historial.timestamp <= until)
+            (Historial.actor_id == actor_id)
+            & (Historial.timestamp >= since)
+            & (Historial.timestamp <= until)
         )
         .order_by(Historial.timestamp.desc())
     )
