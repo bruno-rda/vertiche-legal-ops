@@ -27,7 +27,7 @@ class Tienda(Base):
 
     cumplimiento: Mapped[float] = mapped_column(Float, default=100.0)
     estado_cumplimiento: Mapped[str] = mapped_column(
-        String(30), default="en_cumplimiento"
+        String(30), default="vigente"
     )
     total_tramites: Mapped[int] = mapped_column(Integer, default=0)
     tramites_vencidos: Mapped[int] = mapped_column(Integer, default=0)
