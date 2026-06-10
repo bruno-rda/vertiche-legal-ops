@@ -96,15 +96,15 @@ async def recalculate_compliance(db: AsyncSession, tienda_id: str) -> None:
 
     if total == 0:
         cumplimiento = 100.0
-        estado_cumplimiento = "vigente"
+        estado_cumplimiento = "en_cumplimiento"
     else:
         cumplimiento = (vigentes / total) * 100.0
         if cumplimiento >= 80:
-            estado_cumplimiento = "vigente"
+            estado_cumplimiento = "en_cumplimiento"
         elif cumplimiento >= 50:
-            estado_cumplimiento = "en_riesgo"
+            estado_cumplimiento = "por_vencer"
         else:
-            estado_cumplimiento = "critico"
+            estado_cumplimiento = "en_riesgo_critico"
 
     await tienda_repo.update(
         db,

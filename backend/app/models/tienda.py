@@ -26,7 +26,9 @@ class Tienda(Base):
     marcas: Mapped[list[str] | None] = mapped_column(ARRAY(String), default=list)
 
     cumplimiento: Mapped[float] = mapped_column(Float, default=100.0)
-    estado_cumplimiento: Mapped[str] = mapped_column(String(30), default="vigente")
+    estado_cumplimiento: Mapped[str] = mapped_column(
+        String(30), default="en_cumplimiento"
+    )
     total_tramites: Mapped[int] = mapped_column(Integer, default=0)
     tramites_vencidos: Mapped[int] = mapped_column(Integer, default=0)
     tramites_por_vencer: Mapped[int] = mapped_column(Integer, default=0)
