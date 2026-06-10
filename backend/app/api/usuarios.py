@@ -92,7 +92,7 @@ async def get_performance(
 
 
 @router.put("/{id}/status", response_model=Usuario)
-async def update_status(
+async def update_usuario_status(
     db: DbSession, id: str, data: UsuarioStatusUpdate, admin: RequireAdmin
 ):
     user = await usuario_service.update_status(db, id, estado=data.estado, actor=admin)
@@ -108,7 +108,7 @@ async def update_status(
 
 
 @router.put("/{id}/tiendas", response_model=Usuario)
-async def update_tiendas(
+async def update_usuario_tiendas(
     db: DbSession, id: str, data: UsuarioTiendasUpdate, admin: RequireAdmin
 ):
     user = await usuario_service.update_tiendas(

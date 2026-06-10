@@ -62,13 +62,13 @@ async def list_alertas(
 
 
 @router.get("/count/critical", response_model=AlertaCount)
-async def count_critical(db: DbSession, current_user: CurrentUser):
+async def count_alertas_critical(db: DbSession, current_user: CurrentUser):
     count = await alerta_service.count_active_critical(db, current_user=current_user)
     return {"count": count}
 
 
 @router.post("/{id}/silenciar", response_model=Alerta)
-async def silenciar(
+async def silenciar_alertas(
     db: DbSession, id: str, data: AlertaSilenciarRequest, current_user: CurrentUser
 ):
     a = await alerta_service.silenciar(
@@ -78,18 +78,18 @@ async def silenciar(
 
 
 @router.post("/{id}/resolver", response_model=Alerta)
-async def resolver(db: DbSession, id: str, current_user: CurrentUser):
+async def resolver_alertas(db: DbSession, id: str, current_user: CurrentUser):
     a = await alerta_service.resolver(db, id, actor=current_user)
     return _serialize_alerta(a)
 
 
 @router.post("/{id}/reactivar", response_model=Alerta)
-async def reactivar(db: DbSession, id: str, current_user: CurrentUser):
+async def reactivar_alertas(db: DbSession, id: str, current_user: CurrentUser):
     a = await alerta_service.reactivar(db, id, actor=current_user)
     return _serialize_alerta(a)
 
 
 @router.post("/{id}/notificar/{canal}", response_model=Alerta)
-async def notificar(db: DbSession, id: str, canal: str, current_user: CurrentUser):
+async def notificar_alertas(db: DbSession, id: str, canal: str, current_user: CurrentUser):
     a = await alerta_service.notificar(db, id, canal=canal, actor=current_user)
     return _serialize_alerta(a)
