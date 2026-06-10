@@ -27,12 +27,13 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8000
+        VITE_USE_MOCKS: ${VITE_USE_MOCKS}
+
     container_name: vertiche-frontend
     ports:
       - "5173:80"
-
-    environment:
-      VITE_API_URL: http://localhost:8000
 
     depends_on:
       - backend
