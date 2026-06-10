@@ -28,6 +28,9 @@ dist
 dist-ssr
 *.local
 
+# Auto-generated client
+frontend/src/client
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

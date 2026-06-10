@@ -1,4 +1,4 @@
-import type { Tienda } from '@/types';
+import type { Tienda } from '@/client/types.gen';
 
 import { ESTADOS_MEXICO as estados } from '@/lib/constants';
 

@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api } from '@/api/client';
-import type { Documento, PaginatedResponse } from '@/types';
+import { listDocumentos, renameDocumento } from '@/client/sdk.gen';
+import type { Documento } from '@/client/types.gen';
+import type { PaginatedResponseDocumento } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
 import { Pagination } from '@/components/Pagination';
 import { EmptyState } from '@/components/EmptyState';
@@ -30,7 +31,13 @@ export function DocumentosPage() {
 
   const updateNameMutation = useMutation({
     mutationFn: async ({ docId, newName }: { docId: string; newName: string }) => {
-      return api.post(`/documentos/${docId}/rename`, { nombre_archivo: newName });
+      return (
+        await renameDocumento({
+          path: { id: docId },
+          body: { nombre_archivo: newName },
+          throwOnError: true,
+        })
+      ).data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documentos'] });
@@ -39,13 +46,18 @@ export function DocumentosPage() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['documentos', page, estadoOcr, revision],
-    queryFn: () =>
-      api.get<PaginatedResponse<Documento>>('/api/documentos', {
-        page,
-        page_size: 25,
-        estado_ocr: estadoOcr || undefined,
-        requiere_revision: revision || undefined,
-      }),
+    queryFn: async () =>
+      (
+        await listDocumentos({
+          query: {
+            page,
+            page_size: 25,
+            estado_ocr: estadoOcr || undefined,
+            requiere_revision: revision === 'true' ? true : undefined,
+          },
+          throwOnError: true,
+        })
+      ).data as unknown as PaginatedResponseDocumento, // Cast necessary as generated client types might differ from paginated wrapper
   });
 
   const up = (k: string, v: string) => {

@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/api/client';
+import {
+  getMetrics,
+  getEstadoGeografico,
+  getAlertasRecientes,
+  getTramitesProximos,
+} from '@/client/sdk.gen';
 import { useNavigate } from 'react-router-dom';
-import type { DashboardMetrics, CumplimientoEstado, Alerta, Tramite } from '@/types';
 import { Badge } from '@/components/Badge';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Skeleton } from '@/components/Skeleton';
-import { formatDate, daysRemaining, timeAgo, formatPercent } from '@/lib/utils';
+import { formatPercent, formatDate, daysRemaining, timeAgo } from '@/lib/utils';
 import {
   Store,
   CheckCircle,
@@ -27,22 +31,22 @@ export function DashboardPage() {
 
   const { data: metrics, isLoading: metricsLoading } = useQuery({
     queryKey: ['dashboard', 'metrics'],
-    queryFn: () => api.get<DashboardMetrics>('/api/dashboard/metrics'),
+    queryFn: async () => (await getMetrics({ throwOnError: true })).data,
   });
 
   const { data: cumplimiento, isLoading: cumplimientoLoading } = useQuery({
     queryKey: ['dashboard', 'cumplimiento-por-estado'],
-    queryFn: () => api.get<CumplimientoEstado[]>('/api/dashboard/cumplimiento-por-estado'),
+    queryFn: async () => (await getEstadoGeografico({ throwOnError: true })).data,
   });
 
   const { data: alertas, isLoading: alertasLoading } = useQuery({
     queryKey: ['dashboard', 'alertas-recientes'],
-    queryFn: () => api.get<Alerta[]>('/api/dashboard/alertas-recientes'),
+    queryFn: async () => (await getAlertasRecientes({ throwOnError: true })).data,
   });
 
   const { data: tramites, isLoading: tramitesLoading } = useQuery({
     queryKey: ['dashboard', 'tramites-proximos'],
-    queryFn: () => api.get<Tramite[]>('/api/dashboard/tramites-proximos'),
+    queryFn: async () => (await getTramitesProximos({ throwOnError: true })).data,
   });
 
   const user = useAuthStore((s) => s.user);

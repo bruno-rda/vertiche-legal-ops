@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
+import { updateTienda } from '@/client/sdk.gen';
 import { Modal } from '@/components/Modal';
 import { useUIStore } from '@/stores/uiStore';
-import type { Tienda, TiendaFormData as FormData } from '@/types';
+import type { Tienda, TiendaUpdate as FormData } from '@/client/types.gen';
 import { ChevronDown } from 'lucide-react';
 
 import { ESTADOS_MEXICO } from '@/lib/constants';
@@ -34,7 +34,8 @@ export function TiendaEditModal({
   });
 
   const mutation = useMutation({
-    mutationFn: (data: FormData) => api.put<Tienda>(`/api/tiendas/${tienda.id}`, data),
+    mutationFn: async (data: FormData) =>
+      (await updateTienda({ path: { id: tienda.id }, body: data, throwOnError: true })).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', tienda.id] });
       queryClient.invalidateQueries({ queryKey: ['tiendas'] });

@@ -1,10 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
+import { createUsuario } from '@/client/sdk.gen';
 import { Modal } from '@/components/Modal';
 import { useUIStore } from '@/stores/uiStore';
 import { ChevronDown } from 'lucide-react';
-import type { User, UsuarioInviteFormData as FormData } from '@/types';
+import type { UsuarioCreate as FormData } from '@/client/types.gen';
 
 export function InviteUserModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const queryClient = useQueryClient();
@@ -24,7 +24,8 @@ export function InviteUserModal({ isOpen, onClose }: { isOpen: boolean; onClose:
   });
 
   const mutation = useMutation({
-    mutationFn: (data: FormData) => api.post<User>('/api/usuarios', data),
+    mutationFn: async (data: FormData) =>
+      (await createUsuario({ body: data, throwOnError: true })).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
       addToast({ type: 'success', message: 'Usuario invitado exitosamente' });

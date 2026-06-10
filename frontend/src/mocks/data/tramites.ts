@@ -1,4 +1,5 @@
-import type { Tramite, TramiteEstado } from '@/types';
+import type { Tramite } from '@/client/types.gen';
+import type { TramiteEstado } from '@/client/types.gen';
 import { mockTiendas } from './tiendas';
 
 const tramiteNames = [

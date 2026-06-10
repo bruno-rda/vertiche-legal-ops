@@ -5,7 +5,7 @@ import { mockAlertas } from '../data/alertas';
 import { mockDocumentos } from '../data/documentos';
 import { mockUsers } from '../data/users';
 import { getUserFromRequest } from '../utils';
-import type { CumplimientoEstado } from '@/types';
+import type { CumplimientoEstado } from '@/client/types.gen';
 
 export const tiendasHandlers = [
   // GET /api/tiendas — paginated, filterable, sortable list

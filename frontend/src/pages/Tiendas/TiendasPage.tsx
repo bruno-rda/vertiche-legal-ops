@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api } from '@/api/client';
-import type { Tienda, PaginatedResponse, User } from '@/types';
+import { listTiendas, listUsuarios } from '@/client/sdk.gen';
+
+import type { PaginatedResponseTienda } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Pagination } from '@/components/Pagination';
@@ -44,23 +45,28 @@ export function TiendasPage() {
 
   const { data: usuarios } = useQuery({
     queryKey: ['usuarios'],
-    queryFn: () => api.get<User[]>('/api/usuarios'),
+    queryFn: async () => (await listUsuarios({ throwOnError: true })).data,
     enabled: user?.rol === 'ADMIN',
   });
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['tiendas', page, search, estado, ec, operadorId, sortBy, sortOrder],
-    queryFn: () =>
-      api.get<PaginatedResponse<Tienda>>('/api/tiendas', {
-        page,
-        page_size: 25,
-        search: search || undefined,
-        estado: estado || undefined,
-        estado_cumplimiento: ec || undefined,
-        operador_id: operadorId || undefined,
-        sort_by: sortBy,
-        sort_order: sortOrder,
-      }),
+    queryFn: async () =>
+      (
+        await listTiendas({
+          query: {
+            page,
+            page_size: 25,
+            search: search || undefined,
+            estado: estado || undefined,
+            estado_cumplimiento: ec || undefined,
+            operador_id: operadorId || undefined,
+            sort_by: sortBy,
+            sort_order: sortOrder,
+          },
+          throwOnError: true,
+        })
+      ).data as unknown as PaginatedResponseTienda,
   });
 
   const up = (k: string, v: string) => {

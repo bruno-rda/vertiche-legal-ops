@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronDown } from 'lucide-react';
-import type { Tramite, Expediente } from '@/types';
+import type { Tramite, Expediente } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
 import { EmptyState } from '@/components/EmptyState';
 import { formatDate, daysRemaining } from '@/lib/utils';

@@ -1,8 +1,7 @@
 import { useAuthStore } from '@/stores/authStore';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { api } from '@/api/client';
-import type { User } from '@/types';
+import { getUsuario } from '@/client/sdk.gen';
 import { Badge } from '@/components/Badge';
 import { Skeleton } from '@/components/Skeleton';
 import { formatDate } from '@/lib/utils';
@@ -25,10 +24,10 @@ export function ProfilePage() {
 
   const { data: userProfile, isLoading } = useQuery({
     queryKey: ['usuario', userId],
-    queryFn: () => {
+    queryFn: async () => {
       // If it's the current user, we can just use the auth store data initially,
       // but to keep it fresh, let's fetch.
-      return api.get<User>(`/api/usuarios/${userId}`);
+      return (await getUsuario({ path: { id: userId! }, throwOnError: true })).data;
     },
     enabled: !!userId,
   });

@@ -1,4 +1,9 @@
-import type { TramiteEstado, AlertaSeveridad, EstadoOCR, EstadoCumplimiento } from '@/types';
+import type {
+  TramiteEstado,
+  AlertaSeveridad,
+  EstadoOcr as EstadoOCR,
+  TiendaEstadoCumplimiento as EstadoCumplimiento,
+} from '@/client/types.gen';
 import {
   TRAMITE_ESTADO_LABELS,
   SEVERIDAD_LABELS,
@@ -6,7 +11,12 @@ import {
   CUMPLIMIENTO_LABELS,
 } from '@/lib/utils';
 
-type BadgeVariant = TramiteEstado | AlertaSeveridad | EstadoOCR | EstadoCumplimiento | 'default';
+export type BadgeVariant =
+  | TramiteEstado
+  | AlertaSeveridad
+  | EstadoOCR
+  | EstadoCumplimiento
+  | 'default';
 
 const variantStyles: Record<string, string> = {
   // Tramite states

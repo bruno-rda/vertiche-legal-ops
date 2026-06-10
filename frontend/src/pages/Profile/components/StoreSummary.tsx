@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/api/client';
-import type { EstadoResumen } from '@/types';
+import { getTiendasResumen } from '@/client/sdk.gen';
+import type { UsuarioResumenTiendas } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
+import type { BadgeVariant } from '@/components/Badge';
 import { Skeleton } from '@/components/Skeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { ChevronDown, ChevronRight, Store, MapPin } from 'lucide-react';
@@ -20,7 +21,9 @@ export function StoreSummary({ userId, isAdminView, onEditAssignment }: StoreSum
 
   const { data: resumen, isLoading } = useQuery({
     queryKey: ['usuario', userId, 'tiendas-resumen'],
-    queryFn: () => api.get<EstadoResumen[]>(`/api/usuarios/${userId}/tiendas-resumen`),
+    queryFn: async () =>
+      (await getTiendasResumen({ path: { id: userId }, throwOnError: true }))
+        .data as UsuarioResumenTiendas[],
   });
 
   const toggleState = (estado: string) => {
@@ -138,7 +141,7 @@ export function StoreSummary({ userId, isAdminView, onEditAssignment }: StoreSum
                               {tienda.municipio}
                             </p>
                           </div>
-                          <Badge variant={tienda.estado_cumplimiento} size="sm" />
+                          <Badge variant={tienda.estado_cumplimiento as BadgeVariant} size="sm" />
                         </div>
                       ))}
                     </div>

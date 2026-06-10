@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
+import { uploadDocumentoForTienda } from '@/client/sdk.gen';
 import { Modal } from '@/components/Modal';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Upload, FileText, X, AlertCircle } from 'lucide-react';
-import type { Tramite } from '@/types';
+import type { Tramite } from '@/client/types.gen';
 import { useUIStore } from '@/stores/uiStore';
 import { clsx } from 'clsx';
 
@@ -54,11 +54,15 @@ export function DocumentUploadModal({
           if (progress >= 100) {
             clearInterval(interval);
             // After progress hits 100, make the actual API call
-            api
-              .post(`/tiendas/${tiendaId}/documentos`, {
-                fileName: data.fileName,
-                tramiteIds: data.tramiteIds,
-              })
+            uploadDocumentoForTienda({
+              path: { id: tiendaId },
+              body: {
+                file: data.file,
+                file_name: data.fileName,
+                tramite_ids: data.tramiteIds,
+              },
+              throwOnError: true,
+            })
               .then(resolve)
               .catch(reject);
           }

@@ -1,7 +1,7 @@
 import { mockUsers } from './data/users';
-import type { User } from '@/types';
+import type { Usuario } from '@/client/types.gen';
 
-export function getUserFromRequest(request: Request): (User & { password?: string }) | null {
+export function getUserFromRequest(request: Request): (Usuario & { password?: string }) | null {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader) {
     return null;

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api } from '@/api/client';
-import type { Tramite, PaginatedResponse } from '@/types';
+import { listTramites } from '@/client/sdk.gen';
+import type { PaginatedResponseTramite } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
 import { Pagination } from '@/components/Pagination';
 import { SearchInput } from '@/components/SearchInput';
@@ -25,17 +25,22 @@ export function TramitesPage() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['tramites', page, search, estado, tipo, estadoGeo, soloVencidos, porVencerDias],
-    queryFn: () =>
-      api.get<PaginatedResponse<Tramite>>('/api/tramites', {
-        page,
-        page_size: 25,
-        search: search || undefined,
-        estado: estado || undefined,
-        tipo: tipo || undefined,
-        estado_geografico: estadoGeo || undefined,
-        solo_vencidos: soloVencidos || undefined,
-        por_vencer_dias: porVencerDias || undefined,
-      }),
+    queryFn: async () =>
+      (
+        await listTramites({
+          query: {
+            page,
+            page_size: 25,
+            search: search || undefined,
+            estado: estado || undefined,
+            tipo: tipo || undefined,
+            estado_geografico: estadoGeo || undefined,
+            solo_vencidos: soloVencidos ? true : undefined,
+            por_vencer_dias: porVencerDias ? parseInt(porVencerDias, 10) : undefined,
+          },
+          throwOnError: true,
+        })
+      ).data as unknown as PaginatedResponseTramite,
   });
 
   const up = (k: string, v: string) => {

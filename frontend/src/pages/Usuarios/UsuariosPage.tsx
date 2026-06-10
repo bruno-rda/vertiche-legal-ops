@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { api } from '@/api/client';
+import { listUsuarios } from '@/client/sdk.gen';
 import { UsersTable } from './components/UsersTable';
 import { InviteUserModal } from './components/InviteUserModal';
 import { UserPlus, Search, ChevronDown } from 'lucide-react';
-import type { User } from '@/types';
 
 type Tab = 'activos' | 'inactivos';
 
@@ -38,11 +37,16 @@ export function UsuariosPage() {
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['usuarios', roleFilter, searchQuery],
-    queryFn: () => {
-      const params = new URLSearchParams();
-      if (roleFilter) params.append('rol', roleFilter);
-      if (searchQuery) params.append('search', searchQuery);
-      return api.get<User[]>(`/api/usuarios?${params.toString()}`);
+    queryFn: async () => {
+      return (
+        await listUsuarios({
+          query: {
+            rol: roleFilter || undefined,
+            search: searchQuery || undefined,
+          },
+          throwOnError: true,
+        })
+      ).data;
     },
     placeholderData: (prev) => prev,
   });

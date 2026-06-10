@@ -1,4 +1,9 @@
-import type { TramiteEstado, AlertaSeveridad, EstadoOCR, EstadoCumplimiento } from '@/types';
+import type {
+  TramiteEstado,
+  AlertaSeveridad,
+  EstadoOcr as EstadoOCR,
+  TiendaEstadoCumplimiento as EstadoCumplimiento,
+} from '@/client/types.gen';
 
 /**
  * Format a date string to a localized Spanish date

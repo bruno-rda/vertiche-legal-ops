@@ -1,14 +1,15 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
+import { listTiendas, updateUsuarioTiendas } from '@/client/sdk.gen';
 import { Badge } from '@/components/Badge';
 import { Skeleton } from '@/components/Skeleton';
 import { useUIStore } from '@/stores/uiStore';
 import { ChevronDown, ChevronRight, Store, Save, X } from 'lucide-react';
-import type { Tienda, User, PaginatedResponse } from '@/types';
+import type { Tienda, Usuario } from '@/client/types.gen';
+import type { PaginatedResponseTienda } from '@/client/types.gen';
 
 interface StoreAssignmentProps {
-  user: User;
+  user: Usuario;
   onCancel: () => void;
 }
 
@@ -22,7 +23,9 @@ export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
 
   const { data: todasLasTiendas, isLoading } = useQuery({
     queryKey: ['tiendas', 'all-for-assignment'],
-    queryFn: () => api.get<PaginatedResponse<Tienda>>('/api/tiendas?page_size=5000'),
+    queryFn: async () =>
+      (await listTiendas({ query: { page_size: 5000 }, throwOnError: true }))
+        .data as unknown as PaginatedResponseTienda,
   });
 
   const groupedTiendas = useMemo(() => {
@@ -55,8 +58,14 @@ export function StoreAssignment({ user, onCancel }: StoreAssignmentProps) {
   }, [user.tiendas_asignadas, selectedIds]);
 
   const mutation = useMutation({
-    mutationFn: (newIds: string[]) =>
-      api.put<User>(`/api/usuarios/${user.id}/tiendas`, { tiendas_asignadas: newIds }),
+    mutationFn: async (tiendas: string[]) =>
+      (
+        await updateUsuarioTiendas({
+          path: { id: user.id },
+          body: { tiendas_asignadas: tiendas },
+          throwOnError: true,
+        })
+      ).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['usuario', user.id] });
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
+import { acceptOcrReview } from '@/client/sdk.gen';
 import { Modal } from './Modal';
 import { PDFViewer } from './PDFViewer';
-import type { Documento } from '@/types';
+import type { Documento } from '@/client/types.gen';
 import { useUIStore } from '@/stores/uiStore';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -33,9 +33,13 @@ export function OCRReviewModal({ documento, isOpen, onClose }: OCRReviewModalPro
 
   const mutation = useMutation({
     mutationFn: async (updatedFields: Record<string, string>) => {
-      return api.post(`/documentos/${documento.id}/ocr-review`, {
-        datos_extraidos: updatedFields,
-      });
+      return (
+        await acceptOcrReview({
+          path: { id: documento.id },
+          body: { datos_extraidos: updatedFields },
+          throwOnError: true,
+        })
+      ).data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documentos'] });

@@ -1,7 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { api } from '@/api/client';
-import type { Tienda, Expediente, Alerta, Documento, HistorialItem } from '@/types';
+import {
+  getTienda,
+  getExpediente,
+  getAlertasForTienda,
+  getDocumentosForTienda,
+  getHistorialForTienda,
+  renameDocumento,
+} from '@/client/sdk.gen';
+import type { Documento } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -52,7 +59,13 @@ export function TiendaDetailPage() {
 
   const updateNameMutation = useMutation({
     mutationFn: async ({ docId, newName }: { docId: string; newName: string }) => {
-      return api.post(`/documentos/${docId}/rename`, { nombre_archivo: newName });
+      return (
+        await renameDocumento({
+          path: { id: docId },
+          body: { nombre_archivo: newName },
+          throwOnError: true,
+        })
+      ).data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', id, 'documentos'] });
@@ -69,29 +82,32 @@ export function TiendaDetailPage() {
 
   const { data: tienda, isLoading } = useQuery({
     queryKey: ['tienda', id],
-    queryFn: () => api.get<Tienda>(`/api/tiendas/${id}`),
+    queryFn: async () => (await getTienda({ path: { id: id! }, throwOnError: true })).data,
   });
 
   const { data: expediente } = useQuery({
     queryKey: ['tienda', id, 'expediente'],
-    queryFn: () => api.get<Expediente>(`/api/tiendas/${id}/expediente`),
+    queryFn: async () => (await getExpediente({ path: { id: id! }, throwOnError: true })).data,
   });
 
   const { data: alertas } = useQuery({
     queryKey: ['tienda', id, 'alertas'],
-    queryFn: () => api.get<Alerta[]>(`/api/tiendas/${id}/alertas`),
+    queryFn: async () =>
+      (await getAlertasForTienda({ path: { id: id! }, throwOnError: true })).data,
     enabled: activeTab === 'alertas',
   });
 
   const { data: documentos } = useQuery({
     queryKey: ['tienda', id, 'documentos'],
-    queryFn: () => api.get<Documento[]>(`/api/tiendas/${id}/documentos`),
+    queryFn: async () =>
+      (await getDocumentosForTienda({ path: { id: id! }, throwOnError: true })).data,
     enabled: activeTab === 'documentos',
   });
 
   const { data: historial } = useQuery({
     queryKey: ['tienda', id, 'historial'],
-    queryFn: () => api.get<HistorialItem[]>(`/api/tiendas/${id}/historial`),
+    queryFn: async () =>
+      (await getHistorialForTienda({ path: { id: id! }, throwOnError: true })).data,
     enabled: activeTab === 'historial',
   });
 
@@ -207,14 +223,14 @@ export function TiendaDetailPage() {
               </button>
             )}
           </div>
-          {!documentos || documentos.length === 0 ? (
+          {!documentos || documentos.data.length === 0 ? (
             <EmptyState
               variant="no-data"
               title="Sin documentos"
               description="No hay documentos cargados para esta tienda."
             />
           ) : (
-            documentos.map((d) => (
+            documentos.data.map((d) => (
               <div
                 key={d.id}
                 className="bg-surface-card border border-border rounded-lg px-5 py-4 flex items-center gap-4"
@@ -234,8 +250,8 @@ export function TiendaDetailPage() {
                   <div className="mt-1">
                     <TramitesLinks
                       tiendaId={id}
-                      tramiteIds={d.tramite_ids}
-                      tramiteNombres={d.tramite_nombres}
+                      tramiteIds={d.tramite_ids ?? undefined}
+                      tramiteNombres={d.tramite_nombres ?? undefined}
                     />
                   </div>
                 </div>

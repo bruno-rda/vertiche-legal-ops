@@ -4,8 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuthStore } from '@/stores/authStore';
-import { api } from '@/api/client';
-import type { LoginResponse } from '@/types';
+import { login as loginApi } from '@/client/sdk.gen';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 
 const loginSchema = z.object({
@@ -32,8 +31,12 @@ export function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     try {
       setServerError('');
-      const response = await api.post<LoginResponse>('/api/auth/login', data);
-      login(response.user, response.token);
+      const response = await loginApi({
+        body: { username: data.email, password: data.password },
+        throwOnError: true,
+      });
+      if (!response.data) throw new Error('No response');
+      login(response.data.user, response.data.access_token);
       navigate('/dashboard');
     } catch {
       setServerError('Credenciales incorrectas. Verifica tu correo y contraseña.');

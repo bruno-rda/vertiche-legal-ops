@@ -1,4 +1,5 @@
-import type { Documento, EstadoOCR } from '@/types';
+import type { Documento } from '@/client/types.gen';
+import type { EstadoOcr as EstadoOCR } from '@/client/types.gen';
 import { mockTramites } from './tramites';
 
 const ocrStates: EstadoOCR[] = [
@@ -75,7 +76,7 @@ function generateDocumentosForTramites(): Documento[] {
       };
 
       docs.push(newDoc);
-      tramite.documentos.push(newDoc);
+      tramite.documentos!.push(newDoc);
     }
   });
 

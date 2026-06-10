@@ -1,6 +1,6 @@
-import type { User } from '@/types';
+import type { Usuario } from '@/client/types.gen';
 
-export const mockUsers: (User & { password: string })[] = [
+export const mockUsers: (Usuario & { password: string })[] = [
   {
     id: 'usr-001',
     nombre: 'Ana García López',

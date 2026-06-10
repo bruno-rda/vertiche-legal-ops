@@ -1,8 +1,13 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '@/api/client';
-import type { Alerta } from '@/types';
+import {
+  listAlertas,
+  silenciarAlertas,
+  resolverAlertas,
+  reactivarAlertas,
+  notificarAlertas,
+} from '@/client/sdk.gen';
 import { Badge } from '@/components/Badge';
 import { EmptyState } from '@/components/EmptyState';
 import { Skeleton } from '@/components/Skeleton';
@@ -52,19 +57,30 @@ export function AlertasPage() {
 
   const { data: alertas, isLoading } = useQuery({
     queryKey: ['alertas', tab, sevFilter, searchQuery],
-    queryFn: () =>
-      api.get<Alerta[]>('/api/alertas', {
-        silenciada: tab === 'silenciadas' ? 'true' : tab === 'activas' ? 'false' : undefined,
-        resuelta: tab === 'resueltas' ? 'true' : 'false',
-        severidad: sevFilter || undefined,
-        search: searchQuery || undefined,
-      }),
+    queryFn: async () =>
+      (
+        await listAlertas({
+          query: {
+            silenciada: tab === 'silenciadas' ? true : tab === 'activas' ? false : undefined,
+            resuelta: tab === 'resueltas' ? true : false,
+            severidad: sevFilter || undefined,
+            search: searchQuery || undefined,
+          },
+          throwOnError: true,
+        })
+      ).data,
     placeholderData: keepPreviousData,
   });
 
   const silenciar = useMutation({
-    mutationFn: (id: string) =>
-      api.post(`/api/alertas/${id}/silenciar`, { duracion_dias: duracion }),
+    mutationFn: async (id: string) =>
+      (
+        await silenciarAlertas({
+          path: { id },
+          body: { duracion_dias: duracion },
+          throwOnError: true,
+        })
+      ).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['alertas'] });
       queryClient.invalidateQueries({ queryKey: ['alertas', 'count'] });
@@ -74,7 +90,8 @@ export function AlertasPage() {
   });
 
   const resolver = useMutation({
-    mutationFn: (id: string) => api.post(`/api/alertas/${id}/resolver`, {}),
+    mutationFn: async (id: string) =>
+      (await resolverAlertas({ path: { id }, throwOnError: true })).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['alertas'] });
       queryClient.invalidateQueries({ queryKey: ['alertas', 'count'] });
@@ -83,45 +100,12 @@ export function AlertasPage() {
   });
 
   const reactivar = useMutation({
-    mutationFn: (id: string) => api.post(`/api/alertas/${id}/reactivar`, {}),
+    mutationFn: async (id: string) =>
+      (await reactivarAlertas({ path: { id }, throwOnError: true })).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['alertas'] });
       queryClient.invalidateQueries({ queryKey: ['alertas', 'count'] });
       addToast({ type: 'success', message: 'Alerta reactivada correctamente.' });
-    },
-  });
-
-  // @ts-expect-error unused currently but kept for single notification support
-  const notificar = useMutation({
-    mutationFn: ({ id, canal }: { id: string; canal: 'email' | 'whatsapp' }) =>
-      api.post(`/api/alertas/${id}/notificar/${canal}`, {}),
-    onMutate: async ({ id, canal }) => {
-      await queryClient.cancelQueries({ queryKey: ['alertas', tab, sevFilter] });
-      const previousAlertas = queryClient.getQueryData<Alerta[]>(['alertas', tab, sevFilter]);
-
-      if (previousAlertas) {
-        queryClient.setQueryData<Alerta[]>(
-          ['alertas', tab, sevFilter],
-          previousAlertas.map((a) =>
-            a.id === id
-              ? {
-                  ...a,
-                  notificaciones_enviadas: { ...a.notificaciones_enviadas, [canal]: true } as any,
-                }
-              : a,
-          ),
-        );
-      }
-      return { previousAlertas };
-    },
-    onError: (_err, _variables, context) => {
-      if (context?.previousAlertas) {
-        queryClient.setQueryData(['alertas', tab, sevFilter], context.previousAlertas);
-      }
-      addToast({ type: 'error', message: 'Error al enviar la notificación.' });
-    },
-    onSuccess: () => {
-      addToast({ type: 'success', message: 'Notificación enviada correctamente.' });
     },
   });
 
@@ -136,9 +120,9 @@ export function AlertasPage() {
       const promises = [];
       for (const id of ids) {
         if (canal === 'email' || canal === 'ambos')
-          promises.push(api.post(`/api/alertas/${id}/notificar/email`, {}));
+          promises.push(notificarAlertas({ path: { id, canal: 'email' }, throwOnError: true }));
         if (canal === 'whatsapp' || canal === 'ambos')
-          promises.push(api.post(`/api/alertas/${id}/notificar/whatsapp`, {}));
+          promises.push(notificarAlertas({ path: { id, canal: 'whatsapp' }, throwOnError: true }));
       }
       return Promise.all(promises);
     },

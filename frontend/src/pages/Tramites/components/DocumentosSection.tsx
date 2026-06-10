@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
-import type { Documento, PaginatedResponse } from '@/types';
+import { renameDocumento, listDocumentos, uploadDocumento } from '@/client/sdk.gen';
+import type { Documento } from '@/client/types.gen';
+import type { PaginatedResponseDocumento } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
 import { Skeleton } from '@/components/Skeleton';
 import { EmptyState } from '@/components/EmptyState';
@@ -33,7 +34,13 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
 
   const updateNameMutation = useMutation({
     mutationFn: async ({ docId, newName }: { docId: string; newName: string }) => {
-      return api.post(`/documentos/${docId}/rename`, { nombre_archivo: newName });
+      return (
+        await renameDocumento({
+          path: { id: docId },
+          body: { nombre_archivo: newName },
+          throwOnError: true,
+        })
+      ).data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documentos', { tramite_id: tramiteId }] });
@@ -43,8 +50,13 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
   // Poll every 5s if there's any document processing
   const { data, isLoading } = useQuery({
     queryKey: ['documentos', { tramite_id: tramiteId }],
-    queryFn: () =>
-      api.get<PaginatedResponse<Documento>>(`/api/documentos?tramite_id=${tramiteId}&page_size=50`),
+    queryFn: async () =>
+      (
+        await listDocumentos({
+          query: { tramite_id: tramiteId, page_size: 50 },
+          throwOnError: true,
+        })
+      ).data as unknown as PaginatedResponseDocumento,
     refetchInterval: (query) => {
       const hasProcessing = query.state.data?.data.some((d) => d.estado_ocr === 'procesando');
       return hasProcessing ? 5000 : false;
@@ -53,10 +65,12 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('tramite_ids', tramiteId);
-      return api.post<Documento>('/api/documentos/upload', formData);
+      return (
+        await uploadDocumento({
+          body: { file, tramite_ids: [tramiteId] } as any,
+          throwOnError: true,
+        })
+      ).data;
     },
     onSuccess: () => {
       addToast({ type: 'success', message: 'Documento cargado correctamente.' });

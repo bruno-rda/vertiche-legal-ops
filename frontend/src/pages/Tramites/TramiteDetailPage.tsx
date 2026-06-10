@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { api } from '@/api/client';
-import type { Tramite } from '@/types';
+import { getTramite } from '@/client/sdk.gen';
+
 import { Badge } from '@/components/Badge';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Skeleton } from '@/components/Skeleton';
@@ -19,7 +19,7 @@ export function TramiteDetailPage() {
 
   const { data: tramite, isLoading } = useQuery({
     queryKey: ['tramite', tramiteId],
-    queryFn: () => api.get<Tramite>(`/api/tramites/${tramiteId}`),
+    queryFn: async () => (await getTramite({ path: { id: tramiteId! }, throwOnError: true })).data,
   });
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

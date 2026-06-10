@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { CumplimientoEstado } from '@/types';
+import type { CumplimientoEstado } from '@/client/types.gen';
 import { MapTooltip } from './MapTooltip';
 
 export const MAP_CONTAINER_CLASSES = 'relative w-full max-h-[650px]';

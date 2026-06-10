@@ -1,0 +1,3611 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Vertiche LegalOps API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Login",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_login_api_auth_login_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Get Me",
+        "operationId": "get_me",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/alertas": {
+      "get": {
+        "tags": ["alertas"],
+        "summary": "List Alertas",
+        "operationId": "list_alertas",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "severidad",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Severidad"
+            }
+          },
+          {
+            "name": "tipo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tipo"
+            }
+          },
+          {
+            "name": "silenciada",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Silenciada"
+            }
+          },
+          {
+            "name": "resuelta",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Resuelta"
+            }
+          },
+          {
+            "name": "tienda_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tienda Id"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Alerta"
+                  },
+                  "title": "Response List Alertas Api Alertas Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/alertas/count/critical": {
+      "get": {
+        "tags": ["alertas"],
+        "summary": "Count Alertas Critical",
+        "operationId": "count_alertas_critical",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertaCount"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/alertas/{id}/silenciar": {
+      "post": {
+        "tags": ["alertas"],
+        "summary": "Silenciar Alertas",
+        "operationId": "silenciar_alertas",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertaSilenciarRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Alerta"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/alertas/{id}/resolver": {
+      "post": {
+        "tags": ["alertas"],
+        "summary": "Resolver Alertas",
+        "operationId": "resolver_alertas",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Alerta"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/alertas/{id}/reactivar": {
+      "post": {
+        "tags": ["alertas"],
+        "summary": "Reactivar Alertas",
+        "operationId": "reactivar_alertas",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Alerta"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/alertas/{id}/notificar/{canal}": {
+      "post": {
+        "tags": ["alertas"],
+        "summary": "Notificar Alertas",
+        "operationId": "notificar_alertas",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "canal",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Canal"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Alerta"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/metrics": {
+      "get": {
+        "tags": ["dashboard"],
+        "summary": "Get Metrics",
+        "operationId": "get_metrics",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardMetrics"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/dashboard/cumplimiento-por-estado": {
+      "get": {
+        "tags": ["dashboard"],
+        "summary": "Get Estado Geografico",
+        "operationId": "get_estado_geografico",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CumplimientoEstado"
+                  },
+                  "type": "array",
+                  "title": "Response Get Estado Geografico Api Dashboard Cumplimiento Por Estado Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/dashboard/alertas-recientes": {
+      "get": {
+        "tags": ["dashboard"],
+        "summary": "Get Alertas Recientes",
+        "operationId": "get_alertas_recientes",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Alerta"
+                  },
+                  "type": "array",
+                  "title": "Response Get Alertas Recientes Api Dashboard Alertas Recientes Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/dashboard/tramites-proximos": {
+      "get": {
+        "tags": ["dashboard"],
+        "summary": "Get Tramites Proximos",
+        "operationId": "get_tramites_proximos",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Tramite"
+                  },
+                  "type": "array",
+                  "title": "Response Get Tramites Proximos Api Dashboard Tramites Proximos Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/documentos": {
+      "get": {
+        "tags": ["documentos"],
+        "summary": "List Documentos",
+        "operationId": "list_documentos",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 25,
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "estado_ocr",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado Ocr"
+            }
+          },
+          {
+            "name": "requiere_revision",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Requiere Revision"
+            }
+          },
+          {
+            "name": "tienda_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tienda Id"
+            }
+          },
+          {
+            "name": "tramite_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tramite Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_Documento_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["documentos"],
+        "summary": "Upload Documento",
+        "operationId": "upload_documento",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_documento_api_documentos_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Documento"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/documentos/{id}": {
+      "get": {
+        "tags": ["documentos"],
+        "summary": "Get Documento",
+        "operationId": "get_documento",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Documento"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["documentos"],
+        "summary": "Update Documento",
+        "operationId": "update_documento",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentoUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Documento"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/documentos/{id}/rename": {
+      "post": {
+        "tags": ["documentos"],
+        "summary": "Rename Documento",
+        "operationId": "rename_documento",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentoRename"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Documento"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/documentos/{id}/ocr-review": {
+      "post": {
+        "tags": ["documentos"],
+        "summary": "Accept Ocr Review",
+        "operationId": "accept_ocr_review",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentoOcrReview"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Documento"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tiendas": {
+      "get": {
+        "tags": ["tiendas"],
+        "summary": "List Tiendas",
+        "operationId": "list_tiendas",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 25,
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "estado",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          },
+          {
+            "name": "estado_cumplimiento",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado Cumplimiento"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "nombre",
+              "title": "Sort By"
+            }
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "asc",
+              "title": "Sort Order"
+            }
+          },
+          {
+            "name": "operador_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Operador Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_Tienda_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tiendas/{id}": {
+      "get": {
+        "tags": ["tiendas"],
+        "summary": "Get Tienda",
+        "operationId": "get_tienda",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tienda"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["tiendas"],
+        "summary": "Update Tienda",
+        "operationId": "update_tienda",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TiendaUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tienda"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tiendas/{id}/expediente": {
+      "get": {
+        "tags": ["tiendas"],
+        "summary": "Get Expediente",
+        "operationId": "get_expediente",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Expediente"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tiendas/{id}/tramites": {
+      "post": {
+        "tags": ["tiendas"],
+        "summary": "Create Tramite For Tienda",
+        "operationId": "create_tramite_for_tienda",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TramiteCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tramite"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tiendas/{id}/alertas": {
+      "get": {
+        "tags": ["tiendas"],
+        "summary": "Get Alertas For Tienda",
+        "operationId": "get_alertas_for_tienda",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Alerta"
+                  },
+                  "title": "Response Get Alertas For Tienda Api Tiendas  Id  Alertas Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tiendas/{id}/documentos": {
+      "get": {
+        "tags": ["tiendas"],
+        "summary": "Get Documentos For Tienda",
+        "operationId": "get_documentos_for_tienda",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 25,
+              "title": "Page Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_Documento_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["tiendas"],
+        "summary": "Upload Documento For Tienda",
+        "operationId": "upload_documento_for_tienda",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_documento_for_tienda_api_tiendas__id__documentos_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Documento"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tiendas/{id}/historial": {
+      "get": {
+        "tags": ["tiendas"],
+        "summary": "Get Historial For Tienda",
+        "operationId": "get_historial_for_tienda",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HistorialItem"
+                  },
+                  "title": "Response Get Historial For Tienda Api Tiendas  Id  Historial Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tramites": {
+      "get": {
+        "tags": ["tramites"],
+        "summary": "List Tramites",
+        "operationId": "list_tramites",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 25,
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "name": "estado",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          },
+          {
+            "name": "tipo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tipo"
+            }
+          },
+          {
+            "name": "estado_geografico",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado Geografico"
+            }
+          },
+          {
+            "name": "solo_vencidos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Solo Vencidos"
+            }
+          },
+          {
+            "name": "por_vencer_dias",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Por Vencer Dias"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse_Tramite_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tramites/{id}": {
+      "get": {
+        "tags": ["tramites"],
+        "summary": "Get Tramite",
+        "operationId": "get_tramite",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tramite"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["tramites"],
+        "summary": "Update Tramite",
+        "operationId": "update_tramite",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TramiteUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tramite"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuarios": {
+      "get": {
+        "tags": ["usuarios"],
+        "summary": "List Usuarios",
+        "operationId": "list_usuarios",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "rol",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Rol"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Usuario"
+                  },
+                  "title": "Response List Usuarios Api Usuarios Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["usuarios"],
+        "summary": "Create Usuario",
+        "operationId": "create_usuario",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuarios/{id}": {
+      "get": {
+        "tags": ["usuarios"],
+        "summary": "Get Usuario",
+        "operationId": "get_usuario",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["usuarios"],
+        "summary": "Delete Usuario",
+        "operationId": "delete_usuario",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuarios/{id}/tiendas-resumen": {
+      "get": {
+        "tags": ["usuarios"],
+        "summary": "Get Tiendas Resumen",
+        "operationId": "get_tiendas_resumen",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsuarioResumenTiendas"
+                  },
+                  "title": "Response Get Tiendas Resumen Api Usuarios  Id  Tiendas Resumen Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuarios/{id}/performance": {
+      "get": {
+        "tags": ["usuarios"],
+        "summary": "Get Performance",
+        "operationId": "get_performance",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/RangeType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerformanceData"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuarios/{id}/status": {
+      "put": {
+        "tags": ["usuarios"],
+        "summary": "Update Usuario Status",
+        "operationId": "update_usuario_status",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioStatusUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuarios/{id}/tiendas": {
+      "put": {
+        "tags": ["usuarios"],
+        "summary": "Update Usuario Tiendas",
+        "operationId": "update_usuario_tiendas",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioTiendasUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "operationId": "health_check",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Check Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "summary": "Root",
+        "operationId": "root",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActivityTimelineItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "accion": {
+            "type": "string",
+            "title": "Accion"
+          },
+          "fecha": {
+            "type": "string",
+            "title": "Fecha"
+          },
+          "tienda_id": {
+            "type": "string",
+            "title": "Tienda Id"
+          },
+          "tienda_nombre": {
+            "type": "string",
+            "title": "Tienda Nombre"
+          },
+          "tramite_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tramite Id"
+          },
+          "tramite_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tramite Nombre"
+          }
+        },
+        "type": "object",
+        "required": ["id", "accion", "fecha", "tienda_id", "tienda_nombre"],
+        "title": "ActivityTimelineItem"
+      },
+      "Alerta": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "tipo": {
+            "$ref": "#/components/schemas/AlertaTipo"
+          },
+          "severidad": {
+            "$ref": "#/components/schemas/AlertaSeveridad"
+          },
+          "tienda_id": {
+            "type": "string",
+            "title": "Tienda Id"
+          },
+          "tienda_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tienda Nombre"
+          },
+          "tramite_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tramite Id"
+          },
+          "tramite_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tramite Nombre"
+          },
+          "documento_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Documento Id"
+          },
+          "mensaje": {
+            "type": "string",
+            "title": "Mensaje"
+          },
+          "fecha_generacion": {
+            "type": "string",
+            "title": "Fecha Generacion"
+          },
+          "silenciada": {
+            "type": "boolean",
+            "title": "Silenciada"
+          },
+          "silenciada_hasta": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Silenciada Hasta"
+          },
+          "silenciada_por": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Silenciada Por"
+          },
+          "resuelta": {
+            "type": "boolean",
+            "title": "Resuelta"
+          },
+          "fecha_resolucion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha Resolucion"
+          },
+          "resuelta_por": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resuelta Por"
+          },
+          "notificaciones_enviadas": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AlertaNotificacionSend"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tipo",
+          "severidad",
+          "tienda_id",
+          "mensaje",
+          "fecha_generacion",
+          "silenciada",
+          "resuelta"
+        ],
+        "title": "Alerta"
+      },
+      "AlertaCount": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": ["count"],
+        "title": "AlertaCount"
+      },
+      "AlertaNotificacionSend": {
+        "properties": {
+          "email": {
+            "type": "boolean",
+            "title": "Email"
+          },
+          "whatsapp": {
+            "type": "boolean",
+            "title": "Whatsapp"
+          }
+        },
+        "type": "object",
+        "required": ["email", "whatsapp"],
+        "title": "AlertaNotificacionSend"
+      },
+      "AlertaSeveridad": {
+        "type": "string",
+        "enum": ["info", "warning", "critical"],
+        "title": "AlertaSeveridad"
+      },
+      "AlertaSilenciarRequest": {
+        "properties": {
+          "duracion_dias": {
+            "type": "integer",
+            "title": "Duracion Dias"
+          },
+          "nota": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nota"
+          }
+        },
+        "type": "object",
+        "required": ["duracion_dias"],
+        "title": "AlertaSilenciarRequest"
+      },
+      "AlertaTipo": {
+        "type": "string",
+        "enum": ["vencimiento_proximo", "vencido", "inconsistencia", "baja_confianza_ocr"],
+        "title": "AlertaTipo"
+      },
+      "Body_login_api_auth_login_post": {
+        "properties": {
+          "grant_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^password$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grant Type"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "title": "Password"
+          },
+          "scope": {
+            "type": "string",
+            "title": "Scope",
+            "default": ""
+          },
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
+          "client_secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "format": "password",
+            "title": "Client Secret"
+          }
+        },
+        "type": "object",
+        "required": ["username", "password"],
+        "title": "Body_login_api_auth_login_post"
+      },
+      "Body_upload_documento_api_documentos_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": ["file"],
+        "title": "Body_upload_documento_api_documentos_post"
+      },
+      "Body_upload_documento_for_tienda_api_tiendas__id__documentos_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "file_name": {
+            "type": "string",
+            "title": "File Name"
+          },
+          "tramite_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tramite Ids"
+          }
+        },
+        "type": "object",
+        "title": "Body_upload_documento_for_tienda_api_tiendas__id__documentos_post"
+      },
+      "CampoExtraidoDocumento": {
+        "properties": {
+          "value": {
+            "type": "string",
+            "title": "Value"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          }
+        },
+        "type": "object",
+        "required": ["value", "confidence"],
+        "title": "CampoExtraidoDocumento"
+      },
+      "CumplimientoEstado": {
+        "properties": {
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "total_tiendas": {
+            "type": "integer",
+            "title": "Total Tiendas"
+          },
+          "cumplimiento": {
+            "type": "integer",
+            "title": "Cumplimiento"
+          },
+          "tramites_criticos": {
+            "type": "integer",
+            "title": "Tramites Criticos"
+          }
+        },
+        "type": "object",
+        "required": ["estado", "total_tiendas", "cumplimiento", "tramites_criticos"],
+        "title": "CumplimientoEstado"
+      },
+      "DashboardMetrics": {
+        "properties": {
+          "total_tiendas": {
+            "type": "integer",
+            "title": "Total Tiendas"
+          },
+          "en_cumplimiento": {
+            "type": "integer",
+            "title": "En Cumplimiento"
+          },
+          "por_vencer": {
+            "type": "integer",
+            "title": "Por Vencer"
+          },
+          "en_riesgo_critico": {
+            "type": "integer",
+            "title": "En Riesgo Critico"
+          },
+          "porcentaje_cumplimiento": {
+            "type": "integer",
+            "title": "Porcentaje Cumplimiento"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_tiendas",
+          "en_cumplimiento",
+          "por_vencer",
+          "en_riesgo_critico",
+          "porcentaje_cumplimiento"
+        ],
+        "title": "DashboardMetrics"
+      },
+      "Documento": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "tramite_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tramite Ids"
+          },
+          "tramite_nombres": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tramite Nombres"
+          },
+          "nombre_archivo": {
+            "type": "string",
+            "title": "Nombre Archivo"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "estado_ocr": {
+            "$ref": "#/components/schemas/EstadoOCR"
+          },
+          "datos_extraidos": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/CampoExtraidoDocumento"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Datos Extraidos"
+          },
+          "requiere_revision_manual": {
+            "type": "boolean",
+            "title": "Requiere Revision Manual"
+          },
+          "cargado_por": {
+            "type": "string",
+            "title": "Cargado Por"
+          },
+          "cargado_por_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cargado Por Nombre"
+          },
+          "cargado_en": {
+            "type": "string",
+            "title": "Cargado En"
+          },
+          "tienda_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tienda Id"
+          },
+          "tienda_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tienda Nombre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tramite_ids",
+          "nombre_archivo",
+          "url",
+          "estado_ocr",
+          "requiere_revision_manual",
+          "cargado_por",
+          "cargado_en"
+        ],
+        "title": "Documento"
+      },
+      "DocumentoOcrReview": {
+        "properties": {
+          "datos_extraidos": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Datos Extraidos"
+          }
+        },
+        "type": "object",
+        "required": ["datos_extraidos"],
+        "title": "DocumentoOcrReview"
+      },
+      "DocumentoRename": {
+        "properties": {
+          "nombre_archivo": {
+            "type": "string",
+            "title": "Nombre Archivo"
+          }
+        },
+        "type": "object",
+        "required": ["nombre_archivo"],
+        "title": "DocumentoRename"
+      },
+      "DocumentoUpdate": {
+        "properties": {
+          "tramite_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tramite Ids"
+          }
+        },
+        "type": "object",
+        "title": "DocumentoUpdate"
+      },
+      "EntidadTipo": {
+        "type": "string",
+        "enum": ["alerta", "documento", "tienda", "tramite", "usuario"],
+        "title": "EntidadTipo"
+      },
+      "EstadoOCR": {
+        "type": "string",
+        "enum": ["procesando", "completado", "baja_confianza", "error"],
+        "title": "EstadoOCR"
+      },
+      "Expediente": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "tienda_id": {
+            "type": "string",
+            "title": "Tienda Id"
+          },
+          "tramites": {
+            "items": {
+              "$ref": "#/components/schemas/Tramite"
+            },
+            "type": "array",
+            "title": "Tramites"
+          },
+          "cumplimiento": {
+            "type": "number",
+            "title": "Cumplimiento"
+          },
+          "ultima_actualizacion": {
+            "type": "string",
+            "title": "Ultima Actualizacion"
+          }
+        },
+        "type": "object",
+        "required": ["id", "tienda_id", "tramites", "cumplimiento", "ultima_actualizacion"],
+        "title": "Expediente"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HistorialItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "entidad_tipo": {
+            "$ref": "#/components/schemas/EntidadTipo"
+          },
+          "entidad_id": {
+            "type": "string",
+            "title": "Entidad Id"
+          },
+          "accion": {
+            "type": "string",
+            "title": "Accion"
+          },
+          "usuario_id": {
+            "type": "string",
+            "title": "Usuario Id"
+          },
+          "usuario_nombre": {
+            "type": "string",
+            "title": "Usuario Nombre"
+          },
+          "fecha": {
+            "type": "string",
+            "title": "Fecha"
+          },
+          "detalle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detalle"
+          },
+          "valor_anterior": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Anterior"
+          },
+          "valor_nuevo": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Nuevo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "entidad_tipo",
+          "entidad_id",
+          "accion",
+          "usuario_id",
+          "usuario_nombre",
+          "fecha"
+        ],
+        "title": "HistorialItem"
+      },
+      "LoginResponse": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type"
+          },
+          "user": {
+            "$ref": "#/components/schemas/Usuario"
+          }
+        },
+        "type": "object",
+        "required": ["access_token", "token_type", "user"],
+        "title": "LoginResponse"
+      },
+      "MetricTrend": {
+        "properties": {
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "previous_value": {
+            "type": "number",
+            "title": "Previous Value"
+          },
+          "trend": {
+            "$ref": "#/components/schemas/TrendType"
+          }
+        },
+        "type": "object",
+        "required": ["value", "previous_value", "trend"],
+        "title": "MetricTrend"
+      },
+      "Observacion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "descripcion": {
+            "type": "string",
+            "title": "Descripcion"
+          },
+          "severidad": {
+            "$ref": "#/components/schemas/AlertaSeveridad"
+          },
+          "fecha": {
+            "type": "string",
+            "title": "Fecha"
+          }
+        },
+        "type": "object",
+        "required": ["id", "descripcion", "severidad", "fecha"],
+        "title": "Observacion"
+      },
+      "PaginatedResponse_Documento_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/Documento"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total_pages": {
+            "type": "integer",
+            "title": "Total Pages"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "page", "page_size", "total_pages"],
+        "title": "PaginatedResponse[Documento]"
+      },
+      "PaginatedResponse_Tienda_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/Tienda"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total_pages": {
+            "type": "integer",
+            "title": "Total Pages"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "page", "page_size", "total_pages"],
+        "title": "PaginatedResponse[Tienda]"
+      },
+      "PaginatedResponse_Tramite_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/Tramite"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total_pages": {
+            "type": "integer",
+            "title": "Total Pages"
+          }
+        },
+        "type": "object",
+        "required": ["data", "total", "page", "page_size", "total_pages"],
+        "title": "PaginatedResponse[Tramite]"
+      },
+      "PerformanceData": {
+        "properties": {
+          "metrics": {
+            "$ref": "#/components/schemas/PerformanceMetrics"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityTimelineItem"
+            },
+            "type": "array",
+            "title": "Timeline"
+          }
+        },
+        "type": "object",
+        "required": ["metrics", "timeline"],
+        "title": "PerformanceData"
+      },
+      "PerformanceMetrics": {
+        "properties": {
+          "documentos_cargados": {
+            "$ref": "#/components/schemas/MetricTrend"
+          },
+          "tramites_resueltos": {
+            "$ref": "#/components/schemas/MetricTrend"
+          },
+          "alertas_atendidas": {
+            "$ref": "#/components/schemas/MetricTrend"
+          },
+          "tiempo_promedio_resolucion": {
+            "$ref": "#/components/schemas/MetricTrend"
+          },
+          "tramites_vencidos_responsabilidad": {
+            "$ref": "#/components/schemas/MetricTrend"
+          }
+        },
+        "type": "object",
+        "required": [
+          "documentos_cargados",
+          "tramites_resueltos",
+          "alertas_atendidas",
+          "tiempo_promedio_resolucion",
+          "tramites_vencidos_responsabilidad"
+        ],
+        "title": "PerformanceMetrics"
+      },
+      "RangeType": {
+        "type": "string",
+        "enum": ["30", "month", "90"],
+        "title": "RangeType"
+      },
+      "Tienda": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "municipio": {
+            "type": "string",
+            "title": "Municipio"
+          },
+          "direccion": {
+            "type": "string",
+            "title": "Direccion"
+          },
+          "marcas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Marcas"
+          },
+          "cumplimiento": {
+            "type": "number",
+            "title": "Cumplimiento"
+          },
+          "estado_cumplimiento": {
+            "$ref": "#/components/schemas/TiendaEstadoCumplimiento"
+          },
+          "total_tramites": {
+            "type": "integer",
+            "title": "Total Tramites"
+          },
+          "tramites_vencidos": {
+            "type": "integer",
+            "title": "Tramites Vencidos"
+          },
+          "tramites_por_vencer": {
+            "type": "integer",
+            "title": "Tramites Por Vencer"
+          },
+          "ultima_actualizacion": {
+            "type": "string",
+            "title": "Ultima Actualizacion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nombre",
+          "estado",
+          "municipio",
+          "direccion",
+          "marcas",
+          "cumplimiento",
+          "estado_cumplimiento",
+          "total_tramites",
+          "tramites_vencidos",
+          "tramites_por_vencer",
+          "ultima_actualizacion"
+        ],
+        "title": "Tienda"
+      },
+      "TiendaEstadoCumplimiento": {
+        "type": "string",
+        "enum": ["vigente", "en_riesgo", "critico"],
+        "title": "TiendaEstadoCumplimiento"
+      },
+      "TiendaResumen": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "municipio": {
+            "type": "string",
+            "title": "Municipio"
+          },
+          "estado_cumplimiento": {
+            "type": "string",
+            "title": "Estado Cumplimiento"
+          }
+        },
+        "type": "object",
+        "required": ["id", "nombre", "municipio", "estado_cumplimiento"],
+        "title": "TiendaResumen"
+      },
+      "TiendaUpdate": {
+        "properties": {
+          "nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nombre"
+          },
+          "estado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estado"
+          },
+          "municipio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Municipio"
+          },
+          "direccion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Direccion"
+          }
+        },
+        "type": "object",
+        "title": "TiendaUpdate"
+      },
+      "Tramite": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "tienda_id": {
+            "type": "string",
+            "title": "Tienda Id"
+          },
+          "tienda_nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tienda Nombre"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "tipo": {
+            "$ref": "#/components/schemas/TramiteTipo"
+          },
+          "estado": {
+            "$ref": "#/components/schemas/TramiteEstado"
+          },
+          "fecha_inicio": {
+            "type": "string",
+            "title": "Fecha Inicio"
+          },
+          "fecha_vencimiento": {
+            "type": "string",
+            "title": "Fecha Vencimiento"
+          },
+          "es_permanente": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Es Permanente"
+          },
+          "es_recurrente": {
+            "type": "boolean",
+            "title": "Es Recurrente"
+          },
+          "periodo_recurrencia": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TramitePeriodoRecurrencia"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "observaciones": {
+            "items": {
+              "$ref": "#/components/schemas/Observacion"
+            },
+            "type": "array",
+            "title": "Observaciones",
+            "default": []
+          },
+          "documentos": {
+            "items": {
+              "$ref": "#/components/schemas/Documento"
+            },
+            "type": "array",
+            "title": "Documentos",
+            "default": []
+          },
+          "historial": {
+            "items": {
+              "$ref": "#/components/schemas/HistorialItem"
+            },
+            "type": "array",
+            "title": "Historial",
+            "default": []
+          },
+          "asignado_a": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asignado A"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tienda_id",
+          "nombre",
+          "tipo",
+          "estado",
+          "fecha_inicio",
+          "fecha_vencimiento",
+          "es_recurrente"
+        ],
+        "title": "Tramite"
+      },
+      "TramiteCreate": {
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "tipo": {
+            "type": "string",
+            "title": "Tipo"
+          },
+          "fecha_inicio": {
+            "type": "string",
+            "title": "Fecha Inicio"
+          },
+          "fecha_vencimiento": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha Vencimiento"
+          },
+          "es_permanente": {
+            "type": "boolean",
+            "title": "Es Permanente",
+            "default": false
+          },
+          "es_recurrente": {
+            "type": "boolean",
+            "title": "Es Recurrente",
+            "default": false
+          },
+          "periodo_recurrencia": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Periodo Recurrencia"
+          }
+        },
+        "type": "object",
+        "required": ["nombre", "tipo", "fecha_inicio"],
+        "title": "TramiteCreate"
+      },
+      "TramiteEstado": {
+        "type": "string",
+        "enum": [
+          "pendiente_documentacion",
+          "en_revision",
+          "presentado",
+          "en_espera_resolucion",
+          "vigente",
+          "por_vencer",
+          "vencido"
+        ],
+        "title": "TramiteEstado"
+      },
+      "TramitePeriodoRecurrencia": {
+        "type": "string",
+        "enum": ["anual", "bianual"],
+        "title": "TramitePeriodoRecurrencia"
+      },
+      "TramiteTipo": {
+        "type": "string",
+        "enum": ["federal", "estatal", "municipal"],
+        "title": "TramiteTipo"
+      },
+      "TramiteUpdate": {
+        "properties": {
+          "nombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nombre"
+          },
+          "fecha_inicio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha Inicio"
+          },
+          "fecha_vencimiento": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecha Vencimiento"
+          },
+          "es_permanente": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Es Permanente"
+          }
+        },
+        "type": "object",
+        "title": "TramiteUpdate"
+      },
+      "TrendType": {
+        "type": "string",
+        "enum": ["up", "down", "neutral"],
+        "title": "TrendType"
+      },
+      "Usuario": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "rol": {
+            "$ref": "#/components/schemas/UsuarioRol"
+          },
+          "tiendas_asignadas": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tiendas Asignadas"
+          },
+          "fecha_creacion": {
+            "type": "string",
+            "title": "Fecha Creacion"
+          },
+          "estado": {
+            "$ref": "#/components/schemas/UsuarioEstado"
+          }
+        },
+        "type": "object",
+        "required": ["id", "nombre", "email", "rol", "fecha_creacion", "estado"],
+        "title": "Usuario"
+      },
+      "UsuarioCreate": {
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "rol": {
+            "$ref": "#/components/schemas/UsuarioRol"
+          }
+        },
+        "type": "object",
+        "required": ["nombre", "email", "rol"],
+        "title": "UsuarioCreate"
+      },
+      "UsuarioEstado": {
+        "type": "string",
+        "enum": ["activo", "inactivo"],
+        "title": "UsuarioEstado"
+      },
+      "UsuarioResumenTiendas": {
+        "properties": {
+          "estado": {
+            "type": "string",
+            "title": "Estado"
+          },
+          "total_tiendas": {
+            "type": "integer",
+            "title": "Total Tiendas"
+          },
+          "vigentes": {
+            "type": "integer",
+            "title": "Vigentes"
+          },
+          "por_vencer": {
+            "type": "integer",
+            "title": "Por Vencer"
+          },
+          "criticas": {
+            "type": "integer",
+            "title": "Criticas"
+          },
+          "tiendas": {
+            "items": {
+              "$ref": "#/components/schemas/TiendaResumen"
+            },
+            "type": "array",
+            "title": "Tiendas"
+          }
+        },
+        "type": "object",
+        "required": ["estado", "total_tiendas", "vigentes", "por_vencer", "criticas", "tiendas"],
+        "title": "UsuarioResumenTiendas"
+      },
+      "UsuarioRol": {
+        "type": "string",
+        "enum": ["ADMIN", "OPERATOR", "VIEWER"],
+        "title": "UsuarioRol"
+      },
+      "UsuarioStatusUpdate": {
+        "properties": {
+          "estado": {
+            "$ref": "#/components/schemas/UsuarioEstado"
+          }
+        },
+        "type": "object",
+        "required": ["estado"],
+        "title": "UsuarioStatusUpdate"
+      },
+      "UsuarioTiendasUpdate": {
+        "properties": {
+          "tiendas_asignadas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tiendas Asignadas"
+          }
+        },
+        "type": "object",
+        "required": ["tiendas_asignadas"],
+        "title": "UsuarioTiendasUpdate"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "OAuth2PasswordBearer": {
+        "type": "oauth2",
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "/api/auth/login"
+          }
+        }
+      }
+    }
+  }
+}

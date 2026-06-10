@@ -1,4 +1,5 @@
-import type { Alerta, AlertaSeveridad, AlertaTipo } from '@/types';
+import type { Alerta } from '@/client/types.gen';
+import type { AlertaSeveridad, AlertaTipo } from '@/client/types.gen';
 import { mockTiendas } from './tiendas';
 import { mockTramites } from './tramites';
 

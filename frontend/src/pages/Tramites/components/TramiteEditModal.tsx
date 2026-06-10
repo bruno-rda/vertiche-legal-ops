@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
+import { updateTramite } from '@/client/sdk.gen';
 import { Modal } from '@/components/Modal';
 import { useUIStore } from '@/stores/uiStore';
-import type { Tramite, TramiteUpdateFormData as FormData } from '@/types';
+import type { Tramite, TramiteUpdate as FormData } from '@/client/types.gen';
 
 export function TramiteEditModal({
   isOpen,
@@ -39,7 +39,8 @@ export function TramiteEditModal({
   const isPermanente = watch('es_permanente');
 
   const mutation = useMutation({
-    mutationFn: (data: FormData) => api.put<Tramite>(`/api/tramites/${tramite.id}`, data),
+    mutationFn: async (data: FormData) =>
+      (await updateTramite({ path: { id: tramite.id }, body: data, throwOnError: true })).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tramite', tramite.id] });
       addToast({ type: 'success', message: 'Trámite actualizado exitosamente' });
@@ -142,7 +143,7 @@ export function TramiteEditModal({
             <input
               type="date"
               {...register('fecha_vencimiento', { required: !isPermanente ? 'Requerido' : false })}
-              disabled={isPermanente}
+              disabled={!!isPermanente}
               className="w-full h-10 px-3 bg-surface border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent disabled:opacity-50 disabled:bg-neutral-light"
             />
             {errors.fecha_vencimiento && (

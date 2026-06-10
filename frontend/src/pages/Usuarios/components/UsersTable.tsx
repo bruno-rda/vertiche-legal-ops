@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
+import { updateUsuarioStatus, deleteUsuario } from '@/client/sdk.gen';
 import { Badge } from '@/components/Badge';
 import { EmptyState } from '@/components/EmptyState';
 import { Modal } from '@/components/Modal';
@@ -8,10 +8,10 @@ import { useAuthStore } from '@/stores/authStore';
 import { useUIStore } from '@/stores/uiStore';
 import { Power, PowerOff, Trash2, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import type { User } from '@/types';
+import type { Usuario } from '@/client/types.gen';
 
 interface UsersTableProps {
-  users: User[];
+  users: Usuario[];
   isLoading: boolean;
   type: 'activos' | 'inactivos';
 }
@@ -22,11 +22,17 @@ export function UsersTable({ users, isLoading, type }: UsersTableProps) {
   const currentUser = useAuthStore((s) => s.user);
   const navigate = useNavigate();
 
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<Usuario | null>(null);
 
   const toggleStatusMutation = useMutation({
-    mutationFn: ({ id, estado }: { id: string; estado: 'activo' | 'inactivo' }) =>
-      api.put<User>(`/api/usuarios/${id}/status`, { estado }),
+    mutationFn: async ({ id, estado }: { id: string; estado: 'activo' | 'inactivo' }) =>
+      (
+        await updateUsuarioStatus({
+          path: { id },
+          body: { estado: estado as any },
+          throwOnError: true,
+        })
+      ).data,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
       addToast({
@@ -42,7 +48,8 @@ export function UsersTable({ users, isLoading, type }: UsersTableProps) {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.delete(`/api/usuarios/${id}`),
+    mutationFn: async (id: string) =>
+      (await deleteUsuario({ path: { id }, throwOnError: true })).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
       addToast({ type: 'success', message: 'Usuario eliminado permanentemente' });

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
-import type { Documento, PaginatedResponse } from '@/types';
+import { listDocumentos, updateDocumento } from '@/client/sdk.gen';
+import type { PaginatedResponseDocumento } from '@/client/types.gen';
 import { Modal } from '@/components/Modal';
 import { Badge } from '@/components/Badge';
 import { formatDate } from '@/lib/utils';
@@ -30,8 +30,9 @@ export function AsociarDocumentoModal({
   // Fetch all documents for this tienda
   const { data, isLoading, isError } = useQuery({
     queryKey: ['documentos', { tienda_id: tiendaId }],
-    queryFn: () =>
-      api.get<PaginatedResponse<Documento>>(`/api/documentos?tienda_id=${tiendaId}&page_size=100`),
+    queryFn: async () =>
+      (await listDocumentos({ query: { tienda_id: tiendaId, page_size: 100 }, throwOnError: true }))
+        .data as unknown as PaginatedResponseDocumento,
     enabled: isOpen,
   });
 
@@ -68,11 +69,23 @@ export function AsociarDocumentoModal({
         if (wasAssociated && !isAssociated) {
           // Remove association
           const newTramiteIds = doc.tramite_ids.filter((id) => id !== tramiteId);
-          promises.push(api.patch(`/api/documentos/${doc.id}`, { tramite_ids: newTramiteIds }));
+          promises.push(
+            updateDocumento({
+              path: { id: doc.id },
+              body: { tramite_ids: newTramiteIds },
+              throwOnError: true,
+            }),
+          );
         } else if (!wasAssociated && isAssociated) {
           // Add association
           const newTramiteIds = [...doc.tramite_ids, tramiteId];
-          promises.push(api.patch(`/api/documentos/${doc.id}`, { tramite_ids: newTramiteIds }));
+          promises.push(
+            updateDocumento({
+              path: { id: doc.id },
+              body: { tramite_ids: newTramiteIds },
+              throwOnError: true,
+            }),
+          );
         }
       });
       return Promise.all(promises);

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
-import type { Alerta } from '@/types';
+import { silenciarAlertas, resolverAlertas, reactivarAlertas } from '@/client/sdk.gen';
+import type { Alerta } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
 import { EmptyState } from '@/components/EmptyState';
 import { Modal } from '@/components/Modal';
@@ -25,8 +25,14 @@ export function TiendaAlertasTab({ alertas, tiendaId }: TiendaAlertasTabProps) {
   const addToast = useUIStore((s) => s.addToast);
 
   const silenciar = useMutation({
-    mutationFn: (id: string) =>
-      api.post(`/api/alertas/${id}/silenciar`, { duracion_dias: duracion }),
+    mutationFn: async (id: string) =>
+      (
+        await silenciarAlertas({
+          path: { id },
+          body: { duracion_dias: duracion },
+          throwOnError: true,
+        })
+      ).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'alertas'] });
       queryClient.invalidateQueries({ queryKey: ['alertas', 'count'] });
@@ -36,7 +42,8 @@ export function TiendaAlertasTab({ alertas, tiendaId }: TiendaAlertasTabProps) {
   });
 
   const resolver = useMutation({
-    mutationFn: (id: string) => api.post(`/api/alertas/${id}/resolver`, {}),
+    mutationFn: async (id: string) =>
+      (await resolverAlertas({ path: { id }, throwOnError: true })).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'alertas'] });
       queryClient.invalidateQueries({ queryKey: ['alertas', 'count'] });
@@ -45,7 +52,8 @@ export function TiendaAlertasTab({ alertas, tiendaId }: TiendaAlertasTabProps) {
   });
 
   const reactivar = useMutation({
-    mutationFn: (id: string) => api.post(`/api/alertas/${id}/reactivar`, {}),
+    mutationFn: async (id: string) =>
+      (await reactivarAlertas({ path: { id }, throwOnError: true })).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'alertas'] });
       queryClient.invalidateQueries({ queryKey: ['alertas', 'count'] });

@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/api/client';
+import { createTramiteForTienda } from '@/client/sdk.gen';
 import { Modal } from '@/components/Modal';
 import { useUIStore } from '@/stores/uiStore';
-import type { Tramite, TramiteFormData as FormData } from '@/types';
+import type { TramiteCreate as FormData } from '@/client/types.gen';
 import { ChevronDown } from 'lucide-react';
 
 export function NuevoTramiteModal({
@@ -41,7 +41,9 @@ export function NuevoTramiteModal({
   const isRecurrente = watch('es_recurrente');
 
   const mutation = useMutation({
-    mutationFn: (data: FormData) => api.post<Tramite>(`/api/tiendas/${tiendaId}/tramites`, data),
+    mutationFn: async (data: FormData) =>
+      (await createTramiteForTienda({ path: { id: tiendaId }, body: data, throwOnError: true }))
+        .data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'expediente'] });
       addToast({ type: 'success', message: 'Trámite creado exitosamente' });

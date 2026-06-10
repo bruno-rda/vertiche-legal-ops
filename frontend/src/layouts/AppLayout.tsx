@@ -2,7 +2,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/api/client';
+import { countAlertasCritical } from '@/client/sdk.gen';
 import {
   LayoutDashboard,
   Store,
@@ -35,7 +35,8 @@ export function AppLayout() {
   // Fetch critical alert count for sidebar badge
   const { data: alertCount } = useQuery({
     queryKey: ['alertas', 'count'],
-    queryFn: () => api.get<{ count: number }>('/api/alertas/count'),
+    queryFn: async () =>
+      (await countAlertasCritical({ throwOnError: true })).data as { count: number },
     refetchInterval: 60000, // Every 60 seconds
   });
 
