@@ -1,5 +1,5 @@
 from app.schemas.alerta import AlertaCountOut, AlertaOut, AlertaSilenciarRequest
-from app.schemas.auth import LoginRequest, LoginResponse
+from app.schemas.auth import LoginResponse
 from app.schemas.dashboard import CumplimientoEstadoOut, DashboardMetricsOut
 from app.schemas.documento import (
     DocumentoOcrReview,
@@ -30,7 +30,6 @@ __all__ = [
     "DocumentoUpdate",
     "ExpedienteOut",
     "HistorialOut",
-    "LoginRequest",
     "LoginResponse",
     "PerformanceDataOut",
     "TiendaOut",
