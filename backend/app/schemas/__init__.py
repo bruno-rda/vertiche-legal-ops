@@ -16,6 +16,8 @@ from app.schemas.usuario import (
     UsuarioOut,
     UsuarioStatusUpdate,
     UsuarioTiendasUpdate,
+    UsuarioResumenTiendasOut,
+    UsuarioPerformanceOut
 )
 
 __all__ = [
@@ -41,4 +43,6 @@ __all__ = [
     "UsuarioOut",
     "UsuarioStatusUpdate",
     "UsuarioTiendasUpdate",
+    "UsuarioResumenTiendasOut",
+    "UsuarioPerformanceOut",
 ]

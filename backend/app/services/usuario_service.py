@@ -1,3 +1,7 @@
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+import itertools
+from typing import Literal
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import audit
@@ -5,6 +9,15 @@ from app.core.exceptions import ConflictError, NotFoundError
 from app.core.security import hash_password
 from app.models.usuario import Usuario
 from app.repositories import usuario_repo
+from app.repositories import historial_repo
+from app.schemas.usuario import (
+    TiendaResumen,
+    UsuarioResumenTiendasOut,
+    MetricTrend,
+    UsuarioPerformanceMetrics,
+    UsuarioPerformanceOut, 
+    ActivityTimelineItem
+)
 
 
 async def get_by_id(db: AsyncSession, id: str) -> Usuario:
@@ -98,3 +111,81 @@ async def update_tiendas(
         payload={"tienda_ids": tienda_ids},
     )
     return user
+
+
+async def delete_usuario(db: AsyncSession, id: str, *, actor: Usuario) -> None:
+    u = await get_by_id(db, id)
+    await usuario_repo.delete(db, u)
+    await audit.record(
+        db,
+        actor_id=actor.id,
+        accion="usuario.delete",
+        entidad="usuario",
+        entidad_id=id,
+        payload={},
+    )
+
+
+async def get_tiendas_resumen(db: AsyncSession, id: str) -> UsuarioResumenTiendasOut:
+    u = await get_by_id(db, id)
+    tiendas = u.tiendas
+    result = []
+    for estado, group in itertools.groupby(tiendas, key=lambda t: t.estado):
+        tiendas_list = list(group)
+        result.append(
+            UsuarioResumenTiendasOut(
+                estado=estado,
+                total_tiendas=len(tiendas_list),
+                vigentes=sum(1 for t in tiendas_list if t.estado_cumplimiento == 'vigente'),
+                por_vencer=sum(1 for t in tiendas_list if t.estado_cumplimiento == 'por_vencer'),
+                criticas=sum(1 for t in tiendas_list if t.estado_cumplimiento == 'critico'),
+                tiendas=[
+                    TiendaResumen.model_validate(t)
+                    for t in tiendas_list
+                ],
+        ))
+
+
+async def get_performance(
+    db: AsyncSession, 
+    id: str, 
+    *,
+    range: Literal['30', 'month', '90']
+) -> UsuarioPerformanceOut:
+    if range in ['30', '90']:
+        days = int(range)
+        period_start = datetime.now() - timedelta(days=days)
+        prev_period_start = period_start - timedelta(days=days)
+        prev_period_end = period_start
+
+    elif range == 'month':
+        now = datetime.now()
+        period_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        prev_period_start = period_start - relativedelta(months=1)
+        prev_period_end = prev_period_start + (now - period_start)
+
+    current_records = await historial_repo.get_by_actor(
+        db, id, since=period_start, until=now,
+    )
+    prev_records = await historial_repo.get_by_actor(
+        db, id, since=prev_period_start, until=prev_period_end,
+    )
+
+    return UsuarioPerformanceOut(
+        metrics=UsuarioPerformanceMetrics(
+            documentos_cargados=MetricTrend(0, 0, "neutral"),
+            tramites_resueltos=MetricTrend(0, 0, "neutral"),
+            alertas_atendidas=MetricTrend(0, 0, "neutral"),
+            tiempo_promedio_resolucion=MetricTrend(0, 0, "neutral"),
+            tramites_vencidos_responsabilidad=MetricTrend(0, 0, "neutral"),
+        ),
+        timeline=[
+            ActivityTimelineItem(
+                id="0",
+                accion="test",
+                fecha=datetime.now().isoformat(),
+                tienda_id="0",
+                tienda_nombre="Dont click me",
+            )
+        ]
+    )

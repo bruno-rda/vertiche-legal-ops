@@ -19,13 +19,16 @@ async def get_by_entity(
 
 
 async def get_by_actor(
-    db: AsyncSession, actor_id: str, *, since: datetime, limit: int = 100
+    db: AsyncSession, actor_id: str, *, since: datetime, until: datetime
 ) -> list[Historial]:
     stmt = (
         select(Historial)
-        .where((Historial.actor_id == actor_id) & (Historial.timestamp >= since))
+        .where(
+            (Historial.actor_id == actor_id) &
+            (Historial.timestamp >= since) &
+            (Historial.timestamp <= until)
+        )
         .order_by(Historial.timestamp.desc())
-        .limit(limit)
     )
     result = await db.execute(stmt)
     return list(result.scalars().all())
