@@ -125,7 +125,7 @@ async def delete_usuario(db: AsyncSession, id: str, *, actor: Usuario) -> None:
     )
 
 
-async def get_tiendas_resumen(db: AsyncSession, id: str) -> UsuarioResumenTiendas:
+async def get_tiendas_resumen(db: AsyncSession, id: str) -> list[UsuarioResumenTiendas]:
     u = await get_by_id(db, id)
     tiendas = u.tiendas
     result = []
@@ -147,6 +147,8 @@ async def get_tiendas_resumen(db: AsyncSession, id: str) -> UsuarioResumenTienda
                 tiendas=[TiendaResumen.model_validate(t) for t in tiendas_list],
             )
         )
+    
+    return result
 
 
 async def get_performance(
