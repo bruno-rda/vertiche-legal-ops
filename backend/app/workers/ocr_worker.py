@@ -7,6 +7,7 @@ from app.core import audit, storage
 from app.database import AsyncSessionLocal
 from app.integrations.ocr import ocr_engine
 from app.repositories import documento_repo
+from app.workers.llm_worker import extract_fields_task
 
 logger = logging.getLogger(__name__)
 
@@ -66,13 +67,15 @@ async def process_ocr(ctx, document_id: str):
             await db.commit()
             logger.info(f"Finished OCR for document {document_id}")
 
+            if estado == "pendiente_extraccion":
+                await ctx["redis"].enqueue_job("extract_fields_task", doc.id)
+
         except Exception:
             logger.exception(f"Error processing document {document_id}")
             doc = await documento_repo.update(db, doc, estado_ocr="error")
             await db.commit()
 
 
-# ARQ worker configuration
 class WorkerSettings:
-    functions = [process_ocr]
+    functions = [process_ocr, extract_fields_task]
     redis_settings = RedisSettings(host=settings.redis_host, port=settings.redis_port)

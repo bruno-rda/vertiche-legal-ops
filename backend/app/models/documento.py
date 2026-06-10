@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, func
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -27,6 +27,10 @@ class Documento(Base):
     ocr_metrics: Mapped[dict | None] = mapped_column(JSONB)
     datos_extraidos: Mapped[dict | None] = mapped_column(JSONB)
     requiere_revision_manual: Mapped[bool] = mapped_column(Boolean, default=False)
+    categoria: Mapped[str | None] = mapped_column(String(50))
+    fecha_fin_vigencia: Mapped[date | None] = mapped_column(Date)
+    es_permanente: Mapped[bool] = mapped_column(Boolean, default=False)
+    confianza_extraccion: Mapped[str | None] = mapped_column(String(30))
 
     cargado_por: Mapped[str] = mapped_column(
         String(36), ForeignKey("usuarios.id", ondelete="SET NULL")

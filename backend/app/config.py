@@ -36,6 +36,11 @@ class Settings(BaseSettings):
     minio_bucket: str = "vertiche-documentos"
     minio_secure: bool = False
 
+    # Ollama LLM
+    ollama_url: str = "http://localhost:11434/api/chat"
+    ollama_model: str = "qwen2.5:7b-instruct-q4_K_M"
+    ollama_timeout: int = 120
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
