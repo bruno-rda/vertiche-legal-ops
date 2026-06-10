@@ -82,19 +82,6 @@ async def list_tramites(
     return paginate([_serialize_tramite(t) for t in items], total, page, page_size)
 
 
-@router.post("", response_model=TramiteOut, status_code=201)
-async def create_tramite(
-    db: DbSession, current_user: CurrentUser, tienda_id: str, data: TramiteCreate
-):
-    t = await tramite_service.create(
-        db,
-        tienda_id=tienda_id,
-        actor=current_user,
-        **data.model_dump(exclude_unset=True),
-    )
-    return _serialize_tramite(t)
-
-
 @router.get("/{id}", response_model=TramiteOut)
 async def get_tramite(db: DbSession, id: str, current_user: CurrentUser):
     t = await tramite_service.get_by_id(db, id, current_user=current_user)
