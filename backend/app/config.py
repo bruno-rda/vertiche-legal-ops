@@ -28,7 +28,13 @@ class Settings(BaseSettings):
     ocr_confidence_threshold: float = 0.80
     alert_scan_interval_hours: int = 6
     environment: str = "development"
-    upload_dir: str = "./media"
+
+    # Minio
+    minio_endpoint: str = "localhost:9000"
+    minio_access_key: str = "minioadmin"
+    minio_secret_key: str = "minioadmin"
+    minio_bucket: str = "vertiche-documentos"
+    minio_secure: bool = False
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

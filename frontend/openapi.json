@@ -679,50 +679,6 @@
                         }
                     }
                 }
-            },
-            "post": {
-                "tags": [
-                    "documentos"
-                ],
-                "summary": "Upload Documento",
-                "operationId": "upload_documento",
-                "security": [
-                    {
-                        "OAuth2PasswordBearer": []
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Body_upload_documento_api_documentos_post"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Documento"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
             }
         },
         "/api/documentos/{id}": {
@@ -851,6 +807,62 @@
                 "responses": {
                     "204": {
                         "description": "Successful Response"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/documentos/{id}/url": {
+            "get": {
+                "tags": [
+                    "documentos"
+                ],
+                "summary": "Get Documento Url",
+                "operationId": "get_documento_url",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Id"
+                        }
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "title": "Download"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DocumentoUrl"
+                                }
+                            }
+                        }
                     },
                     "422": {
                         "description": "Validation Error",
@@ -2596,20 +2608,6 @@
                 ],
                 "title": "Body_login_api_auth_login_post"
             },
-            "Body_upload_documento_api_documentos_post": {
-                "properties": {
-                    "file": {
-                        "type": "string",
-                        "contentMediaType": "application/octet-stream",
-                        "title": "File"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "file"
-                ],
-                "title": "Body_upload_documento_api_documentos_post"
-            },
             "Body_upload_documento_for_tienda_api_tiendas__id__documentos_post": {
                 "properties": {
                     "file": {
@@ -2742,9 +2740,9 @@
                         "type": "string",
                         "title": "Nombre Archivo"
                     },
-                    "url": {
+                    "ruta_archivo": {
                         "type": "string",
-                        "title": "Url"
+                        "title": "Ruta Archivo"
                     },
                     "estado_ocr": {
                         "$ref": "#/components/schemas/EstadoOCR"
@@ -2814,7 +2812,7 @@
                     "id",
                     "tramite_ids",
                     "nombre_archivo",
-                    "url",
+                    "ruta_archivo",
                     "estado_ocr",
                     "requiere_revision_manual",
                     "cargado_por",
@@ -2870,6 +2868,19 @@
                 },
                 "type": "object",
                 "title": "DocumentoUpdate"
+            },
+            "DocumentoUrl": {
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "title": "Url"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "url"
+                ],
+                "title": "DocumentoUrl"
             },
             "EntidadTipo": {
                 "type": "string",

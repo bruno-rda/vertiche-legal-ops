@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { acceptOcrReview, renameDocumento } from '@/client/sdk.gen';
 import { Modal } from './Modal';
-import { PDFViewer } from './PDFViewer';
+import { DocumentPDFViewer } from './DocumentPDFViewer';
 import type { Documento } from '@/client/types.gen';
 import { useUIStore } from '@/stores/uiStore';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -112,7 +112,7 @@ export function OCRReviewModal({ documento, isOpen, onClose, mode = 'review' }: 
         <div className="flex h-full gap-6">
           {/* Left panel: PDF Viewer */}
           <div className="flex-1 border border-border rounded-lg overflow-hidden flex flex-col bg-neutral-light">
-            <PDFViewer url={documento.url} title={documento.nombre_archivo} />
+            <DocumentPDFViewer documentoId={documento.id} title={documento.nombre_archivo} />
           </div>
 
           {/* Right panel: Form */}

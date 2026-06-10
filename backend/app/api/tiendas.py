@@ -165,10 +165,14 @@ async def upload_documento_for_tienda(
     await tienda_service.get_by_id(db, id, current_user=current_user)
 
     content = await file.read()
-    name = file_name or file.filename
+    name = file.filename
+    if file_name:
+        name = file_name + "." + name.split(".")[-1]
 
+    storage_client = request.app.state.storage_client
     doc = await documento_service.create_from_upload(
         db,
+        storage_client=storage_client,
         file_content=content,
         filename=name,
         actor=current_user,

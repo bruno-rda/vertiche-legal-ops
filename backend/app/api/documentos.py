@@ -1,12 +1,14 @@
-from fastapi import APIRouter, File, Request, UploadFile
+from fastapi import APIRouter, Request
 
 from app.api.deps import CurrentUser, DbSession
+from app.core import storage
 from app.core.pagination import PaginatedResponse, paginate
 from app.schemas.documento import (
     Documento,
     DocumentoOcrReview,
     DocumentoRename,
     DocumentoUpdate,
+    DocumentoUrl,
 )
 from app.services import documento_service
 
@@ -19,7 +21,7 @@ def _serialize_documento(d) -> dict:
         "tramite_ids": [t.id for t in getattr(d, "tramites", [])],
         "tramite_nombres": [t.nombre for t in getattr(d, "tramites", [])],
         "nombre_archivo": d.nombre_archivo,
-        "url": d.url,
+        "ruta_archivo": d.ruta_archivo,
         "estado_ocr": d.estado_ocr,
         "datos_extraidos": d.datos_extraidos,
         "requiere_revision_manual": d.requiere_revision_manual,
@@ -59,32 +61,22 @@ async def list_documentos(
     return paginate([_serialize_documento(d) for d in items], total, page, page_size)
 
 
-@router.post("", response_model=Documento, status_code=201)
-async def upload_documento(
-    request: Request,
-    db: DbSession,
-    current_user: CurrentUser,
-    file: UploadFile = File(...),
-):
-    content = await file.read()
-    doc = await documento_service.create_from_upload(
-        db,
-        file_content=content,
-        filename=file.filename or "document.pdf",
-        actor=current_user,
-    )
-
-    # Fire off OCR worker asynchronously via ARQ
-    redis = request.app.state.redis
-    await redis.enqueue_job("process_ocr", doc.id)
-
-    return _serialize_documento(doc)
-
-
 @router.get("/{id}", response_model=Documento)
 async def get_documento(db: DbSession, id: str, current_user: CurrentUser):
     doc = await documento_service.get_by_id(db, id, current_user=current_user)
     return _serialize_documento(doc)
+
+
+@router.get("/{id}/url", response_model=DocumentoUrl)
+async def get_documento_url(
+    request: Request, db: DbSession, id: str, download: bool, current_user: CurrentUser
+):
+    doc = await documento_service.get_by_id(db, id, current_user=current_user)
+    if not doc.ruta_archivo:
+        return {"url": ""}
+    storage_client = request.app.state.storage_client
+    url = await storage.get_presigned_url(storage_client, doc.ruta_archivo, download=download)
+    return {"url": url}
 
 
 @router.patch("/{id}", response_model=Documento)
@@ -120,5 +112,10 @@ async def accept_ocr_review(
 
 
 @router.delete("/{id}", status_code=204)
-async def delete_documento(db: DbSession, id: str, current_user: CurrentUser):
-    await documento_service.delete(db, id, actor=current_user)
+async def delete_documento(
+    request: Request, db: DbSession, id: str, current_user: CurrentUser
+):
+    storage_client = request.app.state.storage_client
+    await documento_service.delete(
+        db, id, storage_client=storage_client, actor=current_user
+    )

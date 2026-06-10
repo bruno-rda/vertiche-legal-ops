@@ -40,7 +40,7 @@ def _serialize_tramite(t) -> dict:
                 "id": d.id,
                 "tramite_ids": [],
                 "nombre_archivo": d.nombre_archivo,
-                "url": d.url,
+                "ruta_archivo": d.ruta_archivo,
                 "estado_ocr": d.estado_ocr,
                 "datos_extraidos": d.datos_extraidos,
                 "requiere_revision_manual": d.requiere_revision_manual,

@@ -21,7 +21,7 @@ class Documento(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     nombre_archivo: Mapped[str] = mapped_column(String(500))
-    url: Mapped[str] = mapped_column(Text)
+    ruta_archivo: Mapped[str] = mapped_column(Text)
     estado_ocr: Mapped[str] = mapped_column(String(30), default="procesando")
     datos_extraidos: Mapped[dict | None] = mapped_column(JSONB)
     requiere_revision_manual: Mapped[bool] = mapped_column(Boolean, default=False)

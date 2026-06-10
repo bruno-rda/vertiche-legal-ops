@@ -1,42 +1,55 @@
-import os
-import uuid
+import io
+from datetime import timedelta
 
-import aiofiles
+from minio import Minio
 
 from app.config import settings
 
 
-async def save_file(file_content: bytes, original_filename: str) -> str:
-    """Saves file to UPLOAD_DIR and returns the relative path for DB storage."""
-    os.makedirs(settings.upload_dir, exist_ok=True)
+async def save_file(
+    client: Minio, file_content: bytes, filename: str
+) -> str:
+    file_stream = io.BytesIO(file_content)
+    length = len(file_content)
 
-    extension = os.path.splitext(original_filename)[1]
-    stored_filename = f"{uuid.uuid4()}{extension}"
-    relative_path = f"uploads/{stored_filename}"
-
-    upload_subdir = os.path.join(settings.upload_dir, "uploads")
-    os.makedirs(upload_subdir, exist_ok=True)
-
-    full_path = os.path.join(settings.upload_dir, relative_path)
-
-    async with aiofiles.open(full_path, "wb") as f:
-        await f.write(file_content)
-
-    return relative_path
-
-
-def get_file_url(relative_path: str) -> str:
-    """Converts a stored relative path to a URL the frontend can fetch."""
-    return f"/media/{relative_path}"
+    client.put_object(
+        settings.minio_bucket,
+        filename,
+        file_stream,
+        length,
+        content_type=(
+            "application/pdf"
+            if filename.endswith(".pdf")
+            else "application/octet-stream"
+        ),
+    )
+    return f"{settings.minio_bucket}/{filename}"
 
 
-async def delete_file(relative_path: str) -> bool:
-    """Deletes file from UPLOAD_DIR."""
-    full_path = os.path.join(settings.upload_dir, relative_path)
-    if os.path.exists(full_path):
-        try:
-            os.remove(full_path)
-            return True
-        except Exception:
-            return False
-    return False
+async def delete_file(client: Minio, minio_path: str) -> None:
+    bucket, object_name = minio_path.split("/", 1)
+    try:
+        client.remove_object(bucket, object_name)
+    except Exception:
+        pass
+
+
+async def get_presigned_url(
+    client: Minio, minio_path: str, download: bool = False
+) -> str:
+    bucket, object_name = minio_path.split("/", 1)
+    filename = object_name.split("/")[-1]
+    key = "attachment" if download else "inline"
+
+    try:
+        url = client.presigned_get_object(
+            bucket_name=bucket,
+            object_name=object_name,
+            expires=timedelta(minutes=60),
+            response_headers={
+                "response-content-disposition": f'{key}; filename="{filename}"'
+            },
+        )
+        return url
+    except Exception:
+        return ""

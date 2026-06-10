@@ -11,6 +11,10 @@ class DocumentoRename(BaseModel):
     nombre_archivo: str
 
 
+class DocumentoUrl(BaseModel):
+    url: str
+
+
 class EstadoOCR(StrEnum):
     PROCESANDO = "procesando"
     COMPLETADO = "completado"
@@ -34,7 +38,7 @@ class Documento(BaseModel):
     tramite_ids: list[str]
     tramite_nombres: list[str] | None = None
     nombre_archivo: str
-    url: str
+    ruta_archivo: str
     estado_ocr: EstadoOCR
     datos_extraidos: dict[str, CampoExtraidoDocumento] | None = None
     requiere_revision_manual: bool

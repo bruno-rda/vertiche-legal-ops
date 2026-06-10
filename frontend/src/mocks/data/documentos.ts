@@ -44,7 +44,7 @@ function generateDocumentosForTramites(): Documento[] {
         tramite_ids: [tramite.id],
         tramite_nombres: [tramite.nombre],
         nombre_archivo: `${tramite.tienda_id}_${docName}`,
-        url: `https://api.vertiche.com/docs/${docCounter}/${docName}`,
+        ruta_archivo: `https://api.vertiche.com/docs/${docCounter}/${docName}`,
         estado_ocr: estadoOcr,
         datos_extraidos:
           estadoOcr === 'completado' || estadoOcr === 'baja_confianza'

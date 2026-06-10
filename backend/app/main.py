@@ -7,7 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.routing import APIRoute
-from fastapi.staticfiles import StaticFiles
+from minio import Minio
 
 from app.api import api_router
 from app.config import settings
@@ -31,11 +31,19 @@ async def lifespan(app: FastAPI):
     scheduler.start()
     app.state.scheduler = scheduler
 
+    # Setup Storage Client
+    app.state.storage_client = Minio(
+        settings.minio_endpoint,
+        access_key=settings.minio_access_key,
+        secret_key=settings.minio_secret_key,
+        secure=settings.minio_secure,
+    )
+
     yield
 
     # Shutdown
     scheduler.shutdown()
-    app.state.redis.close()
+    await app.state.redis.close()
 
 
 app = FastAPI(
@@ -61,13 +69,6 @@ async def app_exception_handler(request: Request, exc: AppError) -> JSONResponse
         status_code=exc.status_code,
         content={"code": exc.code, "detail": exc.detail},
     )
-
-
-if settings.environment == "development":
-    import os
-
-    os.makedirs(settings.upload_dir, exist_ok=True)
-    app.mount("/media", StaticFiles(directory=settings.upload_dir), name="media")
 
 
 @app.get("/health")

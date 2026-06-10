@@ -4,10 +4,7 @@ import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, AlertCircle } fro
 import { Skeleton } from './Skeleton';
 
 // Configure PDF worker to load locally via Vite
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -16,9 +13,10 @@ interface PDFViewerProps {
   url: string;
   title: string;
   onClose?: () => void;
+  onDownload?: () => void;
 }
 
-export function PDFViewer({ url, title, onClose }: PDFViewerProps) {
+export function PDFViewer({ url, title, onClose, onDownload }: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number>();
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
@@ -49,12 +47,10 @@ export function PDFViewer({ url, title, onClose }: PDFViewerProps) {
   const zoomOut = () => setScale((prevScale) => Math.max(prevScale - 0.25, 0.5));
 
   const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${title}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (onDownload) {
+      onDownload();
+      return;
+    }
   };
 
   return (
@@ -146,7 +142,7 @@ export function PDFViewer({ url, title, onClose }: PDFViewerProps) {
       <div className="flex-1 overflow-auto bg-neutral-light flex items-center justify-center p-4">
         {error ? (
           <div className="text-center py-12 px-4">
-            <AlertCircle size={48} className="mx-auto text-danger-light mb-4" />
+            <AlertCircle size={48} className="mx-auto text-danger mb-4" />
             <h3 className="text-lg font-display text-text-primary mb-2">
               No se pudo cargar el documento
             </h3>

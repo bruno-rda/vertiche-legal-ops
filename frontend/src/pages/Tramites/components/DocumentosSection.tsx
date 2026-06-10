@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { listDocumentos, uploadDocumento } from '@/client/sdk.gen';
+import { listDocumentos, uploadDocumentoForTienda } from '@/client/sdk.gen';
 import type { Documento } from '@/client/types.gen';
 import type { PaginatedResponseDocumento } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
@@ -12,7 +12,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { FileText, UploadCloud, Link } from 'lucide-react';
 import { AsociarDocumentoModal } from './AsociarDocumentoModal';
 import { Modal } from '@/components/Modal';
-import { PDFViewer } from '@/components/PDFViewer';
+import { DocumentPDFViewer } from '@/components/DocumentPDFViewer';
 import { OCRReviewModal } from '@/components/OCRReviewModal';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { deleteDocumento } from '@/client/sdk.gen';
@@ -69,8 +69,9 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
       return (
-        await uploadDocumento({
-          body: { file, tramite_ids: [tramiteId] } as any,
+        await uploadDocumentoForTienda({
+          path: { id: tiendaId },
+          body: { file: file, tramite_ids: [tramiteId] },
           throwOnError: true,
         })
       ).data;
@@ -264,7 +265,10 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
       >
         <div className="h-full">
           {documentToView && (
-            <PDFViewer url={documentToView.url} title={documentToView.nombre_archivo} />
+            <DocumentPDFViewer
+              documentoId={documentToView.id}
+              title={documentToView.nombre_archivo}
+            />
           )}
         </div>
       </Modal>

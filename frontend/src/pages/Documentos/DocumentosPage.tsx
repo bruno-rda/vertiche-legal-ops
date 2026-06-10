@@ -12,7 +12,7 @@ import { ChevronDown, FileSearch, Edit2 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { Modal } from '@/components/Modal';
-import { PDFViewer } from '@/components/PDFViewer';
+import { DocumentPDFViewer } from '@/components/DocumentPDFViewer';
 import { OCRReviewModal } from '@/components/OCRReviewModal';
 
 export function DocumentosPage() {
@@ -237,7 +237,10 @@ export function DocumentosPage() {
       >
         <div className="h-full">
           {documentToView && (
-            <PDFViewer url={documentToView.url} title={documentToView.nombre_archivo} />
+            <DocumentPDFViewer
+              documentoId={documentToView.id}
+              title={documentToView.nombre_archivo}
+            />
           )}
         </div>
       </Modal>

@@ -58,21 +58,24 @@ async def get_many(
 async def create_from_upload(
     db: AsyncSession,
     *,
+    storage_client,
     file_content: bytes,
     filename: str,
     actor: Usuario,
     tienda_id: str | None = None,
 ) -> Documento:
     # 1. Save file to disk
-    relative_path = await storage.save_file(file_content, filename)
+    doc_id = str(uuid.uuid4())
+    relative_path = await storage.save_file(
+        storage_client, file_content, f"{doc_id}/{filename}"
+    )
 
     # 2. Create database record
-    doc_id = str(uuid.uuid4())
     doc = await documento_repo.create(
         db,
         id=doc_id,
         nombre_archivo=filename,
-        url=relative_path,
+        ruta_archivo=relative_path,
         cargado_por=actor.id,
         tienda_id=tienda_id,
     )
@@ -178,12 +181,12 @@ async def accept_ocr_review(
     return doc
 
 
-async def delete(db: AsyncSession, id: str, *, actor: Usuario) -> None:
+async def delete(db: AsyncSession, id: str, *, storage_client, actor: Usuario) -> None:
     doc = await get_by_id(db, id, current_user=actor)
 
     # Delete file from storage
-    if doc.url:
-        await storage.delete_file(doc.url)
+    if doc.ruta_archivo:
+        await storage.delete_file(storage_client, doc.ruta_archivo)
 
     await documento_repo.delete_by_id(db, id)
 

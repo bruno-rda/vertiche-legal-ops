@@ -33,7 +33,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { DocumentUploadModal } from './components/DocumentUploadModal';
 import { OCRReviewModal } from '@/components/OCRReviewModal';
 import { Modal } from '@/components/Modal';
-import { PDFViewer } from '@/components/PDFViewer';
+import { DocumentPDFViewer } from '@/components/DocumentPDFViewer';
 import { Edit2, Trash2 } from 'lucide-react';
 import { TiendaEditModal } from './components/TiendaEditModal';
 import { ConfirmModal } from '@/components/ConfirmModal';
@@ -368,7 +368,10 @@ export function TiendaDetailPage() {
       >
         <div className="h-full">
           {documentToView && (
-            <PDFViewer url={documentToView.url} title={documentToView.nombre_archivo} />
+            <DocumentPDFViewer
+              documentoId={documentToView.id}
+              title={documentToView.nombre_archivo}
+            />
           )}
         </div>
       </Modal>
