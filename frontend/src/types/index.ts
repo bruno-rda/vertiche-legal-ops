@@ -3,6 +3,7 @@
 // Once the OpenAPI spec is available, these should be auto-generated.
 
 export type UserRole = 'ADMIN' | 'OPERATOR' | 'VIEWER';
+export type UserEstado = 'activo' | 'inactivo'
 
 export interface User {
   id: string;
@@ -11,7 +12,7 @@ export interface User {
   rol: UserRole;
   tiendas_asignadas?: string[];
   fecha_creacion: string;
-  estado: 'activo' | 'inactivo';
+  estado: UserEstado;
 }
 
 export type TramiteEstado =
@@ -40,18 +41,21 @@ export interface Tienda {
   ultima_actualizacion: string;
 }
 
+export type TramiteTipo = 'federal' | 'estatal' | 'municipal';
+export type PeriodoRecurrencia = 'anual' | 'bianual';
+
 export interface Tramite {
   id: string;
   tienda_id: string;
   tienda_nombre?: string;
   nombre: string;
-  tipo: 'federal' | 'estatal' | 'municipal';
+  tipo: TramiteTipo;
   estado: TramiteEstado;
   fecha_inicio: string;
   fecha_vencimiento: string;
   es_permanente?: boolean;
   es_recurrente: boolean;
-  periodo_recurrencia?: string;
+  periodo_recurrencia?: PeriodoRecurrencia;
   observaciones: Observacion[];
   documentos: Documento[];
   historial: HistorialItem[];
@@ -199,7 +203,55 @@ export interface ActivityTimelineItem {
   tramite_nombre?: string;
 }
 
+export type TimeRange = '30' | 'month' | '90';
+
 export interface OperatorPerformanceData {
   metrics: OperatorPerformanceMetrics;
   timeline: ActivityTimelineItem[];
 }
+
+export interface TiendaResumen {
+  id: string;
+  nombre: string;
+  municipio: string;
+  estado_cumplimiento: EstadoCumplimiento;
+}
+
+export interface EstadoResumen {
+  estado: string;
+  total_tiendas: number;
+  vigentes: number;
+  por_vencer: number;
+  criticas: number;
+  tiendas: TiendaResumen[];
+}
+
+export type TramiteFormData = {
+  nombre: string;
+  tipo: TramiteTipo;
+  fecha_inicio: string;
+  fecha_vencimiento: string;
+  es_permanente: boolean;
+  es_recurrente: boolean;
+  periodo_recurrencia: PeriodoRecurrencia;
+};
+
+export type TiendaFormData = {
+  nombre: string;
+  estado: string;
+  municipio: string;
+  direccion: string;
+};
+
+export type TramiteUpdateFormData = {
+  nombre: string;
+  fecha_inicio: string;
+  fecha_vencimiento: string;
+  es_permanente: boolean;
+};
+
+export type UsuarioInviteFormData = {
+  nombre: string;
+  email: string;
+  rol: UserRole;
+};

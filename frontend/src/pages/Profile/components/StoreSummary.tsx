@@ -1,27 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/client';
+import type { EstadoResumen } from '@/types';
 import { Badge } from '@/components/Badge';
 import { Skeleton } from '@/components/Skeleton';
 import { EmptyState } from '@/components/EmptyState';
 import { ChevronDown, ChevronRight, Store, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface TiendaResumen {
-  id: string;
-  nombre: string;
-  municipio: string;
-  estado_cumplimiento: 'vigente' | 'en_riesgo' | 'critico';
-}
-
-interface EstadoResumen {
-  estado: string;
-  total_tiendas: number;
-  vigentes: number;
-  por_vencer: number;
-  criticas: number;
-  tiendas: TiendaResumen[];
-}
 
 interface StoreSummaryProps {
   userId: string;

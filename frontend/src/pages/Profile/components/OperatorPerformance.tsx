@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/client';
+import type { TimeRange } from '@/types';
 import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/Skeleton';
 import type { OperatorPerformanceData, MetricTrend } from '@/types';
@@ -21,8 +22,6 @@ import {
 interface OperatorPerformanceProps {
   userId: string;
 }
-
-type TimeRange = '30' | 'month' | '90';
 
 export function OperatorPerformance({ userId }: OperatorPerformanceProps) {
   const [range, setRange] = useState<TimeRange>('30');
@@ -66,12 +65,12 @@ export function OperatorPerformance({ userId }: OperatorPerformanceProps) {
     const trendText =
       metric.trend === 'up'
         ? `+${Math.abs(metric.value - metric.previous_value)
-            .toFixed(isNegativeMetric ? 1 : 0)
-            .replace(/\.0$/, '')}`
+          .toFixed(isNegativeMetric ? 1 : 0)
+          .replace(/\.0$/, '')}`
         : metric.trend === 'down'
           ? `-${Math.abs(metric.previous_value - metric.value)
-              .toFixed(isNegativeMetric ? 1 : 0)
-              .replace(/\.0$/, '')}`
+            .toFixed(isNegativeMetric ? 1 : 0)
+            .replace(/\.0$/, '')}`
           : 'Sin cambio';
 
     return (
@@ -121,31 +120,28 @@ export function OperatorPerformance({ userId }: OperatorPerformanceProps) {
         <div className="flex items-center bg-surface border border-border rounded-lg p-1">
           <button
             onClick={() => handleRangeChange('30')}
-            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              range === '30'
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${range === '30'
                 ? 'bg-surface-card shadow-sm text-text-primary'
                 : 'text-text-secondary hover:text-text-primary'
-            }`}
+              }`}
           >
             Últimos 30 días
           </button>
           <button
             onClick={() => handleRangeChange('month')}
-            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              range === 'month'
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${range === 'month'
                 ? 'bg-surface-card shadow-sm text-text-primary'
                 : 'text-text-secondary hover:text-text-primary'
-            }`}
+              }`}
           >
             Mes en curso
           </button>
           <button
             onClick={() => handleRangeChange('90')}
-            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              range === '90'
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${range === '90'
                 ? 'bg-surface-card shadow-sm text-text-primary'
                 : 'text-text-secondary hover:text-text-primary'
-            }`}
+              }`}
           >
             Últimos 90 días
           </button>

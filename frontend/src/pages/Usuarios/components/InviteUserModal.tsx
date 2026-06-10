@@ -4,13 +4,7 @@ import { api } from '@/api/client';
 import { Modal } from '@/components/Modal';
 import { useUIStore } from '@/stores/uiStore';
 import { ChevronDown } from 'lucide-react';
-import type { User, UserRole } from '@/types';
-
-type FormData = {
-  nombre: string;
-  email: string;
-  rol: UserRole;
-};
+import type { User, UsuarioInviteFormData as FormData } from '@/types';
 
 export function InviteUserModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const queryClient = useQueryClient();

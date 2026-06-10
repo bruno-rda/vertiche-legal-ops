@@ -3,18 +3,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import { Modal } from '@/components/Modal';
 import { useUIStore } from '@/stores/uiStore';
-import type { Tramite } from '@/types';
+import type { Tramite, TramiteFormData as FormData } from '@/types';
 import { ChevronDown } from 'lucide-react';
-
-type FormData = {
-  nombre: string;
-  tipo: 'federal' | 'estatal' | 'municipal';
-  fecha_inicio: string;
-  fecha_vencimiento: string;
-  es_permanente: boolean;
-  es_recurrente: boolean;
-  periodo_recurrencia: 'anual' | 'bianual';
-};
 
 export function NuevoTramiteModal({
   isOpen,

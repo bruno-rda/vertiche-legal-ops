@@ -4,14 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import { Modal } from '@/components/Modal';
 import { useUIStore } from '@/stores/uiStore';
-import type { Tramite } from '@/types';
-
-type FormData = {
-  nombre: string;
-  fecha_inicio: string;
-  fecha_vencimiento: string;
-  es_permanente: boolean;
-};
+import type { Tramite, TramiteUpdateFormData as FormData } from '@/types';
 
 export function TramiteEditModal({
   isOpen,

@@ -3,15 +3,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import { Modal } from '@/components/Modal';
 import { useUIStore } from '@/stores/uiStore';
-import type { Tienda } from '@/types';
+import type { Tienda, TiendaFormData as FormData } from '@/types';
 import { ChevronDown } from 'lucide-react';
-
-type FormData = {
-  nombre: string;
-  estado: string;
-  municipio: string;
-  direccion: string;
-};
 
 import { ESTADOS_MEXICO } from '@/lib/constants';
 
