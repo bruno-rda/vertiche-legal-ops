@@ -1,9 +1,21 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, File, Form, Request, UploadFile
 
+from app.api.alertas import _serialize_alerta
 from app.api.deps import CurrentUser, DbSession, RequireAdmin
+from app.api.documentos import _serialize_documento
+from app.api.tramites import _serialize_tramite
 from app.core.pagination import PaginatedResponse, paginate
+from app.schemas.alerta import AlertaOut
+from app.schemas.documento import DocumentoOut
+from app.schemas.historial import HistorialOut
 from app.schemas.tienda import ExpedienteOut, TiendaOut, TiendaUpdate
-from app.services import tienda_service
+from app.schemas.tramite import TramiteCreate, TramiteOut
+from app.services import (
+    alerta_service,
+    documento_service,
+    tienda_service,
+    tramite_service,
+)
 
 router = APIRouter()
 
@@ -61,7 +73,7 @@ async def get_tienda(db: DbSession, id: str, current_user: CurrentUser):
     return _serialize_tienda(t)
 
 
-@router.patch("/{id}", response_model=TiendaOut)
+@router.put("/{id}", response_model=TiendaOut)
 async def update_tienda(
     db: DbSession, id: str, data: TiendaUpdate, admin: RequireAdmin
 ):
@@ -86,3 +98,98 @@ async def get_expediente(db: DbSession, id: str, current_user: CurrentUser):
         # this is a simplified payload just to satisfy the folder view requirements
         "tramites": [],
     }
+
+
+@router.post("/{id}/tramites", response_model=TramiteOut, status_code=201)
+async def create_tramite_for_tienda(
+    db: DbSession, id: str, data: TramiteCreate, current_user: CurrentUser
+):
+    # Verifies store access
+    await tienda_service.get_by_id(db, id, current_user=current_user)
+    t = await tramite_service.create(
+        db, tienda_id=id, actor=current_user, **data.model_dump(exclude_unset=True)
+    )
+    return _serialize_tramite(t)
+
+
+@router.get("/{id}/alertas", response_model=list[AlertaOut])
+async def get_alertas_for_tienda(db: DbSession, id: str, current_user: CurrentUser):
+    # Ensure user has access
+    await tienda_service.get_by_id(db, id, current_user=current_user)
+    items = await alerta_service.get_many(db, tienda_id=id, current_user=current_user)
+    return [_serialize_alerta(a) for a in items]
+
+
+@router.get("/{id}/documentos", response_model=PaginatedResponse[DocumentoOut])
+async def get_documentos_for_tienda(
+    db: DbSession,
+    id: str,
+    current_user: CurrentUser,
+    page: int = 1,
+    page_size: int = 25,
+):
+    # Ensure user has access
+    await tienda_service.get_by_id(db, id, current_user=current_user)
+    items, total = await documento_service.get_many(
+        db, tienda_id=id, current_user=current_user, page=page, page_size=page_size
+    )
+    return paginate([_serialize_documento(d) for d in items], total, page, page_size)
+
+
+@router.post("/{id}/documentos", response_model=DocumentoOut, status_code=201)
+async def upload_documento_for_tienda(
+    request: Request,
+    db: DbSession,
+    id: str,
+    current_user: CurrentUser,
+    file: UploadFile = File(None),
+    file_name: str = Form(None),
+    tramite_ids: list[str] = Form(None),
+):
+    # Ensure user has access
+    await tienda_service.get_by_id(db, id, current_user=current_user)
+
+    content = await file.read()
+    name = file_name or file.filename
+
+    doc = await documento_service.create_from_upload(
+        db,
+        file_content=content,
+        filename=name,
+        actor=current_user,
+    )
+
+    doc = await documento_service.update_tramites(
+        db, doc.id, tramite_ids=tramite_ids, actor=current_user
+    )
+
+    # Fire off OCR worker asynchronously via ARQ
+    redis = request.app.state.redis
+    await redis.enqueue_job("process_ocr", doc.id)
+
+    return _serialize_documento(doc)
+
+
+@router.get("/{id}/historial", response_model=list[HistorialOut])
+async def get_historial_for_tienda(db: DbSession, id: str, current_user: CurrentUser):
+    # Verify access
+    await tienda_service.get_by_id(db, id, current_user=current_user)
+
+    from app.repositories import historial_repo
+
+    hist = await historial_repo.get_by_entity(db, "tienda", id)
+
+    return [
+        {
+            "id": h.id,
+            "entidad_tipo": h.entidad,
+            "entidad_id": h.entidad_id,
+            "accion": h.accion,
+            "usuario_id": h.actor_id or "system",
+            "usuario_nombre": "Sistema"
+            if not h.actor_id
+            else h.actor_id,  # Simplified for now
+            "fecha": h.timestamp.isoformat(),
+        }
+        for h in hist
+    ]
