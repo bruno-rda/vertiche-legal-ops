@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.api.deps import CurrentUser, DbSession
 from app.core.pagination import PaginatedResponse, paginate
 from app.schemas.tramite import Tramite, TramiteUpdate
-from app.services import tramite_service, historial_service
+from app.services import historial_service, tramite_service
 
 router = APIRouter()
 

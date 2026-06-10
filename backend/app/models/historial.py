@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String, func
@@ -19,9 +18,7 @@ class Historial(Base):
     actor_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("usuarios.id", ondelete="SET NULL")
     )
-    actor: Mapped["Usuario | None"] = relationship(
-        "Usuario", lazy="joined"
-    )
+    actor: Mapped["Usuario | None"] = relationship("Usuario", lazy="joined")
     accion: Mapped[str] = mapped_column(String(100), index=True)
     entidad: Mapped[str] = mapped_column(String(50), index=True)
     entidad_id: Mapped[str] = mapped_column(String(36), index=True)

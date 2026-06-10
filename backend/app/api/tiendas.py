@@ -1,4 +1,3 @@
-from app.repositories import historial_repo
 from fastapi import APIRouter, File, Form, Request, UploadFile
 
 from app.api.alertas import _serialize_alerta
@@ -10,13 +9,13 @@ from app.schemas.alerta import Alerta
 from app.schemas.documento import Documento
 from app.schemas.historial import HistorialItem
 from app.schemas.tienda import Expediente, Tienda, TiendaUpdate
-from app.schemas.tramite import Tramite, TramiteResumen, TramiteCreate
+from app.schemas.tramite import Tramite, TramiteCreate, TramiteResumen
 from app.services import (
     alerta_service,
     documento_service,
+    historial_service,
     tienda_service,
     tramite_service,
-    historial_service,
 )
 
 router = APIRouter()
@@ -106,8 +105,9 @@ async def get_expediente(db: DbSession, id: str, current_user: CurrentUser):
                 tipo=tramite.tipo,
                 estado=tramite.estado,
                 fecha_vencimiento=(
-                    tramite.fecha_vencimiento.isoformat() 
-                    if tramite.fecha_vencimiento else ""
+                    tramite.fecha_vencimiento.isoformat()
+                    if tramite.fecha_vencimiento
+                    else ""
                 ),
             )
             for tramite in tramites

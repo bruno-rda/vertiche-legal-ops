@@ -43,13 +43,14 @@ async def get_many(
         allowed_tienda_ids=allowed_ids,
     )
 
+
 async def get_by_tienda(
     db: AsyncSession, *, tienda_id: str, current_user: Usuario
 ) -> list[Tramite]:
     allowed_ids = await _get_allowed_tienda_ids(current_user)
     if allowed_ids is not None and tienda_id not in allowed_ids:
         raise NotFoundError("Trámites no encontrados")
-    
+
     return await tramite_repo.get_by_tienda(db, tienda_id)
 
 

@@ -53,6 +53,7 @@ async def get_history(
                 usuario_nombre=usuario_nombre,
                 fecha=h.timestamp.isoformat(),
                 detalle=_generate_detalle(h),
-            ))
+            )
+        )
 
     return formatted

@@ -20,9 +20,21 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 ESTADOS = [
-    "Jalisco", "Nuevo León", "Ciudad de México", "Estado de México",
-    "Puebla", "Guanajuato", "Querétaro", "Chihuahua", "Sonora",
-    "Baja California", "Yucatán", "Veracruz", "Coahuila", "Sinaloa", "Aguascalientes"
+    "Jalisco",
+    "Nuevo León",
+    "Ciudad de México",
+    "Estado de México",
+    "Puebla",
+    "Guanajuato",
+    "Querétaro",
+    "Chihuahua",
+    "Sonora",
+    "Baja California",
+    "Yucatán",
+    "Veracruz",
+    "Coahuila",
+    "Sinaloa",
+    "Aguascalientes",
 ]
 
 MUNICIPIOS = {
@@ -44,8 +56,14 @@ MUNICIPIOS = {
 }
 
 MARCAS = [
-    "Cuidado con el Perro", "Oggi", "Sahara", "Non Stop",
-    "Vertiche", "Milano", "Brantano", "Price Shoes"
+    "Cuidado con el Perro",
+    "Oggi",
+    "Sahara",
+    "Non Stop",
+    "Vertiche",
+    "Milano",
+    "Brantano",
+    "Price Shoes",
 ]
 
 TRAMITES_NAMES = [
@@ -87,20 +105,22 @@ def generate_tiendas(num_tiendas: int = 55):
         estado = ESTADOS[i % len(ESTADOS)]
         munis = MUNICIPIOS.get(estado, ["Centro"])
         municipio = munis[i % len(munis)]
-        
+
         num_marcas = random.randint(1, 3)
         marcas_seleccionadas = random.sample(MARCAS, num_marcas)
 
         suffix = f" {(i // 15) + 1}" if i > 14 else ""
         nombre = f"Vertiche {municipio}{suffix}".strip()
-        
+
         tiendas.append(
             Tienda(
                 id=str(uuid.uuid4()),
                 nombre=nombre,
                 estado=estado,
                 municipio=municipio,
-                direccion=f"Av. Principal #{100 + i}, Col. Centro, {municipio}, {estado}",
+                direccion=(
+                    f"Av. Principal #{100 + i}, Col. Centro, {municipio}, {estado}"
+                ),
                 marcas=marcas_seleccionadas,
                 cumplimiento=100.0,
                 estado_cumplimiento="vigente",
@@ -144,7 +164,9 @@ def generate_tramites(tienda_id: str):
             fecha_vencimiento = random_date(random.randint(30, 210))
 
         es_recurrente = random.random() > 0.3
-        periodo_recurrencia = "anual" if random.random() > 0.5 else "bianual" if es_recurrente else None
+        periodo_recurrencia = (
+            "anual" if random.random() > 0.5 else "bianual" if es_recurrente else None
+        )
 
         tramites.append(
             Tramite(
@@ -158,17 +180,23 @@ def generate_tramites(tienda_id: str):
                 es_permanente=not es_recurrente,
                 es_recurrente=es_recurrente,
                 periodo_recurrencia=periodo_recurrencia,
-                asignado_a=None  # Can assign later if we want
+                asignado_a=None,  # Can assign later if we want
             )
         )
     return tramites
 
 
-def generate_documentos(tienda_id: str, tienda_nombre: str, tramites: list[Tramite], uploader_ids: list[str]):
+def generate_documentos(
+    tienda_id: str, tienda_nombre: str, tramites: list[Tramite], uploader_ids: list[str]
+):
     docs = []
     ocr_states = [
-        "completado", "completado", "completado",
-        "procesando", "baja_confianza", "error"
+        "completado",
+        "completado",
+        "completado",
+        "procesando",
+        "baja_confianza",
+        "error",
     ]
     doc_counter = 0
 
@@ -222,7 +250,7 @@ def generate_documentos(tienda_id: str, tienda_nombre: str, tramites: list[Trami
 
 def generate_alertas(tienda: Tienda, tramites: list[Tramite]):
     alertas = []
-    
+
     vencidos = [t for t in tramites if t.estado == "vencido"]
     por_vencer = [t for t in tramites if t.estado == "por_vencer"]
 
@@ -234,7 +262,10 @@ def generate_alertas(tienda: Tienda, tramites: list[Tramite]):
                 severidad="critical",
                 tienda_id=tienda.id,
                 tramite_id=t.id,
-                mensaje=f'El trámite "{t.nombre}" de {tienda.nombre} ha vencido y requiere atención inmediata.',
+                mensaje=(
+                    f'El trámite "{t.nombre}" de {tienda.nombre} '
+                    "ha vencido y requiere atención inmediata."
+                ),
                 fecha_generacion=datetime.now() - timedelta(days=random.randint(0, 6)),
                 silenciada=False,
                 resuelta=False,
@@ -249,7 +280,9 @@ def generate_alertas(tienda: Tienda, tramites: list[Tramite]):
                 severidad="warning",
                 tienda_id=tienda.id,
                 tramite_id=t.id,
-                mensaje=f'El trámite "{t.nombre}" de {tienda.nombre} está próximo a vencer.',
+                mensaje=(
+                    f'El trámite "{t.nombre}" de {tienda.nombre} está próximo a vencer.'
+                ),
                 fecha_generacion=datetime.now() - timedelta(days=random.randint(0, 13)),
                 silenciada=False,
                 resuelta=False,
@@ -265,17 +298,26 @@ def generate_inconsistencia_alertas(tiendas: list[Tienda]):
         {
             "tipo": "inconsistencia",
             "severidad": "critical",
-            "template": "Se detectó una inconsistencia en el expediente de {tienda}: la dirección registrada no coincide con el permiso.",
+            "template": (
+                "Se detectó una inconsistencia en el expediente de {tienda}: "
+                "la dirección registrada no coincide con el permiso."
+            ),
         },
         {
             "tipo": "baja_confianza_ocr",
             "severidad": "warning",
-            "template": "El documento cargado en {tienda} tiene baja confianza de OCR y requiere revisión manual.",
+            "template": (
+                "El documento cargado en {tienda} tiene baja confianza de OCR "
+                "y requiere revisión manual."
+            ),
         },
         {
             "tipo": "inconsistencia",
             "severidad": "warning",
-            "template": "El número de permiso extraído por OCR no coincide con el registro previo en {tienda}.",
+            "template": (
+                "El número de permiso extraído por OCR "
+                "no coincide con el registro previo en {tienda}."
+            ),
         },
     ]
 
@@ -303,11 +345,13 @@ def generate_inconsistencia_alertas(tiendas: list[Tienda]):
                 tipo="vencimiento_proximo",
                 severidad="info",
                 tienda_id=tienda.id,
-                mensaje=f"Recordatorio: revisar renovación de trámite en {tienda.nombre}.",
+                mensaje=(
+                    f"Recordatorio: revisar renovación de trámite en {tienda.nombre}."
+                ),
                 fecha_generacion=datetime.now() - timedelta(days=random.randint(0, 29)),
                 silenciada=True,
                 silenciada_hasta=datetime.now() + timedelta(days=15),
-                silenciada_por=None, # Will update with a user later if needed
+                silenciada_por=None,  # Will update with a user later if needed
                 resuelta=False,
             )
         )
@@ -334,7 +378,7 @@ async def seed():
                 "email": "ana.garcia@vertiche.com",
                 "rol": "ADMIN",
                 "password": "admin123",
-                "estado": "activo"
+                "estado": "activo",
             },
             {
                 "id": str(uuid.uuid4()),
@@ -342,7 +386,7 @@ async def seed():
                 "email": "carlos.mendoza@vertiche.com",
                 "rol": "OPERATOR",
                 "password": "operator123",
-                "estado": "activo"
+                "estado": "activo",
             },
             {
                 "id": str(uuid.uuid4()),
@@ -350,7 +394,7 @@ async def seed():
                 "email": "maria.fernandez@vertiche.com",
                 "rol": "VIEWER",
                 "password": "viewer123",
-                "estado": "activo"
+                "estado": "activo",
             },
             {
                 "id": str(uuid.uuid4()),
@@ -358,7 +402,7 @@ async def seed():
                 "email": "roberto.silva@vertiche.com",
                 "rol": "OPERATOR",
                 "password": "operator123",
-                "estado": "activo"
+                "estado": "activo",
             },
             {
                 "id": str(uuid.uuid4()),
@@ -366,7 +410,7 @@ async def seed():
                 "email": "luis.gomez@vertiche.com",
                 "rol": "OPERATOR",
                 "password": "operator123",
-                "estado": "activo"
+                "estado": "activo",
             },
             {
                 "id": str(uuid.uuid4()),
@@ -374,8 +418,8 @@ async def seed():
                 "email": "elena.torres@vertiche.com",
                 "rol": "OPERATOR",
                 "password": "operator123",
-                "estado": "inactivo"
-            }
+                "estado": "inactivo",
+            },
         ]
 
         usuarios = []
@@ -390,7 +434,7 @@ async def seed():
                     estado=u["estado"],
                 )
             )
-        
+
         db.add_all(usuarios)
         await db.flush()
 
@@ -416,7 +460,8 @@ async def seed():
             elif i < 10:
                 joins.append({"usuario_id": elena_id, "tienda_id": t.id})
             # Other stores have no specific assignment, or we can distribute them.
-            # We'll leave the rest unassigned to match frontend (where mostly 5/3/0/2 are assigned).
+            # We'll leave the rest unassigned to match frontend
+            # (where mostly 5/3/0/2 are assigned).
 
         if joins:
             await db.execute(usuario_tiendas.insert(), joins)
