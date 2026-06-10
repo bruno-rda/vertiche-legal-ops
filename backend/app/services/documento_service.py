@@ -61,6 +61,7 @@ async def create_from_upload(
     file_content: bytes,
     filename: str,
     actor: Usuario,
+    tienda_id: str | None = None,
 ) -> Documento:
     # 1. Save file to disk
     relative_path = await storage.save_file(file_content, filename)
@@ -73,6 +74,7 @@ async def create_from_upload(
         nombre_archivo=filename,
         url=relative_path,
         cargado_por=actor.id,
+        tienda_id=tienda_id,
     )
 
     await audit.record(
@@ -112,7 +114,7 @@ async def update_tramites(
 
     # update the DB
     await documento_repo.set_tramite_ids(db, doc.id, tramite_ids)
-    if doc.tienda_id != new_tienda_id:
+    if new_tienda_id is not None and doc.tienda_id != new_tienda_id:
         doc = await documento_repo.update(db, doc, tienda_id=new_tienda_id)
 
     # refresh to get relationships

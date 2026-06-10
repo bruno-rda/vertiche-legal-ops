@@ -171,6 +171,7 @@ async def upload_documento_for_tienda(
         file_content=content,
         filename=name,
         actor=current_user,
+        tienda_id=id,
     )
 
     doc = await documento_service.update_tramites(
