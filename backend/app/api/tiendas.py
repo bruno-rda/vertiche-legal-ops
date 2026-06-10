@@ -1,3 +1,4 @@
+from app.repositories import historial_repo
 from fastapi import APIRouter, File, Form, Request, UploadFile
 
 from app.api.alertas import _serialize_alerta
@@ -9,7 +10,7 @@ from app.schemas.alerta import Alerta
 from app.schemas.documento import Documento
 from app.schemas.historial import HistorialItem
 from app.schemas.tienda import Expediente, Tienda, TiendaUpdate
-from app.schemas.tramite import Tramite, TramiteCreate
+from app.schemas.tramite import Tramite, TramiteResumen, TramiteCreate
 from app.services import (
     alerta_service,
     documento_service,
@@ -86,6 +87,9 @@ async def update_tienda(
 @router.get("/{id}/expediente", response_model=Expediente)
 async def get_expediente(db: DbSession, id: str, current_user: CurrentUser):
     t = await tienda_service.get_by_id(db, id, current_user=current_user)
+    tramites = await tramite_service.get_by_tienda(
+        db, tienda_id=t.id, current_user=current_user
+    )
 
     return {
         "id": f"exp-{t.id}",
@@ -94,9 +98,19 @@ async def get_expediente(db: DbSession, id: str, current_user: CurrentUser):
         "ultima_actualizacion": t.updated_at.isoformat()
         if t.updated_at
         else t.created_at.isoformat(),
-        # tramites will be fetched by the frontend via the /tramites endpoint
-        # this is a simplified payload just to satisfy the folder view requirements
-        "tramites": [],
+        "tramites": [
+            TramiteResumen(
+                id=tramite.id,
+                nombre=tramite.nombre,
+                tipo=tramite.tipo,
+                estado=tramite.estado,
+                fecha_vencimiento=(
+                    tramite.fecha_vencimiento.isoformat() 
+                    if tramite.fecha_vencimiento else ""
+                ),
+            )
+            for tramite in tramites
+        ],
     }
 
 

@@ -36,11 +36,11 @@ class Tienda(BaseModel):
 class Expediente(BaseModel):
     id: str
     tienda_id: str
-    tramites: list["Tramite"]
+    tramites: list["TramiteResumen"]
     cumplimiento: float
     ultima_actualizacion: str
 
 
-from app.schemas.tramite import Tramite  # noqa: E402
+from app.schemas.tramite import TramiteResumen  # noqa: E402
 
 Expediente.model_rebuild()

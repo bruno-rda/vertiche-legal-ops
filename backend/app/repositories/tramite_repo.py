@@ -35,7 +35,15 @@ async def get_many(
     por_vencer_dias: int | None = None,
     allowed_tienda_ids: list[str] | None = None,
 ) -> tuple[list[Tramite], int]:
-    stmt = select(Tramite).join(Tramite.tienda).options(selectinload(Tramite.tienda))
+    stmt = (
+        select(Tramite)
+        .join(Tramite.tienda)
+        .options(
+            selectinload(Tramite.tienda),
+            selectinload(Tramite.documentos),
+            selectinload(Tramite.observaciones),
+        )
+    )
 
     if allowed_tienda_ids is not None:
         stmt = stmt.where(Tramite.tienda_id.in_(allowed_tienda_ids))

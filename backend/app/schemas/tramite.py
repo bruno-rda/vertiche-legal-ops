@@ -72,3 +72,13 @@ class Tramite(BaseModel):
     documentos: list[Documento] = []
     historial: list[HistorialItem] = []
     asignado_a: str | None = None
+
+
+class TramiteResumen(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    nombre: str
+    tipo: TramiteTipo
+    estado: TramiteEstado
+    fecha_vencimiento: str
