@@ -10,6 +10,14 @@ class TiendaUpdate(BaseModel):
     direccion: str | None = None
 
 
+class TiendaCreate(BaseModel):
+    nombre: str
+    estado: str
+    municipio: str
+    direccion: str
+    marcas: list[str]
+
+
 class TiendaEstadoCumplimiento(StrEnum):
     VIGENTE = "vigente"
     EN_RIESGO = "en_riesgo"

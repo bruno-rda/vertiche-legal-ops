@@ -8,7 +8,7 @@ from app.core.pagination import PaginatedResponse, paginate
 from app.schemas.alerta import Alerta
 from app.schemas.documento import Documento
 from app.schemas.historial import HistorialItem
-from app.schemas.tienda import Expediente, Tienda, TiendaUpdate
+from app.schemas.tienda import Expediente, Tienda, TiendaCreate, TiendaUpdate
 from app.schemas.tramite import Tramite, TramiteCreate, TramiteResumen
 from app.services import (
     alerta_service,
@@ -66,6 +66,16 @@ async def list_tiendas(
         current_user=current_user,
     )
     return paginate([_serialize_tienda(t) for t in items], total, page, page_size)
+
+
+@router.post("", response_model=Tienda, status_code=201)
+async def create_tienda(
+    db: DbSession, data: TiendaCreate, admin: RequireAdmin
+):
+    t = await tienda_service.create(
+        db, actor=admin, **data.model_dump()
+    )
+    return _serialize_tienda(t)
 
 
 @router.get("/{id}", response_model=Tienda)

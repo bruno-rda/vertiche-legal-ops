@@ -1131,6 +1131,50 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "tags": [
+                    "tiendas"
+                ],
+                "summary": "Create Tienda",
+                "operationId": "create_tienda",
+                "security": [
+                    {
+                        "OAuth2PasswordBearer": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TiendaCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Tienda"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/tiendas/{id}": {
@@ -1321,7 +1365,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Tramite"
+                                    "$ref": "#/components/schemas/TramiteResumen"
                                 }
                             }
                         }
@@ -3324,6 +3368,42 @@
                     "ultima_actualizacion"
                 ],
                 "title": "Tienda"
+            },
+            "TiendaCreate": {
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "title": "Nombre"
+                    },
+                    "estado": {
+                        "type": "string",
+                        "title": "Estado"
+                    },
+                    "municipio": {
+                        "type": "string",
+                        "title": "Municipio"
+                    },
+                    "direccion": {
+                        "type": "string",
+                        "title": "Direccion"
+                    },
+                    "marcas": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "title": "Marcas"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "nombre",
+                    "estado",
+                    "municipio",
+                    "direccion",
+                    "marcas"
+                ],
+                "title": "TiendaCreate"
             },
             "TiendaEstadoCumplimiento": {
                 "type": "string",

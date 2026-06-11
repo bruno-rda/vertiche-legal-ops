@@ -79,6 +79,8 @@ async def create(
         fields["fecha_inicio"] = date.fromisoformat(fields["fecha_inicio"])
     if fields.get("fecha_vencimiento"):
         fields["fecha_vencimiento"] = date.fromisoformat(fields["fecha_vencimiento"])
+    else:
+        fields["fecha_vencimiento"] = None
 
     # Determine initial status
     estado = "vigente"

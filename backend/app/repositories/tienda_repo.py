@@ -112,3 +112,10 @@ async def get_all(
         stmt = stmt.where(Tienda.id.in_(allowed_ids))
     result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+async def create(db: AsyncSession, **fields: object) -> Tienda:
+    tienda = Tienda(**fields)
+    db.add(tienda)
+    await db.flush()
+    return tienda

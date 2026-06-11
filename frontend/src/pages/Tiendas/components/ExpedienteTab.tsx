@@ -66,11 +66,13 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
           <p
             className={`text-xs font-semibold ${days < 0 ? 'text-danger' : days <= 15 ? 'text-warning' : 'text-text-secondary'}`}
           >
-            {days < 0
-              ? `${Math.abs(days)}d vencido`
-              : days === 0
-                ? 'Vence hoy'
-                : `${days}d restantes`}
+            {Number.isNaN(days)
+              ? 'Permanente'
+              : days < 0
+                ? `${Math.abs(days)}d vencido`
+                : days === 0
+                  ? 'Vence hoy'
+                  : `${days}d restantes`}
           </p>
         </div>
         <ChevronRight className="w-4 h-4 text-text-muted" />

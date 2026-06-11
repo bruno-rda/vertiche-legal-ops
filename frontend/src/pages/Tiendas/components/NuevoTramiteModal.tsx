@@ -30,7 +30,7 @@ export function NuevoTramiteModal({
       nombre: '',
       tipo: 'municipal',
       fecha_inicio: new Date().toISOString().split('T')[0],
-      fecha_vencimiento: '',
+      fecha_vencimiento: null,
       es_permanente: false,
       es_recurrente: false,
       periodo_recurrencia: 'anual',

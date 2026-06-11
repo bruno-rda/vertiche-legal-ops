@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+import uuid
 
 from app.core import audit
 from app.core.exceptions import NotFoundError
@@ -71,6 +72,28 @@ async def update(
         entidad="tienda",
         entidad_id=tienda.id,
         payload=update_payload,
+    )
+    return tienda
+
+
+async def create(db: AsyncSession, *, actor: Usuario, **fields: object) -> Tienda:
+    # Initialize default fields
+    fields["id"] = str(uuid.uuid4())
+    fields["cumplimiento"] = 100.0
+    fields["estado_cumplimiento"] = "vigente"
+    fields["total_tramites"] = 0
+    fields["tramites_vencidos"] = 0
+    fields["tramites_por_vencer"] = 0
+    
+    tienda = await tienda_repo.create(db, **fields)
+    
+    await audit.record(
+        db,
+        actor_id=actor.id,
+        accion="tienda.create",
+        entidad="tienda",
+        entidad_id=tienda.id,
+        payload=fields,
     )
     return tienda
 

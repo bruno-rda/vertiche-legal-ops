@@ -9,9 +9,10 @@ import { Pagination } from '@/components/Pagination';
 import { SearchInput } from '@/components/SearchInput';
 import { EmptyState } from '@/components/EmptyState';
 import { TableSkeleton } from '@/components/Skeleton';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Plus } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-
+import { TiendaCreateModal } from './components/TiendaCreateModal';
+import { useState } from 'react';
 const ESTADOS = [
   'Aguascalientes',
   'Baja California',
@@ -40,6 +41,8 @@ export function TiendasPage() {
   const operadorId = sp.get('operador_id') || '';
   const sortBy = sp.get('sort_by') || 'nombre';
   const sortOrder = sp.get('sort_order') || 'asc';
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const user = useAuthStore((s) => s.user);
 
@@ -95,9 +98,20 @@ export function TiendasPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl text-text-primary">Tiendas</h1>
-        <p className="text-sm text-text-secondary mt-1">Red nacional de tiendas Vertiche</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="font-display text-3xl text-text-primary">Tiendas</h1>
+          <p className="text-sm text-text-secondary mt-1">Red nacional de tiendas Vertiche</p>
+        </div>
+        {user?.rol === 'ADMIN' && (
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors font-medium shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Nueva Tienda
+          </button>
+        )}
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <SearchInput
@@ -279,6 +293,11 @@ export function TiendasPage() {
           />
         )}
       </div>
+
+      <TiendaCreateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
     </div>
   );
 }
