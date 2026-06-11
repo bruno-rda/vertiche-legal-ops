@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { listDocumentos, uploadDocumentoForTienda } from '@/client/sdk.gen';
+import { listDocumentos } from '@/client/sdk.gen';
 import type { Documento } from '@/client/types.gen';
 import type { PaginatedResponseDocumento } from '@/client/types.gen';
 import { Badge } from '@/components/Badge';
@@ -11,6 +11,7 @@ import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
 import { FileText, UploadCloud, Link } from 'lucide-react';
 import { AsociarDocumentoModal } from './AsociarDocumentoModal';
+import { DocumentUploadModal } from '@/pages/Tiendas/components/DocumentUploadModal';
 import { Modal } from '@/components/Modal';
 import { DocumentPDFViewer } from '@/components/DocumentPDFViewer';
 import { OCRReviewModal } from '@/components/OCRReviewModal';
@@ -27,10 +28,8 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
   const queryClient = useQueryClient();
   const addToast = useUIStore((s) => s.addToast);
   const user = useAuthStore((s) => s.user);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [isAsociarModalOpen, setIsAsociarModalOpen] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [documentToReview, setDocumentToReview] = useState<Documento | null>(null);
   const [documentToView, setDocumentToView] = useState<Documento | null>(null);
   const [documentToEdit, setDocumentToEdit] = useState<Documento | null>(null);
@@ -66,37 +65,7 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
     },
   });
 
-  const uploadMutation = useMutation({
-    mutationFn: async (file: File) => {
-      return (
-        await uploadDocumentoForTienda({
-          path: { id: tiendaId },
-          body: { file: file, tramite_ids: [tramiteId] },
-          throwOnError: true,
-        })
-      ).data;
-    },
-    onSuccess: () => {
-      addToast({ type: 'success', message: 'Documento cargado correctamente.' });
-      queryClient.invalidateQueries({ queryKey: ['documentos'] });
-      queryClient.invalidateQueries({ queryKey: ['tramite', tramiteId] });
-    },
-    onError: () => {
-      addToast({ type: 'error', message: 'Error al cargar el documento.' });
-    },
-    onSettled: () => {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    },
-  });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setIsUploading(true);
-      uploadMutation.mutate(file);
-    }
-  };
 
   const documentos = data?.data || [];
   const canModify = user?.rol === 'ADMIN' || user?.rol === 'OPERATOR';
@@ -115,19 +84,13 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
             >
               <Link className="w-4 h-4" /> Asociar existente
             </button>
-            <label
-              className={`px-3 py-1.5 text-sm font-medium text-white bg-accent hover:bg-accent-hover rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
+            <button
+              onClick={() => setIsUploadOpen(true)}
+              className="px-3 py-1.5 text-sm font-medium text-white bg-accent hover:bg-accent-hover rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
             >
               <UploadCloud className="w-4 h-4" />
-              {isUploading ? 'Cargando...' : 'Cargar nuevo'}
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                accept="application/pdf"
-                onChange={handleFileChange}
-              />
-            </label>
+              Cargar nuevo
+            </button>
           </div>
         )}
       </div>
@@ -220,6 +183,15 @@ export function DocumentosSection({ tramiteId, tiendaId }: DocumentosSectionProp
           onClose={() => setIsAsociarModalOpen(false)}
           tramiteId={tramiteId}
           tiendaId={tiendaId}
+        />
+      )}
+
+      {isUploadOpen && (
+        <DocumentUploadModal
+          isOpen={isUploadOpen}
+          onClose={() => setIsUploadOpen(false)}
+          tiendaId={tiendaId}
+          tramiteId={tramiteId}
         />
       )}
 

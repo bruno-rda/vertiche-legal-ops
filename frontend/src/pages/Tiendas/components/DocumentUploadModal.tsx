@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { uploadDocumentoForTienda } from '@/client/sdk.gen';
 import { Modal } from '@/components/Modal';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Upload, FileText, X, AlertCircle } from 'lucide-react';
-import type { TramiteResumen } from '@/client/types.gen';
 import { useUIStore } from '@/stores/uiStore';
 import { clsx } from 'clsx';
 
@@ -12,18 +11,22 @@ interface DocumentUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   tiendaId: string;
-  tramites: TramiteResumen[];
+  tramiteId?: string;
+}
+
+interface UploadFile {
+  id: string;
+  file: File;
+  name: string;
 }
 
 export function DocumentUploadModal({
   isOpen,
   onClose,
   tiendaId,
-  tramites,
+  tramiteId,
 }: DocumentUploadModalProps) {
-  const [file, setFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState('');
-  const [selectedTramites, setSelectedTramites] = useState<string[]>([]);
+  const [files, setFiles] = useState<UploadFile[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -34,61 +37,12 @@ export function DocumentUploadModal({
 
   useEffect(() => {
     if (!isOpen) {
-      setFile(null);
-      setFileName('');
-      setSelectedTramites([]);
+      setFiles([]);
       setError(null);
       setUploadProgress(0);
       setIsUploading(false);
     }
   }, [isOpen]);
-
-  const mutation = useMutation({
-    mutationFn: async (data: { file: File; fileName: string; tramiteIds: string[] }) => {
-      // Simulate real upload progress since MSW doesn't support it natively for FormData easily without fetch tricks
-      return new Promise((resolve, reject) => {
-        let progress = 0;
-        const interval = setInterval(() => {
-          progress += 10;
-          setUploadProgress(progress);
-          if (progress >= 100) {
-            clearInterval(interval);
-            // After progress hits 100, make the actual API call
-            uploadDocumentoForTienda({
-              path: { id: tiendaId },
-              body: {
-                file: data.file,
-                file_name: data.fileName,
-                tramite_ids: data.tramiteIds,
-              },
-              throwOnError: true,
-            })
-              .then(resolve)
-              .catch(reject);
-          }
-        }, 150);
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'documentos'] });
-      queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'historial'] });
-      queryClient.invalidateQueries({ queryKey: ['documentos'] });
-      addToast({
-        type: 'success',
-        message: 'Documento cargado correctamente',
-      });
-      onClose();
-    },
-    onError: () => {
-      setError('Error al cargar el documento');
-      setIsUploading(false);
-      setUploadProgress(0);
-      addToast({
-        type: 'error',
-        message: 'Error al cargar el documento',
-      });
-    },
-  });
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -98,48 +52,99 @@ export function DocumentUploadModal({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const droppedFile = e.dataTransfer.files[0];
-    handleFileSelect(droppedFile);
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    handleFilesSelect(droppedFiles);
   };
 
-  const handleFileSelect = (selectedFile: File | undefined) => {
-    if (!selectedFile) return;
+  const handleFilesSelect = (selectedFiles: File[]) => {
+    if (!selectedFiles || selectedFiles.length === 0) return;
 
-    if (selectedFile.type !== 'application/pdf') {
-      setError('Solo se permiten archivos PDF');
+    const validFiles = selectedFiles.filter((f) => f.type === 'application/pdf');
+    if (validFiles.length !== selectedFiles.length) {
+      setError('Algunos archivos no se agregaron porque solo se permiten archivos PDF');
+    } else {
+      setError(null);
+    }
+
+    const newFiles = validFiles.map((f) => ({
+      id: Math.random().toString(36).substring(7),
+      file: f,
+      name: f.name.replace(/\.[^/.]+$/, ''),
+    }));
+
+    setFiles((prev) => [...prev, ...newFiles]);
+  };
+
+  const removeFile = (id: string) => {
+    setFiles((prev) => prev.filter((f) => f.id !== id));
+  };
+
+  const updateFileName = (id: string, newName: string) => {
+    setFiles((prev) => prev.map((f) => (f.id === id ? { ...f, name: newName } : f)));
+  };
+
+  const handleUpload = async () => {
+    if (files.length === 0) {
+      setError('Selecciona al menos un archivo para cargar');
       return;
     }
 
-    setError(null);
-    setFile(selectedFile);
-    // Remove extension for the descriptive name
-    setFileName(selectedFile.name.replace(/\.[^/.]+$/, ''));
-  };
-
-  const handleToggleTramite = (tramiteId: string) => {
-    setSelectedTramites((prev) =>
-      prev.includes(tramiteId) ? prev.filter((id) => id !== tramiteId) : [...prev, tramiteId],
-    );
-  };
-
-  const handleUpload = () => {
-    if (!file) {
-      setError('Selecciona un archivo para cargar');
-      return;
-    }
-    if (selectedTramites.length === 0) {
-      setError('Debes seleccionar al menos un trámite');
-      return;
-    }
-    if (!fileName.trim()) {
-      setError('El nombre del documento no puede estar vacío');
+    if (files.some((f) => !f.name.trim())) {
+      setError('Todos los documentos deben tener un nombre');
       return;
     }
 
     setIsUploading(true);
     setError(null);
+    setUploadProgress(0);
 
-    mutation.mutate({ file, fileName, tramiteIds: selectedTramites });
+    const total = files.length;
+    let successCount = 0;
+
+    for (let i = 0; i < total; i++) {
+      const f = files[i];
+      try {
+        await uploadDocumentoForTienda({
+          path: { id: tiendaId },
+          body: {
+            file: f.file,
+            file_name: f.name,
+            tramite_ids: tramiteId ? [tramiteId] : [],
+          },
+          throwOnError: true,
+        });
+        successCount++;
+      } catch (err) {
+        console.error('Error uploading file', f.name, err);
+      }
+      setUploadProgress(Math.round(((i + 1) / total) * 100));
+    }
+
+    if (successCount === total) {
+      addToast({
+        type: 'success',
+        message: 'Documentos cargados correctamente',
+      });
+    } else if (successCount > 0) {
+      addToast({
+        type: 'warning',
+        message: `Se cargaron ${successCount} de ${total} documentos. Algunos fallaron.`,
+      });
+    } else {
+      addToast({
+        type: 'error',
+        message: 'Error al cargar los documentos',
+      });
+    }
+
+    queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'documentos'] });
+    queryClient.invalidateQueries({ queryKey: ['tienda', tiendaId, 'historial'] });
+    queryClient.invalidateQueries({ queryKey: ['documentos'] });
+    if (tramiteId) {
+      queryClient.invalidateQueries({ queryKey: ['tramite', tramiteId] });
+    }
+    
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -148,8 +153,8 @@ export function DocumentUploadModal({
     <Modal
       isOpen={isOpen}
       onClose={() => !isUploading && onClose()}
-      title="Cargar documento"
-      size="md"
+      title="Cargar documentos"
+      size="lg"
       footer={
         <>
           <button
@@ -161,7 +166,7 @@ export function DocumentUploadModal({
           </button>
           <button
             onClick={handleUpload}
-            disabled={!file || selectedTramites.length === 0 || isUploading}
+            disabled={files.length === 0 || isUploading}
             className="px-4 py-2 text-sm font-medium bg-text-primary text-white rounded-md hover:bg-text-secondary transition-colors disabled:opacity-50 flex items-center gap-2"
           >
             {isUploading ? (
@@ -169,7 +174,7 @@ export function DocumentUploadModal({
             ) : (
               <>
                 <Upload className="w-4 h-4" />
-                Cargar
+                Continuar ({files.length})
               </>
             )}
           </button>
@@ -177,64 +182,6 @@ export function DocumentUploadModal({
       }
     >
       <div className="space-y-6">
-        {/* Drop Zone */}
-        {!file ? (
-          <div
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={clsx(
-              'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
-              error
-                ? 'border-danger bg-danger-light/10'
-                : 'border-border hover:bg-neutral-light hover:border-text-secondary',
-            )}
-          >
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept=".pdf,application/pdf"
-              onChange={(e) => handleFileSelect(e.target.files?.[0])}
-            />
-            <div className="mx-auto w-12 h-12 bg-surface-card border border-border rounded-full flex items-center justify-center mb-4">
-              <Upload className="w-6 h-6 text-text-muted" />
-            </div>
-            <h3 className="text-sm font-medium text-text-primary mb-1">
-              Haz clic o arrastra un PDF aquí
-            </h3>
-            <p className="text-xs text-text-muted">Solo archivos PDF (max. 10MB)</p>
-          </div>
-        ) : (
-          <div className="bg-neutral-light border border-border rounded-lg p-4 flex items-start gap-4">
-            <div className="w-10 h-10 bg-surface rounded flex items-center justify-center shrink-0 border border-border">
-              <FileText className="w-5 h-5 text-text-secondary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <label className="block text-xs font-medium text-text-secondary mb-1">
-                Nombre descriptivo del documento
-              </label>
-              <input
-                type="text"
-                value={fileName}
-                onChange={(e) => setFileName(e.target.value)}
-                disabled={isUploading}
-                className="w-full px-2 py-1.5 text-sm border border-border rounded focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary bg-surface disabled:opacity-50"
-              />
-              <p className="text-xs text-text-muted mt-1 truncate">Archivo original: {file.name}</p>
-            </div>
-            {!isUploading && (
-              <button
-                onClick={() => setFile(null)}
-                className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface rounded transition-colors"
-                title="Quitar archivo"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        )}
-
         {/* Error Message */}
         {error && (
           <div className="flex items-center gap-2 text-sm text-danger bg-danger-light/20 p-3 rounded-md">
@@ -243,51 +190,84 @@ export function DocumentUploadModal({
           </div>
         )}
 
+        {/* Drop Zone */}
+        {!isUploading && (
+          <div
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={clsx(
+              'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
+              'border-border hover:bg-neutral-light hover:border-text-secondary'
+            )}
+          >
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept=".pdf,application/pdf"
+              multiple
+              onChange={(e) => {
+                if (e.target.files) {
+                  handleFilesSelect(Array.from(e.target.files));
+                }
+              }}
+            />
+            <div className="mx-auto w-12 h-12 bg-surface-card border border-border rounded-full flex items-center justify-center mb-4">
+              <Upload className="w-6 h-6 text-text-muted" />
+            </div>
+            <h3 className="text-sm font-medium text-text-primary mb-1">
+              Haz clic o arrastra PDFs aquí
+            </h3>
+            <p className="text-xs text-text-muted">Sube uno o varios archivos PDF</p>
+          </div>
+        )}
+
         {/* Upload Progress */}
         {isUploading && (
           <div className="space-y-2">
             <div className="flex justify-between text-xs text-text-secondary">
-              <span>Cargando documento...</span>
+              <span>Cargando documentos...</span>
               <span>{uploadProgress}%</span>
             </div>
             <ProgressBar value={uploadProgress} />
           </div>
         )}
 
-        {/* Trámites Selection */}
-        {file && !isUploading && (
+        {/* Files List */}
+        {files.length > 0 && (
           <div className="space-y-3">
-            <label className="block text-sm font-medium text-text-primary">
-              Vincular a trámites <span className="text-text-muted font-normal">(requerido)</span>
-            </label>
-            <div className="border border-border rounded-lg max-h-48 overflow-y-auto bg-surface-card">
-              {tramites.length === 0 ? (
-                <div className="p-4 text-center text-sm text-text-muted">
-                  Esta tienda no tiene trámites en su expediente.
-                </div>
-              ) : (
-                <div className="divide-y divide-border">
-                  {tramites.map((tramite) => (
-                    <label
-                      key={tramite.id}
-                      className="flex items-center gap-3 p-3 hover:bg-neutral-light cursor-pointer transition-colors"
+            <h4 className="text-sm font-medium text-text-primary border-b border-border pb-2">
+              Archivos listos para cargar
+            </h4>
+            <div className="max-h-64 overflow-y-auto pr-2 space-y-3">
+              {files.map((f) => (
+                <div key={f.id} className="bg-surface-card border border-border rounded-lg p-3 flex items-start gap-4">
+                  <div className="w-10 h-10 bg-neutral-light rounded flex items-center justify-center shrink-0">
+                    <FileText className="w-5 h-5 text-text-secondary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <input
+                      type="text"
+                      value={f.name}
+                      onChange={(e) => updateFileName(f.id, e.target.value)}
+                      disabled={isUploading}
+                      className="w-full px-2 py-1 text-sm border border-transparent hover:border-border rounded focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary bg-transparent focus:bg-surface disabled:opacity-50 transition-colors"
+                      placeholder="Nombre del documento"
+                    />
+                    <p className="text-xs text-text-muted mt-0.5 truncate px-2">{f.file.name}</p>
+                  </div>
+                  {!isUploading && (
+                    <button
+                      onClick={() => removeFile(f.id)}
+                      className="p-1.5 text-text-muted hover:text-danger hover:bg-danger-light/20 rounded transition-colors"
+                      title="Quitar archivo"
                     >
-                      <input
-                        type="checkbox"
-                        checked={selectedTramites.includes(tramite.id)}
-                        onChange={() => handleToggleTramite(tramite.id)}
-                        className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-text-primary truncate">
-                          {tramite.nombre}
-                        </p>
-                        <p className="text-xs text-text-muted capitalize">{tramite.tipo}</p>
-                      </div>
-                    </label>
-                  ))}
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
-              )}
+              ))}
             </div>
           </div>
         )}

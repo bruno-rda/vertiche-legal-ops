@@ -222,7 +222,7 @@ export function TiendaDetailPage() {
                 className="flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover transition-colors"
               >
                 <Upload className="w-4 h-4" />
-                Cargar documento
+                Cargar documentos
               </button>
             )}
           </div>
@@ -317,12 +317,11 @@ export function TiendaDetailPage() {
       )}
 
       {/* Modals */}
-      {id && expediente && (
+      {id && (
         <DocumentUploadModal
           isOpen={isUploadOpen}
           onClose={() => setIsUploadOpen(false)}
           tiendaId={id}
-          tramites={expediente.tramites}
         />
       )}
 

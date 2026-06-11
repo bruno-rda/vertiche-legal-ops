@@ -203,7 +203,7 @@ async def upload_documento_for_tienda(
     )
 
     doc = await documento_service.update_tramites(
-        db, doc.id, tramite_ids=tramite_ids, actor=current_user
+        db, doc.id, tramite_ids=tramite_ids or [], actor=current_user
     )
 
     # Fire off OCR worker asynchronously via ARQ

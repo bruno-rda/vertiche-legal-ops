@@ -23,7 +23,7 @@ def _generate_detalle(h: Historial) -> str:
         return f"Trámite creado: {payload.get('nombre', '')}"
     if h.accion == "tramite.editado":
         return "Trámite editado"
-    if h.accion == "tienda.creada":
+    if h.accion == "tienda.create":
         return "Tienda creada"
     if h.accion == "tienda.editada":
         return "Tienda editada"
