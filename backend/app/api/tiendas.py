@@ -73,7 +73,13 @@ async def create_tienda(
     db: DbSession, data: TiendaCreate, admin: RequireAdmin
 ):
     t = await tienda_service.create(
-        db, actor=admin, **data.model_dump()
+        db, 
+        actor=admin,
+        nombre=data.nombre,
+        estado=data.estado,
+        municipio=data.municipio,
+        direccion=data.direccion,
+        marcas=data.marcas,
     )
     return _serialize_tienda(t)
 
