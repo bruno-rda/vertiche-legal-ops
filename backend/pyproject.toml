@@ -20,6 +20,10 @@ dependencies = [
     "aiofiles>=24.1.0",
     "python-dateutil>=2.9.0.post0",
     "minio>=7.2.20",
+    "opencv-python-headless>=4.10.0.84",
+    "pymupdf>=1.24.9",
+    "pytesseract>=0.3.13",
+    "pillow>=10.4.0",
 ]
 
 [project.scripts]

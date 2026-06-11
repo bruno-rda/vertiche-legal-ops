@@ -109,7 +109,7 @@ async def extract_fields_task(ctx, document_id: str):
             # 6. Audit
             await audit.record(
                 db,
-                actor_id="system:llm",
+                actor_id=None,
                 accion="documento.llm_extracted",
                 entidad="documento",
                 entidad_id=doc.id,

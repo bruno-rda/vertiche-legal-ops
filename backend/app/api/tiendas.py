@@ -81,6 +81,7 @@ async def update_tienda(
     t = await tienda_service.update(
         db, id, actor=admin, **data.model_dump(exclude_unset=True)
     )
+    await db.refresh(t)
     return _serialize_tienda(t)
 
 
@@ -115,7 +116,7 @@ async def get_expediente(db: DbSession, id: str, current_user: CurrentUser):
     }
 
 
-@router.post("/{id}/tramites", response_model=Tramite, status_code=201)
+@router.post("/{id}/tramites", response_model=TramiteResumen, status_code=201)
 async def create_tramite_for_tienda(
     db: DbSession, id: str, data: TramiteCreate, current_user: CurrentUser
 ):
@@ -124,7 +125,13 @@ async def create_tramite_for_tienda(
     t = await tramite_service.create(
         db, tienda_id=id, actor=current_user, **data.model_dump(exclude_unset=True)
     )
-    return _serialize_tramite(t)
+    return TramiteResumen(
+        id=t.id,
+        nombre=t.nombre,
+        tipo=t.tipo,
+        estado=t.estado,
+        fecha_vencimiento=t.fecha_vencimiento.isoformat() if t.fecha_vencimiento else "",
+    )
 
 
 @router.get("/{id}/alertas", response_model=list[Alerta])

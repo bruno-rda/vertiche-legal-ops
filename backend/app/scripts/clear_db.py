@@ -5,6 +5,7 @@ from sqlalchemy import delete
 
 from app.database import AsyncSessionLocal
 from app.models.alerta import Alerta
+from app.models.regla_alerta import ReglaAlerta
 from app.models.associations import documento_tramites, usuario_tiendas
 from app.models.documento import Documento
 from app.models.tienda import Tienda
@@ -22,6 +23,9 @@ async def clear_db():
         # We delete in reverse dependency order to avoid foreign key constraint errors
         logger.info("Deleting Alertas...")
         await db.execute(delete(Alerta))
+
+        logger.info("Deleting ReglaAlerta...")
+        await db.execute(delete(ReglaAlerta))
 
         logger.info("Deleting Documento-Tramite associations...")
         await db.execute(delete(documento_tramites))

@@ -19,7 +19,7 @@ def _generate_detalle(h: Historial) -> str:
         return "Alerta resuelta"
     if h.accion == "alerta.silenciada":
         return "Alerta silenciada"
-    if h.accion == "tramite.creado":
+    if h.accion == "tramite.create":
         return f"Trámite creado: {payload.get('nombre', '')}"
     if h.accion == "tramite.editado":
         return "Trámite editado"
@@ -27,6 +27,10 @@ def _generate_detalle(h: Historial) -> str:
         return "Tienda creada"
     if h.accion == "tienda.editada":
         return "Tienda editada"
+    if h.accion == "documento.ocr_processed":
+        return f"OCR procesado. Requiere revisión: {payload.get('requiere_revision', '')}"
+    if h.accion == "documento.llm_extracted":
+        return f"LLM extraído. Falla: {payload.get('llm_failed', '')}"
     return h.accion
 
 

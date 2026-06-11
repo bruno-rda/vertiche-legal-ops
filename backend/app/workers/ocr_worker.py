@@ -54,7 +54,7 @@ async def process_ocr(ctx, document_id: str):
 
             await audit.record(
                 db,
-                actor_id="system:ocr",
+                actor_id=None,
                 accion="documento.ocr_processed",
                 entidad="documento",
                 entidad_id=doc.id,

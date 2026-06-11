@@ -238,7 +238,7 @@ def generate_documentos(
                     id=str(uuid.uuid4()),
                     tienda_id=tienda_id,
                     nombre_archivo=f"{tienda_id}_{doc_name}",
-                    url=f"https://api.vertiche.com/docs/{doc_counter}/{doc_name}",
+                    ruta_archivo=f"https://api.vertiche.com/docs/{doc_counter}/{doc_name}",
                     estado_ocr=estado_ocr,
                     datos_extraidos=datos_extraidos,
                     requiere_revision_manual=requiere_revision_manual,

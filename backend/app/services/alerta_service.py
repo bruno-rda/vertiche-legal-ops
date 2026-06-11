@@ -252,7 +252,7 @@ async def ensure_alert_exists(db: AsyncSession, tramite: Tramite) -> Alerta | No
 
     await audit.record(
         db,
-        actor_id="system:scheduler",
+        actor_id=None,
         accion="alerta.auto_create",
         entidad="alerta",
         entidad_id=alerta.id,
