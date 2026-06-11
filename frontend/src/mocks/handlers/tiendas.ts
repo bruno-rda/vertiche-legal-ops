@@ -231,14 +231,14 @@ export const dashboardHandlers = [
 
     const total = tiendas.length;
     const enCumplimiento = tiendas.filter((t) => t.estado_cumplimiento === 'vigente').length;
-    const porVencer = tiendas.filter((t) => t.tramites_por_vencer > 0).length;
-    const enRiesgo = tiendas.filter((t) => t.estado_cumplimiento === 'critico').length;
+    const enRiesgo = tiendas.filter((t) => t.estado_cumplimiento === 'en_riesgo').length;
+    const enRiesgoCritico = tiendas.filter((t) => t.estado_cumplimiento === 'critico').length;
 
     return HttpResponse.json({
       total_tiendas: total,
       en_cumplimiento: enCumplimiento,
-      por_vencer: porVencer,
-      en_riesgo_critico: enRiesgo,
+      en_riesgo: enRiesgo,
+      en_riesgo_critico: enRiesgoCritico,
       porcentaje_cumplimiento: Math.round((enCumplimiento / total) * 100),
     });
   }),

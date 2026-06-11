@@ -4,7 +4,7 @@ from pydantic import BaseModel
 class DashboardMetrics(BaseModel):
     total_tiendas: int
     en_cumplimiento: int
-    por_vencer: int
+    en_riesgo: int
     en_riesgo_critico: int
     porcentaje_cumplimiento: int
 

@@ -113,9 +113,9 @@ export function StoreSummary({ userId, isAdminView, onEditAssignment }: StoreSum
                           {estadoResumen.criticas}
                         </Badge>
                       )}
-                      {estadoResumen.por_vencer > 0 && (
-                        <Badge variant="por_vencer" size="sm">
-                          {estadoResumen.por_vencer}
+                      {estadoResumen.en_riesgo > 0 && (
+                        <Badge variant="en_riesgo" size="sm">
+                          {estadoResumen.en_riesgo}
                         </Badge>
                       )}
                       {estadoResumen.vigentes > 0 && (

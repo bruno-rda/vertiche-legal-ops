@@ -19,13 +19,8 @@ async def get_metrics(db: AsyncSession, *, current_user: Usuario) -> dict:
 
     total_tiendas = len(tiendas)
     en_cumplimiento = sum(1 for t in tiendas if t.estado_cumplimiento == "vigente")
+    en_riesgo = sum(1 for t in tiendas if t.estado_cumplimiento == "en_riesgo")
     en_riesgo_critico = sum(1 for t in tiendas if t.estado_cumplimiento == "critico")
-
-    # Query total por_vencer across these tiendas
-    stmt = select(func.count(Tramite.id)).where(Tramite.estado == "por_vencer")
-    if allowed_ids is not None:
-        stmt = stmt.where(Tramite.tienda_id.in_(allowed_ids))
-    por_vencer = (await db.execute(stmt)).scalar_one()
 
     # Calculate global percentage
     porcentaje_cumplimiento = 0
@@ -36,7 +31,7 @@ async def get_metrics(db: AsyncSession, *, current_user: Usuario) -> dict:
     return {
         "total_tiendas": total_tiendas,
         "en_cumplimiento": en_cumplimiento,
-        "por_vencer": por_vencer,
+        "en_riesgo": en_riesgo,
         "en_riesgo_critico": en_riesgo_critico,
         "porcentaje_cumplimiento": porcentaje_cumplimiento,
     }

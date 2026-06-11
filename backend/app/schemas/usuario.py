@@ -53,6 +53,6 @@ class UsuarioResumenTiendas(BaseModel):
     estado: str
     total_tiendas: int
     vigentes: int
-    por_vencer: int
+    en_riesgo: int
     criticas: int
     tiendas: list[TiendaResumen]

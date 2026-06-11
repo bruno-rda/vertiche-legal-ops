@@ -144,8 +144,8 @@ async def get_tiendas_resumen(db: AsyncSession, id: str) -> list[UsuarioResumenT
                 vigentes=sum(
                     1 for t in tiendas_list if t.estado_cumplimiento == "vigente"
                 ),
-                por_vencer=sum(
-                    1 for t in tiendas_list if t.estado_cumplimiento == "por_vencer"
+                en_riesgo=sum(
+                    1 for t in tiendas_list if t.estado_cumplimiento == "en_riesgo"
                 ),
                 criticas=sum(
                     1 for t in tiendas_list if t.estado_cumplimiento == "critico"

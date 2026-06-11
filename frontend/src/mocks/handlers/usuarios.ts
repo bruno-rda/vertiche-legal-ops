@@ -113,7 +113,7 @@ export const usuariosHandlers = [
             tramites_criticos: 0,
             tiendas: [],
             vigentes: 0,
-            por_vencer: 0,
+            en_riesgo: 0,
             criticas: 0,
           };
         }
@@ -128,7 +128,7 @@ export const usuariosHandlers = [
         });
 
         if (tienda.estado_cumplimiento === 'vigente') acc[tienda.estado].vigentes++;
-        if (tienda.estado_cumplimiento === 'en_riesgo') acc[tienda.estado].por_vencer++;
+        if (tienda.estado_cumplimiento === 'en_riesgo') acc[tienda.estado].en_riesgo++;
         if (tienda.estado_cumplimiento === 'critico') acc[tienda.estado].criticas++;
 
         const tiendaTramites = mockTramites.filter((tr) => tr.tienda_id === tienda.id);

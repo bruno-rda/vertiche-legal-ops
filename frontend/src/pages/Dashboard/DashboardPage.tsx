@@ -113,11 +113,12 @@ export function DashboardPage() {
             subtitle={formatPercent(metrics.porcentaje_cumplimiento)}
             color="text-success"
             bgColor="bg-success-light"
+            onClick={() => navigate('/tiendas?estado_cumplimiento=vigente')}
           />
           <MetricCard
             icon={AlertTriangle}
-            value={metrics.por_vencer}
-            label="Por vencer"
+            value={metrics.en_riesgo}
+            label="En riesgo"
             color="text-warning"
             bgColor="bg-warning-light"
             onClick={() => navigate('/tiendas?estado_cumplimiento=en_riesgo')}

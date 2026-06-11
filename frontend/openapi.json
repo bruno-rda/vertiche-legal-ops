@@ -2677,18 +2677,36 @@
             "CampoExtraidoDocumento": {
                 "properties": {
                     "value": {
-                        "type": "string",
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "boolean"
+                            }
+                        ],
                         "title": "Value"
                     },
                     "confidence": {
-                        "type": "number",
+                        "type": "string",
                         "title": "Confidence"
+                    },
+                    "source": {
+                        "type": "string",
+                        "title": "Source"
                     }
                 },
                 "type": "object",
                 "required": [
                     "value",
-                    "confidence"
+                    "confidence",
+                    "source"
                 ],
                 "title": "CampoExtraidoDocumento"
             },
@@ -2730,9 +2748,9 @@
                         "type": "integer",
                         "title": "En Cumplimiento"
                     },
-                    "por_vencer": {
+                    "en_riesgo": {
                         "type": "integer",
-                        "title": "Por Vencer"
+                        "title": "En Riesgo"
                     },
                     "en_riesgo_critico": {
                         "type": "integer",
@@ -2747,7 +2765,7 @@
                 "required": [
                     "total_tiendas",
                     "en_cumplimiento",
-                    "por_vencer",
+                    "en_riesgo",
                     "en_riesgo_critico",
                     "porcentaje_cumplimiento"
                 ],
@@ -2868,7 +2886,7 @@
                 "properties": {
                     "datos_extraidos": {
                         "additionalProperties": {
-                            "type": "string"
+                            "$ref": "#/components/schemas/CampoExtraidoDocumento"
                         },
                         "type": "object",
                         "title": "Datos Extraidos"
@@ -3894,9 +3912,9 @@
                         "type": "integer",
                         "title": "Vigentes"
                     },
-                    "por_vencer": {
+                    "en_riesgo": {
                         "type": "integer",
-                        "title": "Por Vencer"
+                        "title": "En Riesgo"
                     },
                     "criticas": {
                         "type": "integer",
@@ -3915,7 +3933,7 @@
                     "estado",
                     "total_tiendas",
                     "vigentes",
-                    "por_vencer",
+                    "en_riesgo",
                     "criticas",
                     "tiendas"
                 ],
