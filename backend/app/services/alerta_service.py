@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,6 +8,8 @@ from app.models.alerta import Alerta
 from app.models.tramite import Tramite
 from app.models.usuario import Usuario
 from app.repositories import alerta_repo, tienda_repo
+from app.services import tienda_service
+
 
 SEVERITY_THRESHOLDS_DAYS = {
     "critical": 0,
@@ -58,9 +60,7 @@ async def silenciar(
     if not alerta:
         raise NotFoundError("Alerta no encontrada")
 
-    import datetime
-
-    silenciada_hasta = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
+    silenciada_hasta = datetime.now(timezone.utc) + datetime.timedelta(
         days=duracion_dias
     )
 
@@ -88,14 +88,12 @@ async def resolver(db: AsyncSession, id: str, *, actor: Usuario) -> Alerta:
     if not alerta:
         raise NotFoundError("Alerta no encontrada")
 
-    import datetime
-
     await alerta_repo.update(
         db,
         alerta,
         resuelta=True,
         silenciada=False,
-        fecha_resolucion=datetime.datetime.now(datetime.UTC),
+        fecha_resolucion=datetime.now(timezone.utc),
         resuelta_por=actor.id,
     )
 
@@ -107,6 +105,9 @@ async def resolver(db: AsyncSession, id: str, *, actor: Usuario) -> Alerta:
         entidad_id=alerta.id,
         payload={},
     )
+    
+    # Alert-to-tramite compliance bridge
+    await tienda_service.recalculate_compliance(db, alerta.tienda_id)
     return alerta
 
 
@@ -135,11 +136,52 @@ async def notificar(db: AsyncSession, id: str, *, canal: str, actor: Usuario) ->
     if not alerta:
         raise NotFoundError("Alerta no encontrada")
 
+    # Connect to integrations
+    tienda = await tienda_repo.get_by_id(db, alerta.tienda_id)
+    tramite_nombre = alerta.tramite.nombre if alerta.tramite else "Trámite"
+    
+    detalles = {
+        "sucursal": tienda.nombre if tienda else "Desconocida"
+    }
+    if alerta.tramite:
+        detalles["tramite"] = alerta.tramite.nombre
+        if alerta.tramite.fecha_vencimiento:
+            detalles["fecha_fin"] = alerta.tramite.fecha_vencimiento.isoformat()
+
+    titulo = f"Alerta - {alerta.tipo.replace('_', ' ').capitalize()}"
+    mensaje = alerta.mensaje
+
+    if canal in ["email", "ambos"]:
+        from app.integrations.notifications.email import EmailSender
+        sender = EmailSender()
+        html_body = sender.construir_html(titulo=titulo, mensaje=mensaje, severidad=alerta.severidad, detalles=detalles)
+        # Using a generic admin email for demo purposes
+        recipient = "admin@vertiche.com"
+        sender.send(recipient, titulo, html_body)
+
+    if canal in ["whatsapp", "ambos"]:
+        from app.integrations.notifications.whatsapp import WhatsAppSender
+        w_sender = WhatsAppSender()
+        
+        partes = [
+            f"*Alerta:* {titulo}",
+            f"*Severidad:* {alerta.severidad.upper()}",
+            "",
+            mensaje
+        ]
+        text_message = "\\n".join(partes)
+        phone = "+521234567890" # Demo phone
+        w_sender.send(phone, text_message)
+
     current_notificaciones = alerta.notificaciones_enviadas or {
         "email": False,
         "whatsapp": False,
     }
-    current_notificaciones[canal] = True
+    
+    if canal in ["email", "ambos"]:
+        current_notificaciones["email"] = True
+    if canal in ["whatsapp", "ambos"]:
+        current_notificaciones["whatsapp"] = True
 
     # Assign a new dict to trigger SQLAlchemy JSONB mutation detection
     await alerta_repo.update(

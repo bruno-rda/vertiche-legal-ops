@@ -11,6 +11,7 @@ from app.database import AsyncSessionLocal
 from app.models.alerta import Alerta
 from app.models.associations import usuario_tiendas
 from app.models.documento import Documento
+from app.models.regla_alerta import ReglaAlerta
 from app.models.tienda import Tienda
 from app.models.tramite import Tramite
 from app.models.usuario import Usuario
@@ -369,6 +370,34 @@ async def seed():
             return
 
         logger.info("Starting database seed...")
+
+        # 0. Reglas de Alerta
+        reglas_data = [
+            {"codigo_regla": "VEN_40", "nombre": "Vencimiento en 40 días", "dias": 40, "severidad": "info", "canal": "email", "estado": "vigente"},
+            {"codigo_regla": "VEN_30", "nombre": "Vencimiento en 30 días", "dias": 30, "severidad": "warning", "canal": "email", "estado": "vigente"},
+            {"codigo_regla": "VEN_20", "nombre": "Vencimiento en 20 días", "dias": 20, "severidad": "warning", "canal": "ambos", "estado": "vigente"},
+            {"codigo_regla": "VEN_10", "nombre": "Vencimiento en 10 días", "dias": 10, "severidad": "critical", "canal": "whatsapp", "estado": "vigente"},
+            {"codigo_regla": "VEN_DIARIO", "nombre": "Alerta diaria ≤10 días / vencido", "dias": None, "severidad": "critical", "canal": "whatsapp", "estado": None},
+            {"codigo_regla": "PEND_DOC", "nombre": "Trámite pendiente de documentación", "dias": None, "severidad": "warning", "canal": "email", "estado": "pendiente_documentacion"},
+            {"codigo_regla": "EN_ESPERA", "nombre": "Trámite en espera de resolución", "dias": None, "severidad": "info", "canal": "email", "estado": "en_espera_resolucion"},
+            {"codigo_regla": "EN_REVISION", "nombre": "Trámite en revisión", "dias": None, "severidad": "info", "canal": "email", "estado": "en_revision"},
+            {"codigo_regla": "PRESENTADO", "nombre": "Trámite presentado", "dias": None, "severidad": "info", "canal": "email", "estado": "presentado"},
+        ]
+        
+        for r_data in reglas_data:
+            db.add(
+                ReglaAlerta(
+                    id=str(uuid.uuid4()),
+                    codigo_regla=r_data["codigo_regla"],
+                    nombre=r_data["nombre"],
+                    dias_antes_vencimiento=r_data["dias"],
+                    severidad=r_data["severidad"],
+                    canal=r_data["canal"],
+                    aplica_a_estado=r_data["estado"],
+                    activa=True
+                )
+            )
+        await db.flush()
 
         # 1. Users
         users_data = [
