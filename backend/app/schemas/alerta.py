@@ -19,6 +19,7 @@ class AlertaTipo(StrEnum):
     VENCIDO = "vencido"
     INCONSISTENCIA = "inconsistencia"
     BAJA_CONFIANZA_OCR = "baja_confianza_ocr"
+    ESTADO_TRAMITE = "estado_tramite"
 
 
 class AlertaNotificacionSend(BaseModel):
