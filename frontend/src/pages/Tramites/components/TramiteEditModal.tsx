@@ -5,6 +5,7 @@ import { updateTramite } from '@/client/sdk.gen';
 import { Modal } from '@/components/Modal';
 import { useUIStore } from '@/stores/uiStore';
 import type { Tramite, TramiteUpdate as FormData } from '@/client/types.gen';
+import { TramiteEstadoSelect } from '@/components/TramiteEstadoSelect';
 
 export function TramiteEditModal({
   isOpen,
@@ -30,6 +31,7 @@ export function TramiteEditModal({
   } = useForm<FormData>({
     defaultValues: {
       nombre: tramite.nombre,
+      estado: tramite.estado,
       fecha_inicio: tramite.fecha_inicio.split('T')[0],
       fecha_vencimiento: tramite.fecha_vencimiento ? tramite.fecha_vencimiento.split('T')[0] : '',
       es_permanente: tramite.es_permanente || false,
@@ -57,8 +59,9 @@ export function TramiteEditModal({
       : '';
     const dateChanged = data.fecha_vencimiento !== originalVencimiento;
     const permanencyChanged = data.es_permanente !== (tramite.es_permanente || false);
+    const estadoChanged = data.estado !== tramite.estado;
 
-    if (dateChanged || permanencyChanged) {
+    if (dateChanged || permanencyChanged || estadoChanged) {
       setPendingData(data);
       setShowConfirm(true);
     } else {
@@ -78,8 +81,7 @@ export function TramiteEditModal({
       <Modal isOpen={isOpen} onClose={() => setShowConfirm(false)} title="Confirmar cambios">
         <div className="space-y-4">
           <p className="text-sm text-text-secondary">
-            Estás a punto de modificar la fecha de vencimiento o la condición de permanencia del
-            trámite.
+            Estás a punto de modificar propiedades importantes de este trámite.
             {pendingData?.es_permanente &&
               ' Al ser permanente, este trámite no generará alertas de vencimiento.'}{' '}
             ¿Confirmar?
@@ -119,6 +121,16 @@ export function TramiteEditModal({
             className="w-full h-10 px-3 bg-surface border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
           />
           {errors.nombre && <p className="text-xs text-danger mt-1">{errors.nombre.message}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-1">
+            Estado
+          </label>
+          <TramiteEstadoSelect
+            value={watch('estado') as any}
+            onChange={(val) => setValue('estado', val, { shouldValidate: true })}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">

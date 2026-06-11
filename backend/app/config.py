@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     minio_secure: bool = False
 
     # Ollama LLM
-    ollama_url: str = "http://localhost:11434/api/chat"
+    ollama_url: str = "http://localhost:11434/api/generate"
     ollama_model: str = "qwen2.5:7b-instruct-q4_K_M"
     ollama_timeout: int = 120
 

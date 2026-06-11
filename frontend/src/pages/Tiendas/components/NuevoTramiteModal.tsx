@@ -5,6 +5,7 @@ import { Modal } from '@/components/Modal';
 import { useUIStore } from '@/stores/uiStore';
 import type { TramiteCreate as FormData } from '@/client/types.gen';
 import { ChevronDown } from 'lucide-react';
+import { TramiteEstadoSelect } from '@/components/TramiteEstadoSelect';
 
 export function NuevoTramiteModal({
   isOpen,
@@ -29,6 +30,7 @@ export function NuevoTramiteModal({
     defaultValues: {
       nombre: '',
       tipo: 'municipal',
+      estado: undefined,
       fecha_inicio: new Date().toISOString().split('T')[0],
       fecha_vencimiento: null,
       es_permanente: false,
@@ -91,6 +93,16 @@ export function NuevoTramiteModal({
             </select>
             <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-1">
+            Estado inicial (opcional)
+          </label>
+          <TramiteEstadoSelect
+            value={watch('estado') as any}
+            onChange={(val) => setValue('estado', val, { shouldValidate: true })}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">

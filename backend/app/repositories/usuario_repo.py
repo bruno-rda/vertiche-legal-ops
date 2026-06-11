@@ -45,7 +45,7 @@ async def get_many(
     return list(result.scalars().all())
 
 
-async def create(
+async def create_user(
     db: AsyncSession,
     *,
     id: str,
@@ -67,7 +67,7 @@ async def create(
     return user
 
 
-async def update(db: AsyncSession, user: Usuario, **fields: object) -> Usuario:
+async def update_user(db: AsyncSession, user: Usuario, **fields: object) -> Usuario:
     for key, value in fields.items():
         setattr(user, key, value)
     await db.flush()

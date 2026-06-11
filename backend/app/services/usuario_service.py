@@ -53,7 +53,7 @@ async def create(
 
     import uuid
 
-    new_user = await usuario_repo.create(
+    new_user = await usuario_repo.create_user(
         db,
         id=str(uuid.uuid4()),
         nombre=nombre,
@@ -81,7 +81,7 @@ async def update_status(
     if user.id == actor.id:
         raise ConflictError("No puedes cambiar tu propio estado")
 
-    user = await usuario_repo.update(db, user, estado=estado)
+    user = await usuario_repo.update_user(db, user, estado=estado)
 
     await audit.record(
         db,
@@ -120,7 +120,7 @@ async def update_tiendas(
 
 async def delete_usuario(db: AsyncSession, id: str, *, actor: Usuario) -> None:
     u = await get_by_id(db, id)
-    await usuario_repo.delete(db, u)
+    await usuario_repo.delete_user(db, u)
     await audit.record(
         db,
         actor_id=actor.id,

@@ -83,13 +83,15 @@ async def create(
         fields["fecha_vencimiento"] = None
 
     # Determine initial status
-    estado = "vigente"
-    if fields.get("fecha_vencimiento"):
-        days = (fields["fecha_vencimiento"] - date.today()).days
-        if days < 0:
-            estado = "vencido"
-        elif days <= 30:
-            estado = "por_vencer"
+    estado = fields.pop("estado", None)
+    if not estado:
+        estado = "vigente"
+        if fields.get("fecha_vencimiento"):
+            days = (fields["fecha_vencimiento"] - date.today()).days
+            if days < 0:
+                estado = "vencido"
+            elif days <= 30:
+                estado = "por_vencer"
 
     tramite = await tramite_repo.create(
         db,
@@ -129,8 +131,11 @@ async def update(
     if "es_permanente" in fields and fields["es_permanente"] is not None:
         update_payload["es_permanente"] = fields["es_permanente"]
 
-    # Re-evaluate status if dates changed
-    if "fecha_vencimiento" in update_payload or "es_permanente" in update_payload:
+    if "estado" in fields and fields["estado"] is not None:
+        update_payload["estado"] = fields["estado"]
+        
+    # Re-evaluate status if dates changed and estado was not explicitly provided
+    if "estado" not in update_payload and ("fecha_vencimiento" in update_payload or "es_permanente" in update_payload):
         venc = update_payload.get("fecha_vencimiento", tramite.fecha_vencimiento)
         perm = update_payload.get("es_permanente", tramite.es_permanente)
 

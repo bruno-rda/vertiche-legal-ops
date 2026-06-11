@@ -43,13 +43,7 @@ async def extract_fields_task(ctx, document_id: str):
             merged = merge_doc_with_hints(llm_result, hints)
 
             # Check if LLM failed
-            llm_failed = (
-                llm_result_original.confianza_extraccion == "baja" 
-                and llm_result_original.notas_extraccion
-                and ("Ollama no disponible" in llm_result_original.notas_extraccion 
-                     or "Error" in llm_result_original.notas_extraccion
-                     or "JSON inválido" in llm_result_original.notas_extraccion)
-            )
+            llm_failed = "Extracción LLM fallida" in llm_result_original.notas_extraccion
 
             requiere_revision = doc.requiere_revision_manual
             if llm_failed:

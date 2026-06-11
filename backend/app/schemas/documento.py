@@ -23,12 +23,13 @@ class EstadoOCR(StrEnum):
 
 
 class CampoExtraidoDocumento(BaseModel):
-    value: str
-    confidence: float
+    value: str | int | float | bool
+    confidence: str
+    source: str
 
 
 class DocumentoOcrReview(BaseModel):
-    datos_extraidos: dict[str, str]
+    datos_extraidos: dict[str, CampoExtraidoDocumento]
 
 
 class Documento(BaseModel):

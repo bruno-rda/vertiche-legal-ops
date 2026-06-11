@@ -30,7 +30,7 @@ def _generate_detalle(h: Historial) -> str:
     if h.accion == "documento.ocr_processed":
         return f"OCR procesado. Requiere revisión: {payload.get('requiere_revision', '')}"
     if h.accion == "documento.llm_extracted":
-        return f"LLM extraído. Falla: {payload.get('llm_failed', '')}"
+        return f"Información extraída del OCR. Confianza: {payload.get('confianza', '')}"
     return h.accion
 
 

@@ -3615,6 +3615,16 @@
                         "type": "string",
                         "title": "Tipo"
                     },
+                    "estado": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/TramiteEstado"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
                     "fecha_inicio": {
                         "type": "string",
                         "title": "Fecha Inicio"
@@ -3733,6 +3743,16 @@
                             }
                         ],
                         "title": "Nombre"
+                    },
+                    "estado": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/TramiteEstado"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     },
                     "fecha_inicio": {
                         "anyOf": [

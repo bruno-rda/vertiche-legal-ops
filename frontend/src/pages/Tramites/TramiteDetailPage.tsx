@@ -35,6 +35,7 @@ export function TramiteDetailPage() {
 
   const days = daysRemaining(tramite.fecha_vencimiento);
   const isAdmin = user?.rol === 'ADMIN';
+  const canEdit = user?.rol === 'ADMIN' || user?.rol === 'OPERATOR';
 
   return (
     <div className="space-y-6">
@@ -48,10 +49,10 @@ export function TramiteDetailPage() {
 
       {/* Header card */}
       <div
-        className={`bg-surface-card rounded-xl border border-border p-6 relative ${isAdmin ? 'hover:border-accent/30 cursor-pointer group transition-colors' : ''}`}
-        onClick={() => isAdmin && setIsEditModalOpen(true)}
+        className={`bg-surface-card rounded-xl border border-border p-6 relative ${canEdit ? 'hover:border-accent/30 cursor-pointer group transition-colors' : ''}`}
+        onClick={() => canEdit && setIsEditModalOpen(true)}
       >
-        {isAdmin && (
+        {canEdit && (
           <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
             <button className="p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-neutral-light">
               <Edit2 className="w-4 h-4" />

@@ -18,7 +18,7 @@ interface ExpedienteTabProps {
 export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const isAdmin = user?.rol === 'ADMIN';
+  const canEdit = user?.rol === 'ADMIN' || user?.rol === 'OPERATOR';
 
   const [isActivosOpen, setIsActivosOpen] = useState(true);
   const [isVencidosOpen, setIsVencidosOpen] = useState(false);
@@ -34,7 +34,7 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
         title="Sin trámites"
         description="Esta tienda no tiene trámites registrados."
       />
-      {isAdmin && (
+      {canEdit && (
         <div className="flex justify-center">
           <button
             onClick={() => setIsNuevoTramiteOpen(true)}
@@ -97,7 +97,7 @@ export function ExpedienteTab({ expediente, tiendaId }: ExpedienteTabProps) {
 
   return (
     <div className="space-y-4">
-      {isAdmin && (
+      {canEdit && (
         <div className="flex justify-end">
           <button
             onClick={() => setIsNuevoTramiteOpen(true)}

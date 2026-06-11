@@ -16,23 +16,6 @@ class Observacion(BaseModel):
     fecha: str
 
 
-class TramiteCreate(BaseModel):
-    nombre: str
-    tipo: str
-    fecha_inicio: str
-    fecha_vencimiento: str | None = None
-    es_permanente: bool = False
-    es_recurrente: bool = False
-    periodo_recurrencia: str | None = None
-
-
-class TramiteUpdate(BaseModel):
-    nombre: str | None = None
-    fecha_inicio: str | None = None
-    fecha_vencimiento: str | None = None
-    es_permanente: bool | None = None
-
-
 class TramiteTipo(StrEnum):
     FEDERAL = "federal"
     ESTATAL = "estatal"
@@ -47,6 +30,25 @@ class TramiteEstado(StrEnum):
     VIGENTE = "vigente"
     POR_VENCER = "por_vencer"
     VENCIDO = "vencido"
+
+
+class TramiteCreate(BaseModel):
+    nombre: str
+    tipo: str
+    estado: TramiteEstado | None = None
+    fecha_inicio: str
+    fecha_vencimiento: str | None = None
+    es_permanente: bool = False
+    es_recurrente: bool = False
+    periodo_recurrencia: str | None = None
+
+
+class TramiteUpdate(BaseModel):
+    nombre: str | None = None
+    estado: TramiteEstado | None = None
+    fecha_inicio: str | None = None
+    fecha_vencimiento: str | None = None
+    es_permanente: bool | None = None
 
 
 class TramitePeriodoRecurrencia(StrEnum):
