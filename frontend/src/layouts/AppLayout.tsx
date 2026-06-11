@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useUIStore } from '@/stores/uiStore';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { countAlertasCritical } from '@/client/sdk.gen';
 import {
   LayoutDashboard,
@@ -31,6 +31,7 @@ export function AppLayout() {
   const { sidebarCollapsed, toggleSidebar } = useUIStore();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   // Fetch critical alert count for sidebar badge
   const { data: alertCount } = useQuery({
@@ -52,6 +53,7 @@ export function AppLayout() {
   }, []);
 
   const handleLogout = () => {
+    queryClient.clear();
     logout();
     navigate('/login');
   };
